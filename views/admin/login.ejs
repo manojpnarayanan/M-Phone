@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/adminloginpage.css">
+</head>
+<body>
+   
+
+
+
+
+
+
+
+    <form action="/admin/login" method="POST">
+        <h3>Login Here</h3>
+        
+        <input type="text" id="message" value="<%= message %>" name="message" hidden>
+        
+        <label for="username">username</label>
+        <input name="email" type="text" placeholder="Email or Phone" id="username" >
+    
+        <label for="password">Password</label>
+        <input name="password" type="password" name="Password" id="password" >
+    
+        <button>Log In</button>
+    
+         <div class="social">
+            
+            
+              <a href="/user/login">Switch to User</a>
+         </div>    
+    </form>
+</body>
+</html>

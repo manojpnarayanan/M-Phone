@@ -1,0 +1,258 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Evara Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <%- include('./partials/nav') %>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <form class="searchform">
+                    <div class="input-group">
+                        <input list="search_terms" type="text" class="form-control" placeholder="Search term">
+                        <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
+                    </div>
+                    <datalist id="search_terms">
+                        <option value="Products">
+                        <option value="New orders">
+                        <option value="Apple iphone">
+                        <option value="Ahmed Hassan">
+                    </datalist>
+                </form>
+            </div>
+            <div class="col-nav">
+                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon" href="#">
+                            <i class="material-icons md-notifications animation-shake"></i>
+                            <span class="badge rounded-pill">3</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
+                            <a class="dropdown-item text-brand" href="#"><img src="/assets/imgs/theme/flag-us.png" alt="English">English</a>
+                            <a class="dropdown-item" href="#"><img src="/assets/imgs/theme/flag-fr.png" alt="Français">Français</a>
+                            <a class="dropdown-item" href="#"><img src="/assets/imgs/theme/flag-jp.png" alt="Français">日本語</a>
+                            <a class="dropdown-item" href="#"><img src="/assets/imgs/theme/flag-cn.png" alt="Français">中国人</a>
+                        </div>
+                    </li>
+                    <li class="dropdown nav-item">
+                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="assets/imgs/people/avatar2.jpg" alt="User"></a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
+                            <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
+                            <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
+                            <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
+                            <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
+                            <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Categories </h2>
+                    <p>Add, edit or delete a category</p>
+                </div>
+                <div>
+                    <input id="categorySearch" type="text" placeholder="Search Categories" class="form-control bg-white">
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <form action="/admin/dashboard/products/createcategory" method="post">
+                                <div class="mb-4">
+                                    <label for="product_name" class="form-label">Name</label>
+                                    <input type="text" name="name" placeholder="Type here" class="form-control" id="product_name" />
+                                </div>
+                                <div class="mb-4">
+                                    <label for="product_slug" class="form-label">Slug</label>
+                                    <input type="text" name="slug" placeholder="Type here" class="form-control" id="product_slug" />
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Parent</label>
+                                    <select name="parent" class="form-select">
+                                        <option>Premium</option>
+                                        <option>Business</option>
+                                        <option>Featured</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="description" placeholder="Type here" class="form-control"></textarea>
+                                </div>
+                                <div class="d-grid">
+                                    <button class="btn btn-primary">Create category</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="table-responsive">
+                                                <!-- Table Section -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Parent</th>
+                    <th>Actions</th>
+                    <th>List/UnList</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                    <% categories.forEach(category => { %>
+                        <tr>
+                            <td><%= category.name %></td>
+                            <td><%= category.slug %></td>
+                            <td><%= category.parent ? category.parent.name: 'None' %></td>
+
+                            <td> <!-- Buttons column -->
+                                <a href="/admin/dashboard/products/editcategory/<%= category._id  %>" class="btn btn-primary btn-sm">Edit</a>
+                                
+                            </td>
+                               <td>
+                                <label class="switch">
+                                    <input type="checkbox" class="toggle-category" data-id="<%= category._id %>" <%= category.listed ? 'checked' : '' %>>
+                                    <span class="slider round"></span>
+                                </label>
+                               </td>
+                           <!-- <td> <button type="submit" class="btn <%= category.listed ? 'btn-danger' : 'btn-success' %> btn-sm">
+                                <%= category.listed ? 'Unlist' : 'List' %>
+                            </button></td> -->
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="3">No categories found</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+                               
+                              
+                                                        
+                            </div>
+                        </div> <!-- .col// -->
+                    </div> <!-- .row // -->
+                </div> <!-- card body .// -->
+            </div> <!-- card .// -->
+        </section> <!-- content-main end// -->
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                    document.write(new Date().getFullYear())
+                    </script> ©, Evara - HTML Ecommerce Template .
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <script src="/assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/vendors/select2.min.js"></script>
+    <script src="/assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assets/js/main.js" type="text/javascript"></script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".toggle-category").forEach(toggle => {
+            toggle.addEventListener("change", function () {
+                const categoryId = this.dataset.id;
+                const isChecked = this.checked;
+
+                fetch(`/admin/dashboard/products/toggle-category/${categoryId}`, { // Added leading "/"
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ listed: isChecked })
+                })
+                .then(response => {  // Fixed .then() syntax
+                    if (!response.ok) {
+                        throw new Error("Failed to toggle category");
+                    }
+                })
+                .catch(error => {  // Fixed .catch() syntax
+                    console.error("Error:", error);
+                });
+            });
+        });
+    });
+       document.addEventListener("DOMContentLoaded",function () {
+
+        const searchInput=document.getElementById("categorySearch");
+        searchInput.addEventListener("keyup",function () {
+            const searchTerm=searchInput.value.trim();
+       
+         
+        fetch(`/admin/dashboard/products/categories?search=${searchTerm}`)
+        .then(response=>response.text())
+        .then(html=>{
+            const parser=new DOMParser();
+            const doc=parser.parseFromString(html,"text/html");
+            const newTableBody=doc.querySelector("tbody");
+                if(newTableBody){
+            document.querySelector("tbody").innerHTML=newTableBody.innerHTML
+                }
+        })
+        .catch(error=>console.log(error))
+    })
+
+
+       })
+
+
+
+
+
+
+
+</script>
+
+
+
+
+
+</body>
+
+</html>

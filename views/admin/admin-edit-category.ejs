@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category</title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+</head>
+<body>
+    <!-- <h2>Edit Category</h2>
+    <form action="/admin/dashboard/products/editcategory/<%= categories._id %>" method="POST">
+        <label for="name">Category Name:</label>
+        <input type="text" id="name" name="name" value="<%= categories.name %>" required>
+        <br>
+
+        <label for="slug">Slug:</label>
+        <input type="text" id="slug" name="slug" value="<%= categories.slug %>" required>
+        <br>
+
+        <label for="parent">Parent Category:</label>
+       
+        <br>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description"><%= categories.description %></textarea>
+        <br>
+
+        <button type="submit">Update Category</button>
+    </form>
+    <br>
+    <a href="/admin/dashboard/products/categories">Back to Categories</a> -->
+    <form action="/admin/dashboard/products/editcategory/<%= category._id %>" method="POST" enctype="application/x-www-form-urlencoded" id="editform">
+        <div class="mb-4">
+            <label for="product_name" class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" id="product_name" value="<%= category.name %>" required />
+        </div>
+    
+        <div class="mb-4">
+            <label for="product_slug" class="form-label">Slug</label>
+            <input type="text" name="slug" class="form-control" id="product_slug" value="<%= category.slug %>" required />
+        </div>
+    
+        <div class="mb-4">
+            <label class="form-label">Parent</label>
+            <select name="parent" class="form-select">
+                <option value="">None</option>
+                <% categories.forEach(cat => { %>
+                    <option value="<%= cat._id %>" <%= category.parent && category.parent.toString() === cat._id.toString() ? 'selected' : '' %>>
+                        <%= cat.name %>
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+    
+        <div class="mb-4">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control"><%= category.description %></textarea>
+        </div>
+    
+        <div class="d-grid">
+            <!-- <a href="/admin/dashboard/products/categories" class="btn btn-primary btn-sm">Update Category</a> -->
+            <button type="submit" class="btn btn-primary btn-sm">Update Category</button>
+           
+        </div>
+    </form>
+    
+
+
+
+<script>
+document.getElementById("editform").addEventListener("submit",async function(event){
+       event.preventDefault();
+       const form=new FormData(this)  //get form data
+       const formDataObject = {};
+    
+    form.forEach((value, key) => {
+        formDataObject[key] = value;
+    })
+    try{
+    const categoryId = "<%= category._id %>"
+    const response= await fetch(`/admin/dashboard/products/editcategory/${categoryId}`,{
+        method:"PUT",
+        headers:{
+            "content-type":"application/json"        //send form data as json
+        },  
+        body:JSON.stringify(formDataObject)   // Convert form data object to JSON
+       })
+       
+        if(response.ok){
+            window.location.href="/admin/dashboard/categories"
+        }else{
+            const data=await response.json()
+            alert("error"+data.error)
+        }
+    
+    }catch(error){
+        console.log(error)
+        alert("There was an error ")
+       }
+
+})
+
+</script>
+
+
+
+
+
+</body>
+</html>

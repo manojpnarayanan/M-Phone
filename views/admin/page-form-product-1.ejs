@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Evara Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <%- include('./partials/nav') %>
+    <main class="main-wrap">
+        <section class="content-main">
+            <div class="content-header">
+                <h2 class="content-title">Add New Product</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <form id="productForm" action="/admin/dashboard/products/addproduct" method="post">
+                        <div class="mb-4">
+                            <label class="form-label">Product Title</label>
+                            <input name="name" type="text" class="form-control" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Full Description</label>
+                            <textarea name="description" class="form-control" rows="4" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Price</label>
+                                    <input name="price" type="number" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="mb-4">
+                                    <label class="form-label">Stock</label>
+                                    <input name="stock" type="number" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="form-check mb-4">
+                            <input name="isActive" class="form-check-input" type="checkbox">
+                            <span class="form-check-label"> IsActive </span>
+                        </label>
+
+                        <!-- Image Upload with Cropping -->
+                        <div class="mb-4">
+                            <label class="form-label">Upload Images (Min 3)</label>
+                            <input type="file" class="form-control" id="imageUpload" multiple accept="image/*" required>
+                            <div id="imagePreview" class="mt-3 d-flex gap-2"></div>
+                            <input type="hidden" name="croppedImages" id="croppedImages">
+                        </div>
+
+                        <!-- Image Cropping Modal -->
+                        <div id="cropModal" style="display: none;">
+                            <div style="max-width: 500px; margin: auto;">
+                                <img id="cropImage" style="max-width: 100%;">
+                                <button type="button" id="cropBtn" class="btn btn-primary mt-2">Crop</button>
+                            </div>
+                        </div>
+
+                        <div class="row gx-2">
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Category</label>
+                                <select name="category" class="form-select" required>
+                                    <option value="Premium">Premium</option>
+                                    <option value="Business">Business</option>
+                                    <option value="Camera">Camera</option>
+                                    <option value="Featured">Featured</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6 mb-3">
+                                <label class="form-label">Brand</label>
+                                <select name="brand" class="form-select" required>
+                                    <option value="Apple">Apple</option>
+                                    <option value="Samsung">Samsung</option>
+                                    <option value="Xiomi">Xiomi</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Tags</label>
+                                <input type="text" class="form-control" name="tags">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Product</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let cropper;
+        let croppedImagesData = [];
+
+        document.getElementById("imageUpload").addEventListener("change", function(event) {
+            let preview = document.getElementById("imagePreview");
+            preview.innerHTML = "";
+            const files = event.target.files;
+            if (files.length < 3) {
+                alert("Please upload at least 3 images.");
+                return;
+            }
+
+            let imageIndex = 0;
+            function processImage() {
+                if (imageIndex >= files.length) {
+                    document.getElementById("croppedImages").value = JSON.stringify(croppedImagesData);
+                    return;
+                }
+
+                let file = files[imageIndex];
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.id = "cropImage";
+                    img.style.maxWidth = "100%";
+                    
+                    document.getElementById("cropModal").style.display = "block";
+                    document.getElementById("cropModal").innerHTML = "";
+                    document.getElementById("cropModal").appendChild(img);
+                    
+                    cropper = new Cropper(img, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        autoCropArea: 0.8,
+                    });
+
+                    let cropBtn = document.createElement("button");
+                    cropBtn.innerText = "Crop";
+                    cropBtn.classList.add("btn", "btn-primary", "mt-2");
+                    document.getElementById("cropModal").appendChild(cropBtn);
+                    
+                    cropBtn.addEventListener("click", function() {
+                        let canvas = cropper.getCroppedCanvas();
+                        croppedImagesData.push(canvas.toDataURL("image/jpeg"));
+                        let croppedImg = document.createElement("img");
+                        croppedImg.src = canvas.toDataURL("image/jpeg");
+                        croppedImg.style.width = "100px";
+                        croppedImg.style.height = "100px";
+                        croppedImg.classList.add("rounded", "border");
+                        preview.appendChild(croppedImg);
+                        document.getElementById("cropModal").style.display = "none";
+                        cropper.destroy();
+                        imageIndex++;
+                        processImage();
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+
+            processImage();
+        });
+
+        document.getElementById("productForm").addEventListener("submit", function(event) {
+            if (croppedImagesData.length < 3) {
+                event.preventDefault();
+                alert("Please crop at least 3 images before submitting.");
+            }
+        });
+    </script>
+
+    <script src="/assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/vendors/select2.min.js"></script>
+    <script src="/assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <script src="/assets/js/main.js" type="text/javascript"></script>
+</body>
+</html>

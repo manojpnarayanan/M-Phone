@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.name %> - Product Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .breadcrumb {
+            background: none;
+            padding: 0;
+        }
+        .product-container {
+            margin-top: 20px;
+        }
+        .img-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .img-thumbnail {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: transform 0.2s;
+        }
+        .img-thumbnail:hover {
+            transform: scale(1.1);
+        }
+        .main-img-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        .main-img {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+        .main-img:hover {
+            transform: scale(1.5);
+        }
+        .price-tag {
+            font-size: 28px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+        .stock-status {
+            font-weight: bold;
+        }
+        .related-products .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+        .related-products .card img:hover {
+            transform: scale(1.1);
+        }
+        .card {
+            border: none;
+            transition: box-shadow 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">M Store</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/user/dashboard">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Support</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">My Profile</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container product-container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/user/dashboard">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><%= product.name %></li>
+            </ol>
+        </nav>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="img-gallery me-3">
+                        <% if (product.image && product.image.length > 0) { %>
+                            <% product.image.forEach(img => { %>
+                                <img src="/<%= img %>" class="img-thumbnail" onclick="changeMainImage(this.src)" alt="Thumbnail">
+                            <% }) %>
+                        <% } %>
+                    </div>
+                    <div class="main-img-container">
+                        <% if (product.image && product.image.length > 0) { %>
+                            <img id="mainImage" src="/<%= product.image[0] %>" class="main-img" alt="<%= product.name %>">
+                        <% } else { %>
+                            <img id="mainImage" src="/images/default.png" class="main-img" alt="No Image Available">
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2><%= product.name %></h2>
+                <p>⭐ <%= product.ratings %> / 5 ( <%= product.reviews ? product.reviews.length : 0 %> Reviews )</p>
+                <p class="price-tag">₹<%= product.price %></p>
+                <% if (product.discount) { %>
+                    <p class="text-success">Discount: <%= product.discount %>% OFF</p>
+                <% } %>
+                <% if (product.stock > 0) { %>
+                    <p class="text-success stock-status">In Stock: <%= product.stock %> left</p>
+                    <button class="btn btn-primary">Add to Cart</button>
+                <% } else { %>
+                    <p class="text-danger stock-status">Out of Stock</p>
+                <% } %>
+                <h5>Specifications:</h5>
+                <ul>
+                    <% if (product.specs && Array.isArray(product.specs)) { %>
+                        <% product.specs.forEach(spec => { %>
+                            <li><%= spec %></li>
+                        <% }) %>
+                    <% } else { %>
+                        <li>No specifications available.</li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+
+        <h4 class="mt-5">Related Products</h4>
+        <div class="row related-products">
+            <% if (relatedProducts && relatedProducts.length > 0) { %>
+                <% relatedProducts.forEach(related => { %>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <a href="/user/dashboard/product/<%= related._id %>">
+                                <% if (related.image && related.image.length > 0) { %>
+                                    <img src="/<%= related.image[0] %>" class="card-img-top" alt="<%= related.name %>">
+                                <% } else { %>
+                                    <img src="/images/default.png" class="card-img-top" alt="No Image Available">
+                                <% } %>
+                                <div class="card-body">
+                                    <p><%= related.name %></p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>No related products found.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2025 M Store. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function changeMainImage(src) {
+            document.getElementById('mainImage').src = src;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

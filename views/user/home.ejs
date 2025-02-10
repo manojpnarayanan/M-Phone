@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M Phone</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        /* Navbar styling */
+        .nav-link, .logout-btn {
+            color: white !important;
+        }
+        .logout-btn:hover {
+            color: #ccc !important;
+        }
+
+        /* Category section styling */
+        .category-section {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px 0;
+        }
+        .category-card {
+            text-align: center;
+            width: 120px; /* Adjust size */
+        }
+        .category-card img {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Product card styling */
+        .card {
+            transition: transform 0.3s ease-in-out;
+            width: 90%; /* Make cards smaller */
+            margin: auto;
+        }
+        .card:hover {
+            transform: scale(1.05); /* Slight zoom on hover */
+        }
+
+        /* Popup effect on hover */
+        .card:hover .popup-info {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(-10px);
+        }
+
+        /* Popup styling */
+        .popup-info {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+            white-space: nowrap;
+        }
+        /* Remove default link styles inside product cards */
+.card a {
+    text-decoration: none;
+    color: inherit;
+}
+.card a:hover {
+    color: inherit;
+}
+
+/* Improve category styling */
+.category-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+.category-card:hover {
+    transform: scale(1.1);
+}
+
+/* Product Card Styling */
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.card-body {
+    padding: 15px;
+}
+.hero {
+    position: relative;
+    overflow: hidden;
+}
+.hero img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+.hero-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+ /* Ensure uniform card height */
+ .card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Make all images the same size */
+    .card-img-top {
+        width: 100%;
+        height: 250px; /* Adjust height as needed */
+        object-fit: cover; /* Ensures image fills the space */
+    }
+
+    /* Ensure card body stretches properly */
+    .card-body {
+        flex-grow: 1;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 15px;
+    }
+
+    /* Place price inside card below image */
+    .price-tag {
+        font-size: 18px;
+        font-weight: bold;
+        color: #007bff; /* Bootstrap primary color */
+        margin-bottom: 10px;
+    }
+
+    /* Adjust button position */
+    .add-to-cart {
+        margin-top: auto;
+    }
+
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">M Store</a>
+            
+            <!-- Search Bar -->
+            <!-- <form class="d-flex me-auto">
+                <input class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">Search</button>
+            </form> -->
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Support</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">My Profile</a></li>
+                    <li class="nav-item">
+                        <form id="logoutForm" action="/logout" method="post">
+                            <button type="submit" class="btn btn-dark logout-btn ms-3">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero text-center py-5">
+        <img src="/uploads/image-1738661995255.jpg" class="img-fluid w-100" alt="Hero Image">
+        <div class="hero-overlay">
+            <h2 class="fw-bold">Life is easier on iPhone.</h2>
+            <p>Discover the latest technology at unbeatable prices.</p>
+            <a href="/shop" class="btn btn-primary btn-lg">Shop Now</a>
+        </div>
+    </section>
+    
+    
+
+    <!-- Category Section (Above Products) -->
+    <div class="container">
+        <div class="category-section">
+            <div class="category-card">
+                <img src="/assets/imgs/products/iphone.png" alt="Premium Phones">
+                <p><strong>PREMIUM PHONES</strong></p>
+            </div>
+            <div class="category-card">
+                <img src="/assets/imgs/products/s23_Ultra-removebg-preview.png" alt="Featured Phones">
+                <p><strong>BUSINESS PHONES</strong></p>
+            </div>
+            <div class="category-card">
+                <img src="/assets/imgs/products/iphone.png" alt="Branded Phones">
+                <p><strong>FEATURED PHONES</strong></p>
+            </div>
+        </div>
+    </div>
+   <!-- Search Bar -->
+<div class="container mt-3">
+    <form action="/user/dashboard/products" method="GET" class="d-flex">
+        <input class="form-control me-2" type="search" name="search" value="<%= searchQuery %>" placeholder="Search products..." aria-label="Search">
+        <button class="btn btn-primary me-2" type="submit">Search</button>
+        <a href="/user/dashboard" class="btn btn-secondary">Clear</a>
+    </form>
+</div>
+
+
+
+
+    <!-- Product Grid -->
+    <style>
+        /* Ensure uniform card height */
+        .card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* Make all images the same size */
+        .card-img-top {
+            width: 100%;
+            height: 250px; /* Adjust height as needed */
+            object-fit: cover; /* Ensures image fills the space */
+        }
+    
+        /* Ensure card body stretches properly */
+        .card-body {
+            flex-grow: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+        }
+    
+        /* Place price inside card below image */
+        .price-tag {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff; /* Bootstrap primary color */
+            margin-bottom: 10px;
+        }
+    
+        /* Adjust button position */
+        .add-to-cart {
+            margin-top: auto;
+        }
+    </style>
+    
+    <!-- Updated Product Grid -->
+    <div class="container my-5">
+        <div class="row">
+            <% if (products && products.length > 0) { %>
+                <% products.forEach(product => { %>
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <a href="/user/dashboard/products/<%= product._id %>">
+                                <div class="position-relative">
+                                    <% if (product.image && product.image.length > 0) { %>
+                                        <img src="/<%= product.image[0] %>" class="card-img-top" alt="<%= product.name %>">
+                                    <% } else { %>
+                                        <img src="/images/default.png" class="card-img-top" alt="No Image Available">
+                                    <% } %>
+                                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">SALE</span>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="fw-bold"><%= product.name %></h5>
+                                    <p class="text-muted"><%= product.description.substring(0, 50) %>...</p>
+                                    <p class="price-tag">₹<%= product.price %></p>
+                                    <button class="btn btn-dark btn-sm add-to-cart">Add to Cart</button>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p class="text-center">No products found.</p>
+            <% } %>
+        </div>
+    </div>
+    
+    
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <h5>Customer Support</h5>
+                    <p>Email: support@mstore.com</p>
+                    <p>Phone: +91 98765 43210</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h5>Quick Links</h5>
+                    <a href="#" class="text-white d-block">Home</a>
+                    <a href="#" class="text-white d-block">Shop</a>
+                    <a href="#" class="text-white d-block">Contact</a>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h5>We Accept</h5>
+                    <img src="/assets/imgs/payment-methods.png" width="150" alt="Payment Methods">
+                </div>
+            </div>
+            <hr class="bg-light">
+            <p class="text-center">&copy; 2025 M Store. All rights reserved.</p>
+        </div>
+    </footer>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
