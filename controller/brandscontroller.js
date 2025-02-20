@@ -28,10 +28,26 @@ catch(error){
 },
 getBrands:async(req,res)=>{
     try{
-    const brand=await Brands.find();
+        const brandsPerPage=2
+        const page=parseInt(req.query.page)||1
+        const search=req.query.search||""
+        const query=search?  { name: { $regex: search, $options: "i" } } : {};
+        const totalBrands=await Brands.countDocuments(query)
+        //  console.log(search)
+         console.log('Page:', page, 'Search:', search)
+    const brand=await Brands.find(query)
+    .skip((page-1)*brandsPerPage)
+    .limit(brandsPerPage)
+    .sort({createdAt:-1})
     // console.log(brand)
-    res.render("admin/page-brands",{brand})
+    res.render("admin/page-brands",{
+        brand,
+        search,
+        currentPage:page,
+        totalPages:Math.ceil(totalBrands / brandsPerPage)
+    })
 }catch(error){
+    console.error("Error in getBrands:", error);
     res.status(500).send("Server error")
 }
 }

@@ -20,6 +20,31 @@ const userViews={
         console.log(error)
         res.status(500).send("server error")
     }
+    },
+    loadShoppingPage:async (req,res)=>{
+        const sort=req.query.sort;
+        let sortOption={}
+        if(sort==="price_high_to_low"){
+            sortOption={price:-1}
+           
+        }else if(sort==="price_low_to_high"){
+            sortOption={price:1}
+           
+        }
+       
+        try{
+            const products=await Product.find().sort(sortOption)
+            res.render("user/shop", { products,sort });
+
+            // if (req.xhr) {
+            //     // Render only the product list partial for AJAX requests
+            //     res.render("user/partials/product-list", { products, layout: false });
+            // } else {
+            //     // Render the full page for normal browser requests
+            // }
+        }catch(error){
+            console.log(error)
+        }
     }
 }
 module.exports=userViews

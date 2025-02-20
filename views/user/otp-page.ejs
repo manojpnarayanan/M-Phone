@@ -68,7 +68,7 @@
         </div>
     </div>
 
-    <script>
+    <!-- <script>
         
 document.addEventListener("DOMContentLoaded", function () {
     // Timer setup
@@ -104,14 +104,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Resend OTP Button functionality
     resendOtpButton.addEventListener("click", async function () {
+        const email = localStorage.getItem("userEmail"); // Store the email when signing up
+        
+        if (!email) {
+        alert("Email is missing. Please sign up again.");
+        return;
+    }
         try {
             const response = await fetch("/user/resend-otp", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
             });
 
             const data = await response.json();
-            if (data.ok) {
+            console.log(data)
+            if (data.otpToken) {
+                localStorage.setItem("otpToken", data.otpToken); // Store new OTP token
                 alert("OTP has been resent!");
                 startTimer(); // Restart the countdown
             } else {
@@ -161,6 +170,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-    </script>
+    </script> -->
 </body>
 </html>

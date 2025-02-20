@@ -35,12 +35,7 @@
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
-                <form class="searchform">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search brands...">
-                        <button class="btn btn-light bg" type="submit"> <i class="material-icons md-search"></i></button>
-                    </div>
-                </form>
+               
             </div>
         </header>
 
@@ -50,6 +45,12 @@
                     <h2 class="content-title">Brand Management</h2>
                     <p>Manage all your brands and vendors here.</p>
                 </div>
+                <form class="searchform">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search brands..."id="searchbrand">
+                        <!-- <button class="btn btn-light bg" type="submit"> <i class="material-icons md-search"></i></button> -->
+                    </div>
+                </form>
                 <a href="/admin/dashboard/brands/addbrands" class="btn btn-primary">Add New Brand</a>
             </div>
 
@@ -63,7 +64,7 @@
                                 </div>
                                 <div class="card-body">
                                     <h6 class="brand-title"><%= brand.name %></h6>
-                                    <a href="#" class="text-primary">View Products</a>
+                                    <!-- <a href="#" class="text-primary">View Products</a> -->
                                 </div>
                             </div>
                         </div>
@@ -75,6 +76,31 @@
                 <% } %>
             </div>
         </section>
+        <div class="pagination-area mt-30 mb-50">
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                <% if (currentPage > 1) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search ? encodeURIComponent(search) : '' %>">Previous</a>
+                </li>
+                <% } %>
+        
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                  <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>&search=<%= encodeURIComponent(search) %>"><%= i %></a>
+                  </li>
+                <% } %>
+        
+                <% if (currentPage < totalPages) { %>
+                  <li class="page-item">
+                    <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= encodeURIComponent(search) %>">Next</a>
+                  </li>
+                <% } %>
+              </ul>
+            </nav>
+        </div>
+        
+          
 
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
@@ -94,5 +120,42 @@
         <script src="/assets/js/main.js" type="text/javascript"></script>
         <script src="/assets/js/custom-chart.js" type="text/javascript"></script>
     </main>
-</body>
+
+
+
+
+
+    <script>
+       document.addEventListener("DOMContentLoaded",function(){
+        const searchInput=document.getElementById("searchbrand")
+         searchInput.addEventListener("keyup",function(){
+            const searchTerm=searchInput.value.trim()
+
+
+            fetch(`/admin/dashboard/brands/?search=${encodeURIComponent(searchTerm)}`)
+            .then(response=>response.text())
+            .then(html=>{
+                const parser=new DOMParser();
+                const doc=parser.parseFromString(html,"text/html")
+                const newTableBody=doc.querySelector(".row.g-3")
+                const newPagination = doc.querySelector(".pagination-area");
+                if(newTableBody){
+                    document.querySelector(".row.g-3").innerHTML=newTableBody.innerHTML
+                }
+                if(newPagination){
+                document.querySelector(".pagination-area").innerHTML = newPagination.innerHTML;
+            }
+            })
+            .catch(error=>{
+                console.log(error)
+            })
+
+        })
+       })
+    </script>
+
+
+  
+   
+    </body>
 </html>

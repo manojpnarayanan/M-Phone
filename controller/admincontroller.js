@@ -17,7 +17,7 @@ const admincontroller={
         if(!ismatch){
             return  res.status(400,{message:"Invalid credentials"})
         }
-        const token=jwt.sign({id:admin._id},process.env.JWT_SECRET,{expiresIn:"1h"})
+        const token=jwt.sign({id:admin._id},process.env.JWT_SECRET,{expiresIn:"1d"})
         console.log(token);
         
          res.cookie("token",token,{
@@ -34,15 +34,7 @@ const admincontroller={
  loadDashboard: async (req,res)=>{
   return  res.render("admin/index")
 },
-loadUserList: async (req,res)=>{
-    try{
-    const users=await User.find()
-    res.render("admin/page-orders-1",{users})
-    }catch(error){
-        console.log(error)
-        res.status(500).send("error fetching Details")
-    }
-}
+
 
 
 

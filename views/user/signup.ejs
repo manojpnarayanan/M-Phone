@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -45,23 +46,23 @@
                         <form id="signupForm">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="name" name="name" required>
+                                <input type="text" class="form-control" id="name" name="name" >
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <input type="email" class="form-control" id="email" name="email" >
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
+                                <input type="password" class="form-control" id="password" name="password" >
                             </div>
                             <div class="mb-3">
                                 <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" >
                             </div>
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Phone Number</label>
-                                <input type="text" class="form-control" id="phone" name="phonenumber" required>
+                                <input type="text" class="form-control" id="phone" name="phonenumber" >
                             </div>
                             <button type="submit" class="btn btn-brand w-100">Sign Up</button>
                         </form>
@@ -73,20 +74,68 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <script>
+    <!-- <script>
+
+         // Check if there is an error message in the URL
+    const params = new URLSearchParams(window.location.search);
+    const errorMessage = params.get('error');
+
+    if (errorMessage) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: errorMessage,
+        });
+    }
+
+
+
         document.getElementById("signupForm").addEventListener("submit", async function (event) {
             event.preventDefault(); // Prevent default form submission
 
             const formData = new FormData(this);
             const jsonData = Object.fromEntries(formData.entries());
-
-            // Simple validation for password match
-            if (jsonData.password !== jsonData.confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
+            
+             // Simple validation
+        if (!jsonData.name || !jsonData.email || !jsonData.password || !jsonData.confirmPassword || !jsonData.phonenumber) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Fields',
+                text: 'All fields are required!',
+            });
+            return;
+        }
+         // Email validation
+         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(jsonData.email)) {
+            Swal.fire({
+                icon: "warning",
+                title: "Invalid Email",
+                text: "Please enter a valid email address.",
+            });
+            return;
+        }
+             // Password match validation
+        if (jsonData.password !== jsonData.confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Password Mismatch',
+                text: 'Passwords do not match!',
+            });
+            return;
+        }
+         // Phone number validation  (Indian format)
+         const phonePattern = /^[6-9]\d{9}$/;
+        if (!phonePattern.test(jsonData.phonenumber)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Phone Number',
+                text: 'Please enter a valid 10-digit Indian mobile number.',
+            });
+            return;
+        }
 
             try {
                 const response = await fetch("/user/signup", {
@@ -96,21 +145,680 @@
                 });
 
                 const data = await response.json();
-
+                 console.log(data)
                 if (response.ok) {
+                    Swal.fire({
+                    icon: 'success',
+                    title: 'Sign-up Successful!',
+                    text: 'Please verify your email with the OTP sent to your inbox.',
+                    timer: 3000,
+                    showConfirmButton: false
+                }).then(() => {
                     // Store OTP token and email in localStorage for OTP verification
-                    localStorage.setItem("otpToken", data.otpToken);
+                    if (data) {
+                    // localStorage.setItem("otpToken", data.otpToken);
                     localStorage.setItem("userEmail", jsonData.email);
-                    window.location.href = "/user/otp"; // Redirect to OTP page
-                } else {
-                    alert(data.message);
+                    }
+                    window.location.href = `/user/otp/validate/${jsonData.email}`;
+                });
+                } else { 
+                    Swal.fire({
+                    icon: 'error',
+                    title: 'Sign-up Failed',
+                    text: data.message || 'Something went wrong. Please try again.',
+                });
                 }
             } catch (error) {
                 console.error("Error:", error);
-                alert("Something went wrong. Please try again.");
+                Swal.fire({
+                icon: 'error',
+                title: 'Network Error',
+                text: 'Failed to connect to the server. Please check your connection.',
+            });
             }
         });
-    </script>
+    </script> -->
+    <!-- <script>
+        document.getElementById("signupForm").addEventListener("submit", async function (event) {
+          event.preventDefault(); // Prevent default form submission
+        
+          const formData = new FormData(this);
+          const jsonData = Object.fromEntries(formData.entries());
+          
+          // Simple validation
+          if (!jsonData.name || !jsonData.email || !jsonData.password || !jsonData.confirmPassword || !jsonData.phonenumber) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Missing Fields',
+              text: 'All fields are required!',
+            });
+            return;
+          }
+          
+          // Email validation
+          const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailPattern.test(jsonData.email)) {
+            Swal.fire({
+              icon: "warning",
+              title: "Invalid Email",
+              text: "Please enter a valid email address.",
+            });
+            return;
+          }
+          
+          // Password match validation
+          if (jsonData.password !== jsonData.confirmPassword) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Password Mismatch',
+              text: 'Passwords do not match!',
+            });
+            return;
+          }
+          
+          // Phone number validation (Indian format)
+          const phonePattern = /^[6-9]\d{9}$/;
+          if (!phonePattern.test(jsonData.phonenumber)) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Invalid Phone Number',
+              text: 'Please enter a valid 10-digit Indian mobile number.',
+            });
+            return;
+          }
+        
+          try {
+            // Send signup request
+            const response = await fetch("/user/signup", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(jsonData),
+            });
+        
+            const data = await response.json();
+            console.log("Signup response:", data);
+            if (response.ok) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Sign-up Successful!',
+                text: 'Please verify your email with the OTP sent to your inbox.',
+                timer: 3000,
+                showConfirmButton: false
+              }).then(() => {
+                // Store email in localStorage for OTP verification if needed later
+                localStorage.setItem("userEmail", jsonData.email);
+        
+                // Prompt the user to enter the OTP using SweetAlert
+                Swal.fire({
+                  title: 'Enter OTP',
+                  input: 'text',
+                  inputLabel: 'OTP',
+                  inputPlaceholder: 'Enter the OTP you received',
+                  showCancelButton: true,
+                }).then(async (result) => {
+                  if (result.value) {
+                    try {
+                      // Send OTP verification request to /user/otp/validate/:email
+                      const otpResponse = await fetch(`/user/otp/validate/${encodeURIComponent(jsonData.email)}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ otp: result.value })
+                      });
+                      const otpData = await otpResponse.json();
+                      console.log("OTP verification response:", otpData);
+                      if (otpResponse.ok) {
+                        Swal.fire({
+                          icon: 'success',
+                          title: 'OTP Verified!',
+                          text: otpData.message,
+                          timer: 2000,
+                          showConfirmButton: false
+                        }).then(() => {
+                          window.location.href = otpData.redirect; // e.g., "/user/login"
+                        });
+                      } else {
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'OTP Verification Failed',
+                          text: otpData.message || 'Invalid OTP, please try again.'
+                        });
+                      }
+                    } catch (error) {
+                      console.error("Error during OTP verification:", error);
+                      Swal.fire({
+                        icon: 'error',
+                        title: 'Network Error',
+                        text: 'Failed to verify OTP. Please try again.'
+                      });
+                    }
+                  }
+                });
+              });
+            } else { 
+              Swal.fire({
+                icon: 'error',
+                title: 'Sign-up Failed',
+                text: data.message || 'Something went wrong. Please try again.',
+              });
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Network Error',
+              text: 'Failed to connect to the server. Please check your connection.',
+            });
+          }
+        });
+        </script> -->
+        <!-- <script>
+          document.getElementById("signupForm").addEventListener("submit", async function (event) {
+            event.preventDefault(); // Prevent default form submission
+          
+            const formData = new FormData(this);
+            const jsonData = Object.fromEntries(formData.entries());
+          
+            // Simple validation
+            if (!jsonData.name || !jsonData.email || !jsonData.password || !jsonData.confirmPassword || !jsonData.phonenumber) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Missing Fields',
+                text: 'All fields are required!',
+              });
+              return;
+            }
+          
+            // Email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(jsonData.email)) {
+              Swal.fire({
+                icon: "warning",
+                title: "Invalid Email",
+                text: "Please enter a valid email address.",
+              });
+              return;
+            }
+          
+            // Password match validation
+            if (jsonData.password !== jsonData.confirmPassword) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Password Mismatch',
+                text: 'Passwords do not match!',
+              });
+              return;
+            }
+          
+            // Phone number validation (Indian format)
+            const phonePattern = /^[6-9]\d{9}$/;
+            if (!phonePattern.test(jsonData.phonenumber)) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Phone Number',
+                text: 'Please enter a valid 10-digit Indian mobile number.',
+              });
+              return;
+            }
+          
+            try {
+              // Send signup request
+              const response = await fetch("/user/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(jsonData),
+              });
+          
+              const data = await response.json();
+              console.log("Signup response:", data);
+              if (response.ok) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Sign-up Successful!',
+                  text: 'Please verify your email with the OTP sent to your inbox.',
+                  timer: 3000,
+                  showConfirmButton: false
+                }).then(() => {
+                  // Save user email in localStorage for later use
+                  localStorage.setItem("userEmail", jsonData.email);
+          
+                  // Display a custom OTP modal with an input field, timer, and resend button.
+                  Swal.fire({
+                    title: 'Enter OTP',
+                    html: `
+                      <input id="otpInput" class="swal2-input" placeholder="Enter OTP">
+                      <div id="otpTimer" style="margin-top:10px; font-size:16px;">01:00</div>
+                      <button id="resendOtpBtn" class="swal2-confirm swal2-styled" style="margin-top:10px;" disabled>Resend OTP</button>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Verify OTP',
+                    focusConfirm: false,
+                    preConfirm: () => {
+                      const otp = document.getElementById('otpInput').value;
+                      if (!otp) {
+                        Swal.showValidationMessage('Please enter the OTP');
+                      }
+                      return { otp: otp };
+                    },
+                    didOpen: () => {
+                      // Initialize 1-minute timer and disable the resend button until time expires
+                      let timeLeft = 60;
+                      const timerElement = document.getElementById('otpTimer');
+                      const resendBtn = document.getElementById('resendOtpBtn');
+          
+                      const countdown = setInterval(() => {
+                        if (timeLeft <= 0) {
+                          clearInterval(countdown);
+                          timerElement.textContent = "00:00";
+                          resendBtn.disabled = false;
+                        } else {
+                          timeLeft--;
+                          const minutes = Math.floor(timeLeft / 60);
+                          const seconds = timeLeft % 60;
+                          timerElement.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                        }
+                      }, 1000);
+          
+                      // Add event listener to the Resend OTP button
+                      resendBtn.addEventListener('click', async () => {
+                        resendBtn.disabled = true;
+                        // Reset timer
+                        timeLeft = 60;
+                        timerElement.textContent = "01:00";
+                        try {
+                          // Call the resend OTP endpoint with the user's email
+                          const resendResponse = await fetch("/user/resend-otp", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email: jsonData.email })
+                          });
+                          const resendData = await resendResponse.json();
+                          console.log("Resend OTP response:", resendData);
+                          if (resendResponse.ok) {
+                            Swal.fire({
+                              icon: 'success',
+                              title: 'OTP Resent',
+                              text: 'A new OTP has been sent to your email.',
+                              timer: 2000,
+                              showConfirmButton: false
+                            });
+                          } else {
+                            Swal.fire({
+                              icon: 'error',
+                              title: 'Resend Failed',
+                              text: resendData.message || 'Unable to resend OTP. Please try again later.'
+                            });
+                          }
+                        } catch (error) {
+                          console.error("Error during resend OTP:", error);
+                          Swal.fire({
+                            icon: 'error',
+                            title: 'Network Error',
+                            text: 'Failed to resend OTP. Please try again.'
+                          });
+                        }
+                      });
+                    }
+                  }).then(async (result) => {
+                    if (result.isConfirmed) {
+                      // When the user clicks "Verify OTP", send the OTP for verification
+                      const otpValue = result.value.otp;
+                      try {
+                        const otpResponse = await fetch(`/user/otp/validate/${encodeURIComponent(jsonData.email)}`, {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ otp: otpValue })
+                        });
+                        const otpData = await otpResponse.json();
+                        console.log("OTP verification response:", otpData);
+                        if (otpResponse.ok) {
+                          Swal.fire({
+                            icon: 'success',
+                            title: 'OTP Verified!',
+                            text: otpData.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                          }).then(() => {
+                            window.location.href = otpData.redirect; // e.g., "/user/login"
+                          });
+                        } else {
+                          Swal.fire({
+                            icon: 'error',
+                            title: 'OTP Verification Failed',
+                            text: otpData.message || 'Invalid OTP, please try again.'
+                          });
+                        }
+                      } catch (error) {
+                        console.error("Error during OTP verification:", error);
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'Network Error',
+                          text: 'Failed to verify OTP. Please try again.'
+                        });
+                      }
+                    }
+                  });
+                });
+              } else { 
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Sign-up Failed',
+                  text: data.message || 'Something went wrong. Please try again.'
+                });
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Network Error',
+                text: 'Failed to connect to the server. Please check your connection.'
+              });
+            }
+          });
+          </script> -->
 
+        <!-- </body>
+        </html> -->
+        
+          
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .btn-brand {
+      background: #764ba2;
+      color: #fff;
+    }
+    .btn-brand:hover {
+      background: #5a3e80;
+    }
+    .btn-google {
+      background-color: #db4437;
+      color: #fff;
+    }
+    .btn-google:hover {
+      background-color: #c1351d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card p-4">
+          <div class="card-header text-center bg-white">
+            <h4>Sign Up</h4>
+          </div>
+          <div class="card-body">
+            <form id="signupForm">
+              <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name" />
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" />
+              </div>
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" />
+              </div>
+              <div class="mb-3">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phone" name="phonenumber" />
+              </div>
+              <button type="submit" class="btn btn-brand w-100">Sign Up</button>
+            </form>
+            <hr />
+            <button class="btn btn-google w-100 mt-2" onclick="location.href='/user/google'">
+              Sign Up with Google
+            </button>
+            <hr />
+            <a href="/user/login" class="d-block text-center">Already have an account? Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signup & OTP Modal Script -->
+  <script>
+    document.getElementById("signupForm").addEventListener("submit", async function (event) {
+      event.preventDefault(); // Prevent default form submission
+
+      const formData = new FormData(this);
+      const jsonData = Object.fromEntries(formData.entries());
+
+      // Simple validation
+      if (!jsonData.name || !jsonData.email || !jsonData.password || !jsonData.confirmPassword || !jsonData.phonenumber) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Fields',
+          text: 'All fields are required!'
+        });
+        return;
+      }
+
+      // Email validation
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(jsonData.email)) {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Email",
+          text: "Please enter a valid email address."
+        });
+        return;
+      }
+
+      // Password match validation
+      if (jsonData.password !== jsonData.confirmPassword) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Password Mismatch',
+          text: 'Passwords do not match!'
+        });
+        return;
+      }
+
+      // Phone number validation (Indian format)
+      const phonePattern = /^[6-9]\d{9}$/;
+      if (!phonePattern.test(jsonData.phonenumber)) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Invalid Phone Number',
+          text: 'Please enter a valid 10-digit Indian mobile number.'
+        });
+        return;
+      }
+
+      try {
+        // Send signup request
+        const response = await fetch("/user/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(jsonData)
+        });
+
+        const data = await response.json();
+        console.log("Signup response:", data);
+        if (response.ok) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Sign-up Successful!',
+            text: 'Please verify your email with the OTP sent to your inbox.',
+            timer: 3000,
+            showConfirmButton: false
+          }).then(() => {
+            // Save user email in localStorage for later use
+            localStorage.setItem("userEmail", jsonData.email);
+
+            // Display a custom OTP modal with an input field, timer, resend button, and a message area.
+            Swal.fire({
+              title: 'Enter OTP',
+              html: `
+                <input id="otpInput" class="swal2-input" placeholder="Enter OTP">
+                <div id="otpTimer" style="margin-top:10px; font-size:16px;">01:00</div>
+                <button id="resendOtpBtn" class="swal2-confirm swal2-styled" style="margin-top:10px;" disabled>Resend OTP</button>
+                <div id="otpMessage" style="margin-top:10px; color: green;"></div>
+              `,
+              showCancelButton: true,
+              confirmButtonText: 'Verify OTP',
+              focusConfirm: false,
+              preConfirm: () => {
+                const otp = document.getElementById('otpInput').value;
+                if (!otp) {
+                  Swal.showValidationMessage('Please enter the OTP');
+                }
+                return { otp: otp };
+              },
+              didOpen: () => {
+                let timeLeft = 60;
+                const timerElement = document.getElementById('otpTimer');
+                const resendBtn = document.getElementById('resendOtpBtn');
+                let countdownInterval;
+
+                // Function to start the countdown
+                function startCountdown() {
+                  // Clear any existing interval before starting a new one
+                  if (countdownInterval) clearInterval(countdownInterval);
+                  countdownInterval = setInterval(() => {
+                    if (timeLeft <= 0) {
+                      clearInterval(countdownInterval);
+                      timerElement.textContent = "00:00";
+                      resendBtn.disabled = false;
+                    } else {
+                      timeLeft--;
+                      const minutes = Math.floor(timeLeft / 60);
+                      const seconds = timeLeft % 60;
+                      timerElement.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                    }
+                  }, 1000);
+                }
+
+                // Start the countdown when modal opens
+                startCountdown();
+
+                // Add event listener to the Resend OTP button
+                resendBtn.addEventListener('click', async () => {
+                  // Clear the current countdown interval
+                  clearInterval(countdownInterval);
+                  // Reset timer value and UI
+                  timeLeft = 60;
+                  timerElement.textContent = "01:00";
+                  resendBtn.disabled = true;
+                  try {
+                    // Call the resend OTP endpoint with the user's email
+                    const resendResponse = await fetch("/user/resend-otp", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email: jsonData.email })
+                    });
+                    const resendData = await resendResponse.json();
+                    console.log("Resend OTP response:", resendData);
+                    const otpMessageDiv = document.getElementById("otpMessage");
+                    if (resendResponse.ok) {
+                      otpMessageDiv.textContent = "A new OTP has been sent to your email.";
+                      setTimeout(() => {
+                        otpMessageDiv.textContent = "";
+                      }, 2000);
+                    } else {
+                      otpMessageDiv.style.color = "red";
+                      otpMessageDiv.textContent = resendData.message || "Unable to resend OTP. Please try again later.";
+                      setTimeout(() => {
+                        otpMessageDiv.textContent = "";
+                        otpMessageDiv.style.color = "green";
+                      }, 2000);
+                    }
+                  } catch (error) {
+                    console.error("Error during resend OTP:", error);
+                    const otpMessageDiv = document.getElementById("otpMessage");
+                    otpMessageDiv.style.color = "red";
+                    otpMessageDiv.textContent = "Failed to resend OTP. Please try again.";
+                    setTimeout(() => {
+                      otpMessageDiv.textContent = "";
+                      otpMessageDiv.style.color = "green";
+                    }, 2000);
+                  }
+                  // Restart the countdown after resending OTP
+                  startCountdown();
+                });
+              }
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                // When the user clicks "Verify OTP", send the OTP for verification
+                const otpValue = result.value.otp;
+                try {
+                  const otpResponse = await fetch(`/user/otp/validate/${encodeURIComponent(jsonData.email)}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ otp: otpValue })
+                  });
+                  const otpData = await otpResponse.json();
+                  console.log("OTP verification response:", otpData);
+                  if (otpResponse.ok) {
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'OTP Verified!',
+                      text: otpData.message,
+                      timer: 2000,
+                      showConfirmButton: false
+                    }).then(() => {
+                      window.location.href = otpData.redirect; // e.g., "/user/login"
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'OTP Verification Failed',
+                      text: otpData.message || 'Invalid OTP, please try again.'
+                    });
+                  }
+                } catch (error) {
+                  console.error("Error during OTP verification:", error);
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Network Error',
+                    text: 'Failed to verify OTP. Please try again.'
+                  });
+                }
+              }
+            });
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Sign-up Failed',
+            text: data.message || 'Something went wrong. Please try again.'
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Network Error',
+          text: 'Failed to connect to the server. Please check your connection.'
+        });
+      }
+    });
+  </script>
 </body>
 </html>
+

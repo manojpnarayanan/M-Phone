@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Evara Dashboard - Edit Product</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <%- include('./partials/nav') %>
+    <main class="main-wrap">
+        <section class="content-main">
+            <div class="content-header">
+                <h2 class="content-title">Edit Product</h2>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <form id="editProductForm" action="/admin/dashboard/products/edit/<%= product._id %>" method="POST" enctype="multipart/form-data">
+                        <!-- For each existing image, output a hidden field and a replacement file input -->
+                        <% if (product.image && product.image.length > 0) { %>
+                          <% product.image.forEach((image, index) => { %>
+                            <div class="mb-4">
+                              <img src="/<%= image %>" class="rounded border" style="width:100px; height:100px;">
+                              <!-- Hidden field to preserve the current image if not replaced -->
+                              <input type="hidden" name="existingImages[]" value="<%= image %>">
+                              <!-- File input for replacing this image -->
+                              <div>
+                                <label for="replacementImage<%= index %>">Replace this image:</label>
+                                <input type="file" id="replacementImage<%= index %>" name="replacementImage<%= index %>" accept="image/*">
+                              </div>
+                            </div>
+                          <% }) %>
+                        <% } %>
+                      
+                        <!-- Other product fields -->
+                        <div class="mb-4">
+                          <label class="form-label">Product Title</label>
+                          <input name="name" type="text" class="form-control" value="<%= product.name %>" required>
+                        </div>
+                        <div class="mb-4">
+                          <label class="form-label">Full Description</label>
+                          <textarea name="description" class="form-control" rows="4" required><%= product.description %></textarea>
+                        </div>
+                        <div class="row">
+                          <div class="col-lg-4">
+                            <div class="mb-4">
+                              <label class="form-label">Price</label>
+                              <input name="price" type="number" class="form-control" value="<%= product.price %>" required>
+                            </div>
+                          </div>
+                          <div class="col-lg-4">
+                            <div class="mb-4">
+                              <label class="form-label">Stock</label>
+                              <input name="stock" type="number" class="form-control" value="<%= product.stock %>" required>
+                            </div>
+                          </div>
+                        </div>
+                        <label class="form-check mb-4">
+                          <input name="isActive" class="form-check-input" type="checkbox" <%= product.isActive ? 'checked' : '' %>>
+                          <span class="form-check-label"> IsActive </span>
+                        </label>
+                      
+                        <div class="row gx-2">
+                          <div class="col-sm-6 mb-3">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-select">
+                              <option value="Premium" <%= product.category === 'Premium' ? 'selected' : '' %>>Premium</option>
+                              <option value="Business" <%= product.category === 'Business' ? 'selected' : '' %>>Business</option>
+                              <option value="Camera" <%= product.category === 'Camera' ? 'selected' : '' %>>Camera</option>
+                              <option value="Featured" <%= product.category === 'Featured' ? 'selected' : '' %>>Featured</option>
+                            </select>
+                          </div>
+                          <div class="col-sm-6 mb-3">
+                            <label class="form-label">Brand</label>
+                            <select name="brand" class="form-select">
+                              <option value="Apple" <%= product.brand === 'Apple' ? 'selected' : '' %>>Apple</option>
+                              <option value="Samsung" <%= product.brand === 'Samsung' ? 'selected' : '' %>>Samsung</option>
+                              <option value="Xiomi" <%= product.brand === 'Xiomi' ? 'selected' : '' %>>Xiomi</option>
+                            </select>
+                          </div>
+                          <div class="mb-4">
+                            <label class="form-label">Tags</label>
+                            <input type="text" class="form-control" name="tags" value="<%= product.tags %>">
+                          </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Product</button>
+                      </form>
+                      
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/vendors/select2.min.js"></script>
+    <script src="/assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assets/js/main.js" type="text/javascript"></script>
+<!-- <script>
+       
+    document.addEventListener("DOMContentLoaded",()=>{
+        const imageInput=document.getElementById("imageUpload");
+        const imagePreview=document.getElementById("imagePreview")
+
+         // Preview Images Before Upload
+        imageInput.addEventListener("change", function () {
+        imagePreview.innerHTML = "";
+        [...this.files].forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.classList.add("rounded", "border");
+                img.style.width = "100px";
+                img.style.height = "100px";
+                imagePreview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        });
+     });
+       
+           // Remove Existing Image (AJAX Request)
+     document.querySelectorAll(".deleteImage").forEach(button => {
+        button.addEventListener("click", function () {
+            const imageName = this.getAttribute("data-image");
+            const parentElement = this.parentElement;
+        
+         Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to recover this image!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!"
+         }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/dashboard/products/delete-image`, { 
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ image: imageName, productId: "<%= product._id %>" })
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        Swal.fire("Deleted!", "Your image has been removed.", "success");
+                        parentElement.remove();
+
+            //      fetch(`/admin/dashboard/products/edit/<%=product._id%>`, {
+            //     method: "POST",
+            //     headers: { "Content-Type": "application/json" },
+            //     body: JSON.stringify({ image: imageName, productId: "<%= product._id %>" })
+            // }).then(response => response.json()).then(data => {
+            //     if (data.success) {
+            //         this.parentElement.remove();
+            //     }
+            // });
+        });
+      });
+});
+
+     const existingImagesInput = document.getElementById("existingImagesInput");
+      document.querySelectorAll(".deleteImage").forEach(button => {
+      button.addEventListener("click", function () {
+        const imageName = this.getAttribute("data-image");
+        existingImagesInput.value = existingImagesInput.value.split(',').filter(img => img !== imageName).join(',');
+        this.parentElement.remove();
+    });
+});
+
+
+</script> -->
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const imageInput = document.getElementById("imageUpload");
+        const imagePreview = document.getElementById("imagePreview");
+
+        // Preview Images Before Upload
+        imageInput.addEventListener("change", function () {
+            imagePreview.innerHTML = "";
+            [...this.files].forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.classList.add("rounded", "border");
+                    img.style.width = "100px";
+                    img.style.height = "100px";
+                    imagePreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Remove Existing Image with SweetAlert Confirmation
+        document.querySelectorAll(".deleteImage").forEach(button => {
+            button.addEventListener("click", function () {
+                const imageName = this.getAttribute("data-image");
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you really want to delete this image?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/admin/dashboard/products/edit/<%= product._id %>`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ image: imageName, productId: "<%= product._id %>" })
+                        }).then(response => response.json()).then(data => {
+                            if (data.success) {
+                                this.parentElement.remove();
+                                Swal.fire("Deleted!", "Your image has been deleted.", "success");
+                            } else {
+                                Swal.fire("Error!", "Failed to delete the image.", "error");
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    });
+//Second part
+    document.getElementById("editProductForm").addEventListener("submit", function (event) {
+    const existingImages = document.querySelector("input[name='existingImages']").value.split(",");
+    const newImages = document.getElementById("imageUpload").files;
+    
+    if (existingImages.length + newImages.length < 3) {
+        Swal.fire("Error!", "You must upload at least 3 images.", "error");
+        event.preventDefault();
+    }
+});
+// Third section
+let cropper;
+const imageUpload = document.getElementById("imageUpload");
+const cropModal = document.getElementById("cropModal");
+const cropImage = document.getElementById("cropImage");
+const cropBtn = document.getElementById("cropBtn");
+
+imageUpload.addEventListener("change", function (event) {
+    if (event.target.files.length > 0) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            cropImage.src = e.target.result;
+            cropModal.style.display = "block"; // Show cropping modal
+
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1, // Square crop, change as needed
+                viewMode: 2,
+            });
+        };
+
+        reader.readAsDataURL(file);
+    }
+});
+
+cropBtn.addEventListener("click", function () {
+    const canvas = cropper.getCroppedCanvas();
+    
+    if (canvas) {
+        canvas.toBlob((blob) => {
+            const croppedFile = new File([blob], "cropped-image.jpg", { type: "image/jpeg" });
+            
+            // Create a preview of cropped image
+            const imgPreview = document.createElement("img");
+            imgPreview.src = URL.createObjectURL(blob);
+            imgPreview.classList.add("rounded", "border");
+            imgPreview.style.width = "100px";
+            imgPreview.style.height = "100px";
+            document.getElementById("imagePreview").appendChild(imgPreview);
+
+            // Replace the original image input with the cropped image
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(croppedFile);
+            imageUpload.files = dataTransfer.files;
+
+            cropModal.style.display = "none"; // Hide modal after cropping
+        });
+    }
+});
+
+
+</script> -->
+
+
+
+
+
+
+</body>
+</html>
