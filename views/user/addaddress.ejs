@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- SweetAlert CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
+    <style>
+        /* Custom CSS for the modal */
+        #addressModal .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            background-color: #f9fafb; /* Light background for the modal */
+        }
+
+        #addressModal .modal-header {
+            background-color: #007bff; /* Blue header */
+            color: white;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            padding: 16px 24px;
+        }
+
+        #addressModal .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        #addressModal .btn-close {
+            filter: invert(1); /* Make the close button white */
+        }
+
+        #addressModal .modal-body {
+            padding: 24px;
+        }
+
+        #addressModal .form-label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        #addressModal .form-control,
+        #addressModal .form-select {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 10px 12px;
+            font-size: 14px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #fff; /* White background for inputs */
+        }
+
+        #addressModal .form-control:focus,
+        #addressModal .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+            outline: none;
+        }
+
+        #addressModal .modal-footer {
+            border-top: 1px solid #eee;
+            padding: 16px 24px;
+            background-color: #f9fafb; /* Light background for the footer */
+        }
+
+        #addressModal .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        #addressModal .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        #addressModal .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        #addressModal .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* Add spacing between form elements */
+        #addressModal .mb-3 {
+            margin-bottom: 1.25rem;
+        }
+
+        /* Add a subtle animation to the modal */
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #addressModal .modal-content {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Address Modal (for Add/Edit Address) -->
+    <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addressForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addressModalLabel">Add Address</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Hidden field to store address ID when editing -->
+                        <input type="hidden" name="addressId" id="addressId" value="" />
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="mobilenumber" class="form-label">Mobile Number</label>
+                            <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="housename" class="form-label">House Name</label>
+                            <input type="text" class="form-control" id="housename" name="housename" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="pincode" class="form-label">Pincode</label>
+                            <input type="text" class="form-control" id="pincode" name="pincode" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" class="form-control" id="state" name="state" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" class="form-control" id="country" name="country" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="addresstype" class="form-label">Address Type</label>
+                            <select name="addresstype" id="addresstype" class="form-select" required>
+                                <option value="home">Home</option>
+                                <option value="work">Work</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Address</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- <script>
+        // Ensure the modal's aria-hidden attribute is updated dynamically
+        const modal = document.getElementById('addressModal');
+
+        modal.addEventListener('show.bs.modal', () => {
+            modal.setAttribute('aria-hidden', 'false');
+        });
+
+        modal.addEventListener('hide.bs.modal', () => {
+            modal.setAttribute('aria-hidden', 'true');
+        });
+
+        // Handle form submission
+        document.getElementById("addressForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const formdata = {
+                name: document.getElementById("name").value,
+                mobilenumber: document.getElementById("mobilenumber").value,
+                housename: document.getElementById("housename").value,
+                city: document.getElementById('city').value,
+                pincode: document.getElementById('pincode').value,
+                state: document.getElementById('state').value,
+                country: document.getElementById('country').value,
+                addresstype: document.getElementById('addresstype').value,
+            };
+
+            try {
+                const response = await fetch(`/user/myprofile/addaddress/<%=user._id%>`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formdata)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save address');
+                }
+
+                const result = await response.json();
+                alert('Address saved successfully!');
+                console.log(result);
+
+                // Close the modal after successful submission
+                // Close the modal after successful submission
+const modalElement = document.getElementById('addressModal');
+const modalInstance = new bootstrap.Modal(modalElement); // Create a new instance
+modalInstance.hide(); // Close the modal
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to save address. Please try again.');
+            }
+        });
+    </script> -->
+     
+
+    <script>
+        // Handle form submission
+        document.getElementById("addressForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+    
+            const formdata = {
+                name: document.getElementById("name").value,
+                mobilenumber: document.getElementById("mobilenumber").value,
+                housename: document.getElementById("housename").value,
+                city: document.getElementById('city').value,
+                pincode: document.getElementById('pincode').value,
+                state: document.getElementById('state').value,
+                country: document.getElementById('country').value,
+                addresstype: document.getElementById('addresstype').value,
+            };
+    
+            try {
+                const response = await fetch(`/user/myprofile/addaddress/<%=user._id%>`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formdata)
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Failed to save address');
+                }
+    
+                const result = await response.json();
+                console.log(result);
+    
+                // Show success alert using SweetAlert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Address saved successfully!',
+                }).then(() => {
+                    // Close the modal after the user clicks "OK"
+                    const modalElement = document.getElementById('addressModal');
+                    const modalInstance = new bootstrap.Modal(modalElement);
+                    modalInstance.hide();
+                    window.location.href = `/user/myprofile/<%=user._id%>`; // Replace with your desired URL
+                });
+            } catch (error) {
+                console.error('Error:', error);
+    
+                // Show error alert using SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to save address. Please try again.',
+                });
+            }
+        });
+    </script>
+
+
+</body>
+</html>

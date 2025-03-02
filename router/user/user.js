@@ -7,6 +7,9 @@ const userController=require("../../controller/user/userController")
 const userDashboard=require("./userdashboard")
 const middleware=require("../../middleware/user")
 const jwt=require("jsonwebtoken")
+const userViews=require("../../controller/user/userviews")
+const profile=require("./profile")
+
 
 router.get("/login",middleware.preventLoginpage,(req,res)=>{res.render("user/login")})
 router.get("/signup",middleware.preventLoginpage,(req,res)=>{res.render("user/signup")})
@@ -24,9 +27,10 @@ router.post("/forgot-password",userController.forgotPassword)
 router.get("/reset-password",(req,res)=>{res.render("user/resetpassword")})
 router.post("/reset-password", userController.resetPassword);
 
+
 router.get("/dashboard",middleware.existUser,userController.loadDashboard)
 router.use("/dashboard",userDashboard)
-
+router.use("/myprofile",profile)
 
 router.post("/logout",(req,res)=>{res.clearCookie("token"),res.redirect("/user/login")})
 router.get("/google",passport.authenticate("google",{

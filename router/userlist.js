@@ -5,7 +5,6 @@ const clientController=require("../controller/clientController")
 
 
 
-
 router.post("/:id",clientController.blockUser)
 
 

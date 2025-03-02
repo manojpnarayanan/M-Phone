@@ -1,4 +1,5 @@
 const mongoose=require("mongoose")
+const {Schema}=require("mongoose")
 
 const productSchema= new mongoose.Schema({
     name:{
@@ -19,6 +20,11 @@ const productSchema= new mongoose.Schema({
         type:String,
         required:true,
     },
+    category:{
+         type: mongoose.Schema.Types.ObjectId, 
+         ref: "Category",
+          unique: true 
+    },
     image:{
         type:[String],
         required:true,
@@ -37,6 +43,21 @@ const productSchema= new mongoose.Schema({
     stock:{
         type:Number,
         required:true
+    },
+    discount:{
+         type: Number, 
+         min: 0, 
+         max: 100, 
+         default: 0 
+    },
+    availability:{ 
+        type: String, 
+        enum: ['in_stock', 'out_of_stock', 'pre_order'], 
+        default: 'in_stock' 
+    },
+    deliveryTime:{
+         type: Number, 
+         min: 1 
     }
 
     

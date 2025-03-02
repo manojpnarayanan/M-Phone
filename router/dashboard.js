@@ -9,6 +9,8 @@ const admincontroller=require("../controller/admincontroller")
 const userList=require("../router/userlist")
 const clientController=require("../controller/clientController")
 const upload=require("../multer/allmulter")
+const orderController=require("../controller/ordercontroller")
+const ordermanage=require("../router/ordermanage")
 
 
 router.get("/productlist",addproductController.getProduct)
@@ -22,9 +24,11 @@ router.get("/categories",productController.getCategory,(req,res)=>{res.render("a
 router.post("/categories/:id",productController.blockCategory)
 
 router.get("/orders",clientController.loadUserList)
+router.get("/ordermanage",orderController.loadOrderDetails)
 router.get("/orderdetails",(req,res)=>{res.render("admin/page-orders-detail")})
 router.use("/products",productRoute)
 router.use("/brands",Brands)
 router.use("/orders",userList)
+router.use("/ordermanage",ordermanage)
 
 module.exports=router

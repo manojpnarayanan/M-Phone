@@ -37,7 +37,7 @@
                         <option value="Ahmed Hassan">
                     </datalist>
                 </form> -->
-            </div>
+            <!-- </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
                 <ul class="nav">
@@ -75,7 +75,7 @@
                         </div>
                     </li>
                 </ul>
-            </div>
+            </div> -->
         </header>
         <section class="content-main">
             <div class="content-header">
@@ -103,10 +103,12 @@
                                 <div class="mb-4">
                                     <label class="form-label">Parent</label>
                                     <select name="parent" class="form-select">
-                                        <option>Premium</option>
-                                        <option>Business</option>
-                                        <option>Featured</option>
+                                        <option value="Premium">Premium</option>
+                                        <option value="Business">Business</option>
+                                        <option value="Featured">Featured</option>
                                     </select>
+                                   
+
                                 </div>
                                 <div class="mb-4">
                                     <label class="form-label">Description</label>
@@ -138,7 +140,7 @@
                         <tr>
                             <td><%= category.name %></td>
                             <td><%= category.slug %></td>
-                            <td><%= category.parent ? category.parent.name : 'None' %></td>
+                            <td><%= category.parent ? category.parent : 'None' %></td>
         
                             <td> <!-- Actions Column -->
                                 <a href="/admin/dashboard/products/editcategory/<%= category._id %>" class="btn btn-primary btn-sm">Edit</a>

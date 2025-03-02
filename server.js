@@ -1,7 +1,9 @@
 const dotenv=require("dotenv")
 dotenv.config()
 const express=require("express")
+// const helmet=require("helmet")
 const app=express()
+// app.use(helmet());
 const connectDb=require("./database/connectDb")
 const path = require("path")
 const adminRouter=require("./router/admin")
@@ -10,6 +12,7 @@ const cookieParser=require("cookie-parser")
 const userRouter=require("./router/user/user")
 const passport=require("./database/passportConfig")
 const flash = require('connect-flash');
+const middleware=require("./middleware/admin")
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));

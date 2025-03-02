@@ -41,7 +41,11 @@ const userSchema=new mongoose.Schema({
     otpExpiry:{
         type:Date,
         default:null
-    }
+    },
+    photo: {
+        type: String, // Store the filename of the user's profile photo
+        default:"/uploads/profile-pictures/default.png" // Default profile photo
+      },
    
 },{timestamps:true});
 userSchema.plugin(mongoosePaginate);

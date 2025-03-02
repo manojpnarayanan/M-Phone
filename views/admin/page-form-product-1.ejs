@@ -42,8 +42,22 @@
                                     <label class="form-label">Stock</label>
                                     <input name="stock" type="number" class="form-control" required>
                                 </div>
-                            </div>
+                             </div>
+                             <!-- Discount Percentage -->
+                                <div class="mb-4">
+                                    <label class="form-label">Discount Percentage</label>
+                                    <input name="discount" type="number" class="form-control" min="0" max="100" required>
+                                </div>
                         </div>
+                        <!-- Availability -->
+<div class="mb-4">
+    <label class="form-label">Availability</label>
+    <select name="availability" class="form-select">
+        <option value="in_stock">In Stock</option>
+        <option value="out_of_stock">Out of Stock</option>
+        <option value="pre_order">Pre-Order</option>
+    </select>
+</div>
                         <label class="form-check mb-4">
                             <input name="isActive" class="form-check-input" type="checkbox">
                             <span class="form-check-label"> IsActive </span>
@@ -69,11 +83,19 @@
                             <div class="col-sm-6 mb-3">
                                 <label class="form-label">Category</label>
                                 <select name="category" class="form-select" required>
-                                    <option value="Premium">Premium</option>
-                                    <option value="Business">Business</option>
-                                    <option value="Camera">Camera</option>
-                                    <option value="Featured">Featured</option>
+                                  <% 
+                                
+                                    let seenParents = [];
+                                  %>
+                                  <% categories.forEach(category => { %>
+                                    <% if (!seenParents.includes(category.parent)) { 
+                                         seenParents.push(category.parent); 
+                                    %>
+                                      <option value="<%= category._id %>"><%= category.parent %></option>
+                                    <% } %>
+                                  <% }); %>
                                 </select>
+                                
                             </div>
                             <div class="col-sm-6 mb-3">
                                 <label class="form-label">Brand</label>
@@ -87,7 +109,13 @@
                                 <label class="form-label">Tags</label>
                                 <input type="text" class="form-control" name="tags">
                             </div>
-                        </div>
+                                <!-- Shipping Information -->
+                                <div class="mb-4">
+                                    <label class="form-label">Estimated Delivery Time (days)</label>
+                                    <input name="deliveryTime" type="number" class="form-control" min="1">
+                                </div>
+                            </div>
+                        
                         <button type="submit" class="btn btn-primary">Submit Product</button>
                     </form>
                 </div>

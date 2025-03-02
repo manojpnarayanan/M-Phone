@@ -7,11 +7,12 @@ const productupdates={
 addCategory: async(req,res)=>{
     try{
      let {name,slug,parent,description,isActive}=req.body
+    //  console.log("Categories from :",req.body)
      const existingCategory=await Category.findOne({slug})
      if(existingCategory){
          return res.status(400).send("Already Exists...")
      }
-     parent=parent&&mongoose.Types.ObjectId.isValid(parent)? new mongoose.Types.ObjectId(parent):null;
+    //  parent=parent&&mongoose.Types.ObjectId.isValid(parent)? new mongoose.Types.ObjectId(parent):null;
     //  console.log(parent)
      const category= new Category({
          name,

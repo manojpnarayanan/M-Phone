@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Address</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- SweetAlert CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    /* Custom CSS for the form */
+    body {
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Gradient background */
+      font-family: 'Arial', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .form-container {
+      max-width: 600px;
+      width: 100%;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+      font-weight: 700;
+      font-size: 28px;
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      padding: 12px 16px;
+      font-size: 14px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      background-color: #f9fafb; /* Light background for inputs */
+    }
+
+    .form-control:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+      outline: none;
+      background-color: #fff;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: #5a6268;
+      transform: translateY(-2px);
+    }
+
+    /* Add spacing between form elements */
+    .mb-3 {
+      margin-bottom: 1.5rem;
+    }
+
+    /* Add a subtle animation to the form */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-container {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Add hover effect to form container */
+    .form-container:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      transform: translateY(-5px);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Add a subtle border to the form container */
+    .form-container {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    /* Add a gradient background to buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #6c757d, #5a6268);
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Edit Address</h2>
+    <form id="editAddressForm" action="/user/myprofile/editaddress/<%= address._id %>" method="POST">
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="<%= address.name %>" required>
+      </div>
+      <div class="mb-3">
+        <label for="mobilenumber" class="form-label">Mobile Number</label>
+        <input type="text" class="form-control" id="mobilenumber" name="mobilenumber" value="<%= address.mobilenumber %>" required>
+      </div>
+      <div class="mb-3">
+        <label for="housename" class="form-label">House Name</label>
+        <input type="text" class="form-control" id="housename" name="housename" value="<%= address.housename %>" required>
+      </div>
+      <div class="mb-3">
+        <label for="city" class="form-label">City</label>
+        <input type="text" class="form-control" id="city" name="city" value="<%= address.city %>" required>
+      </div>
+      <div class="mb-3">
+        <label for="pincode" class="form-label">Pincode</label>
+        <input type="text" class="form-control" id="pincode" name="pincode" value="<%= address.pincode %>" required>
+      </div>
+      <div class="mb-3">
+        <label for="state" class="form-label">State</label>
+        <input type="text" class="form-control" id="state" name="state" value="<%= address.state %>" required>
+      </div>
+      <div class="mb-3">
+        <label for="country" class="form-label">Country</label>
+        <input type="text" class="form-control" id="country" name="country" value="<%= address.country %>" required>
+      </div>
+      <div class="mb-3">
+        <label for="addresstype" class="form-label">Address Type</label>
+        <input type="text" class="form-control" id="addresstype" name="addresstype" value="<%= address.addresstype %>" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="/user/myprofile" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- SweetAlert JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- <script>
+    // SweetAlert for form submission
+    document.getElementById('editAddressForm').addEventListener('submit', function (e) {
+      e.preventDefault(); // Prevent default form submission
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to save these changes?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#007bff',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, save changes!',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Submit the form if confirmed
+          this.submit();
+        }
+      });
+    });
+
+    // Show success message if redirected with a success query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      Swal.fire({
+        title: 'Success!',
+        text: 'Address updated successfully.',
+        icon: 'success',
+        confirmButtonColor: '#007bff'
+      });
+    }
+  </script> -->
+
+       <!-- <script>    
+  document.getElementById('editAddressForm').addEventListener('submit', async function (e) {
+    e.preventDefault(); // Prevent default form submission
+
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to save these changes?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#007bff',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, save changes!',
+        cancelButtonText: 'Cancel'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const formData = new FormData(this); // Get form data
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json(); // Parse JSON response
+
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#007bff'
+                    }).then(() => {
+                        // Optionally, update the form fields with the new data
+                        document.getElementById('name').value = data.address.name;
+                        document.getElementById('mobilenumber').value = data.address.mobilenumber;
+                        document.getElementById('housename').value = data.address.housename;
+                        document.getElementById('city').value = data.address.city;
+                        document.getElementById('pincode').value = data.address.pincode;
+                        document.getElementById('state').value = data.address.state;
+                        document.getElementById('country').value = data.address.country;
+                        document.getElementById('addresstype').value = data.address.addresstype;
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message || 'Failed to update address',
+                        icon: 'error',
+                        confirmButtonColor: '#007bff'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while updating the address',
+                    icon: 'error',
+                    confirmButtonColor: '#007bff'
+                });
+            }
+        }
+    });
+});
+</script> -->
+        <!-- <script>
+            document.querySelector('.edit-address').addEventListener('click', function () {
+    const addressId = this.getAttribute('data-address-id');
+     // Show confirmation dialog
+     Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to save these changes?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#007bff',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, save changes!',
+        cancelButtonText: 'Cancel'
+      })
+      
+    const formData = {
+        name: document.getElementById('name').value,
+        mobilenumber: document.getElementById('mobilenumber').value,
+        housename: document.getElementById('housename').value,
+        city: document.getElementById('city').value,
+        pincode: document.getElementById('pincode').value,
+        state: document.getElementById('state').value,
+        country: document.getElementById('country').value,
+        addresstype: document.getElementById('addresstype').value,
+        user: document.getElementById('userId').value // Ensure this is set
+    };
+
+    fetch(`/user/myprofile/editaddress/${addressId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Address updated successfully') {
+            alert('Address updated successfully');
+            window.location.reload();
+        } else {
+            alert('Failed to update address');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+        </script> -->
+
+
+        <!-- <script>
+            //working script
+            document.querySelector('.edit-address').addEventListener('click', function () {
+    const addressId = this.getAttribute('data-address-id');
+    const formData = {
+        name: document.getElementById('name').value,
+        mobilenumber: document.getElementById('mobilenumber').value,
+        housename: document.getElementById('housename').value,
+        city: document.getElementById('city').value,
+        pincode: document.getElementById('pincode').value,
+        state: document.getElementById('state').value,
+        country: document.getElementById('country').value,
+        addresstype: document.getElementById('addresstype').value,
+        user: document.getElementById('userId').value // Ensure this is set
+    };
+
+    fetch(`/user/myprofile/editaddress/${addressId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Address updated successfully') {
+            // Show success message with SweetAlert
+            Swal.fire({
+                title: 'Success!',
+                text: 'Address updated successfully',
+                icon: 'success',
+                confirmButtonColor: '#007bff'
+            }).then(() => {
+                // Reload the page after the user clicks "OK"
+                window.location.reload();
+            });
+        } else {
+            // Show error message with SweetAlert
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to update address',
+                icon: 'error',
+                confirmButtonColor: '#007bff'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Show error message with SweetAlert
+        Swal.fire({
+            title: 'Error!',
+            text: 'An error occurred while updating the address',
+            icon: 'error',
+            confirmButtonColor: '#007bff'
+        });
+    });
+});
+        </script> -->
+
+         <script>
+            document.getElementById('editAddressForm').addEventListener('submit', async function (e) {
+  e.preventDefault(); // Prevent default form submission
+
+  // Get form data
+  const formData = new FormData(this);
+
+  // Convert FormData to a plain object
+  const formObject = {};
+  formData.forEach((value, key) => {
+    formObject[key] = value;
+  });
+
+  try {
+    // Send the form data to the backend
+    const response = await fetch(this.action, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', // Send JSON data
+      },
+      body: JSON.stringify(formObject), // Convert object to JSON
+    });
+
+    const data = await response.json(); // Parse JSON response
+
+    if (response.ok && data.message === 'Address updated successfully') {
+      // Show success message with SweetAlert
+      Swal.fire({
+        title: 'Success!',
+        text: data.message,
+        icon: 'success',
+        confirmButtonColor: '#007bff',
+      }).then(() => {
+        // Optionally, reload the page or update the UI
+        window.location.href=`/user/myprofile/${userId}`; // Reload the page to reflect changes
+      });
+    } else {
+      // Show error message with SweetAlert
+      Swal.fire({
+        title: 'Error!',
+        text: data.message || 'Failed to update address',
+        icon: 'error',
+        confirmButtonColor: '#007bff',
+      });
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    // Show error message with SweetAlert
+    Swal.fire({
+      title: 'Error!',
+      text: 'An error occurred while updating the address',
+      icon: 'error',
+      confirmButtonColor: '#007bff',
+    });
+  }
+});
+
+   
+         </script>
+
+
+    </body>
+</html>

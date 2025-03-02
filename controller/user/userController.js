@@ -8,6 +8,7 @@ const userController={
     login: async(req,res)=>{
         try{
             const {email,password}=req.body
+            
             const user=await User.findOne({email})
 
             if(!user){
@@ -39,6 +40,13 @@ const userController={
     },
     loadDashboard:async (req,res)=>{
         try{
+           const token=req.cookies.token
+           
+            const decoded=jwt.verify(token,process.env.JWT_SECRET)
+            // console.log("token decoded",decoded)
+           
+           const user=await User.findById(decoded.id)
+        //    console.log(userId)
             let query={}
             if(req.query.search){
                 query={
@@ -46,11 +54,11 @@ const userController={
                         {name:{$regex:req.query.search,$options:"i"}},
                         {description:{$regex:req.query.search,$options:"i"}}
                     ]
-                }}
-            
-            
+                }
+            }
         const products=await Product.find(query);
-        res.render("user/home",{products,searchQuery:req.query.search || ""})
+        
+        res.render("user/home",{user,products,searchQuery:req.query.search || ""})
         }catch(error){
             console.log(error)
             res.status(500).send("Error fetching Data")
@@ -59,9 +67,9 @@ const userController={
    forgotPassword:async (req,res)=>{
      try{
            const {email}=req.body
-           console.log(email)
+        //    console.log(email)
            const user=await User.findOne({email:email})
-           console.log(user)
+        //    console.log(user)
            if(!user){
             return res.status(404).json({message:"User not found"})
            }
@@ -109,8 +117,7 @@ const userController={
         }
         const user=await User.findOne({email:req.body.email})
         console.log(user)
-        console.log(typeof(req.body.otp))
-        console.log(typeof(user.otp))
+       
         if(user.otp!==otp){
             return res.status(400).json({message:"Invalid OTp"})
         }

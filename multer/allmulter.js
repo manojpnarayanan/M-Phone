@@ -8,6 +8,8 @@ const storage = multer.diskStorage({
     // Adjust destination based on URL if needed; here we assume product images
     if (req.originalUrl.includes('admin/dashboard/brands/addbrands')) {
       uploadPath = "public/uploads";
+    }else if(req.originalUrl.includes('/user/myprofile/update-email')){
+        uploadPath="public/uploads/profile-pictures"
     } else {
       uploadPath = "public/uploads/product-images";
     }

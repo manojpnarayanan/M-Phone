@@ -55,14 +55,16 @@
                 <div class="card">
                     <div class="card-header text-center">Login</div>
                     <div class="card-body">
-                        <form id="loginForm" action="/user/login" method="POST">
+                        <form id="loginForm" action="/user/login" method="POST" onsubmit="return validateForm()">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email" >
+                                <small id="emailError" class="text-danger"></small> 
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
                                 <input type="password" class="form-control" id="password" name="password" >
+                                <small id="passwordError" class="text-danger"></small>
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Login</button>
                         </form>
@@ -84,16 +86,34 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            if (!email || !password) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Please fill in all fields!'
-                });
-                return false;
-            }
-            return true;
-        }
+            let isValid = true;
+
+// Clear previous errors
+document.getElementById("emailError").textContent = "";
+document.getElementById("passwordError").textContent = "";
+
+if (!email) {
+    document.getElementById("emailError").textContent = "Email is required";
+    isValid = false;
+}
+
+if (!password) {
+    document.getElementById("passwordError").textContent = "Password is required";
+    isValid = false;
+}
+
+return isValid; // Stop submission if validation fails
+}
+        //     if (!email || !password) {
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'Oops...',
+        //             text: 'Please fill in all fields!'
+        //         });
+        //         return false;
+        //     }
+        //     return true;
+        // }
 
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);

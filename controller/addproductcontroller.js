@@ -9,7 +9,8 @@ const Category=require("../model/createcategory")
 const addproducts={
     addProduct:async (req,res)=>{
         try{
-              const {name, description,price,stock,isActive,brand,croppedImages}=req.body
+              const {name, description,price,stock,isActive,brand,croppedImages,category,discount,availability,deliveryTime,tags}=req.body
+              console.log(req.body)
             if (!croppedImages) {
               return res.status(400).send("Product adding Failed, Add At Least 3 images");
           }
@@ -38,9 +39,10 @@ const addproducts={
                     description,
                     price,
                     brand,
+                    category,
                     isActive:isActive? true:false,
                     image:imagePaths,
-                    stock,
+                    stock,discount,availability,deliveryTime,tags
                  })
                 
                  await product.save();
@@ -67,10 +69,12 @@ const addproducts={
         .limit(productsPerPage)
         .sort({createdAt:-1})
         .lean()
-        
+        const categories=await Category.find({isActive:true})
+        console.log(categories)
         res.render("admin/page-products-list",{
           products,
           search,
+          categories,
           currentPage:page,
           totalPages:Math.ceil(totalProducts / productsPerPage)
         })
@@ -195,6 +199,15 @@ blockProduct: async (req,res)=>{
     } catch (error) {
       console.error("Error updating product:", error);
       res.status(500).send("Error updating product");
+    }
+  },
+  loadAddProductForm:async (req,res)=>{
+    try{
+      const categories=await Category.find({isActive:true})
+       res.render("admin/page-form-product-1",{categories})
+
+    }catch(error){
+     console.log(error)
     }
   }
 //   updateEditProduct: async (req, res) => {

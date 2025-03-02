@@ -554,6 +554,11 @@
     .btn-google:hover {
       background-color: #c1351d;
     }
+    .error-message {
+  color:red;
+  font-size: 12px;
+  margin-left: 5px;
+}
   </style>
 </head>
 <body>
@@ -569,22 +574,27 @@
               <div class="mb-3">
                 <label for="name" class="form-label">Full Name</label>
                 <input type="text" class="form-control" id="name" name="name" />
+                <span id="nameError" class="error-message"></span>  
               </div>
               <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" />
+                <span id="emailError" class="error-message"></span>
               </div>
               <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" name="password" />
+                <span id="passwordError" class="error-message"></span>
               </div>
               <div class="mb-3">
                 <label for="confirmPassword" class="form-label">Confirm Password</label>
                 <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" />
+                <span id="confirmPasswordError" class="error-message"></span>
               </div>
               <div class="mb-3">
                 <label for="phone" class="form-label">Phone Number</label>
                 <input type="text" class="form-control" id="phone" name="phonenumber" />
+                <span id="phoneError" class="error-message"></span>
               </div>
               <button type="submit" class="btn btn-brand w-100">Sign Up</button>
             </form>
@@ -607,48 +617,95 @@
 
       const formData = new FormData(this);
       const jsonData = Object.fromEntries(formData.entries());
+//now
+document.querySelectorAll(".error-message").forEach(el => el.textContent = "");
 
-      // Simple validation
-      if (!jsonData.name || !jsonData.email || !jsonData.password || !jsonData.confirmPassword || !jsonData.phonenumber) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Missing Fields',
-          text: 'All fields are required!'
-        });
-        return;
-      }
+let isValid = true;
 
-      // Email validation
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(jsonData.email)) {
-        Swal.fire({
-          icon: "warning",
-          title: "Invalid Email",
-          text: "Please enter a valid email address."
-        });
-        return;
-      }
+// Validate each field and show error messages in respective input fields
+if (!jsonData.name) {
+  document.getElementById("nameError").textContent = "Name is required";
+  isValid = false;
+}
+if (!jsonData.email) {
+  document.getElementById("emailError").textContent = "Email is required";
+  isValid = false;
+} else {
+  // Email validation
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(jsonData.email)) {
+    document.getElementById("emailError").textContent = "Invalid email format";
+    isValid = false;
+  }
+}
+if (!jsonData.password) {
+  document.getElementById("passwordError").textContent = "Password is required";
+  isValid = false;
+}
+if (!jsonData.confirmPassword) {
+  document.getElementById("confirmPasswordError").textContent = "Confirm Password is required";
+  isValid = false;
+} else if (jsonData.password !== jsonData.confirmPassword) {
+  document.getElementById("confirmPasswordError").textContent = "Passwords do not match";
+  isValid = false;
+}
+if (!jsonData.phonenumber) {
+  document.getElementById("phoneError").textContent = "Phone number is required";
+  isValid = false;
+} else {
+  // Phone number validation (Indian format)
+  const phonePattern = /^[6-9]\d{9}$/;
+  if (!phonePattern.test(jsonData.phonenumber)) {
+    document.getElementById("phoneError").textContent = "Invalid phone number format";
+    isValid = false;
+  }
+}
 
-      // Password match validation
-      if (jsonData.password !== jsonData.confirmPassword) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Password Mismatch',
-          text: 'Passwords do not match!'
-        });
-        return;
-      }
+if (!isValid) return; // Stop form submission if validation fails
 
-      // Phone number validation (Indian format)
-      const phonePattern = /^[6-9]\d{9}$/;
-      if (!phonePattern.test(jsonData.phonenumber)) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Invalid Phone Number',
-          text: 'Please enter a valid 10-digit Indian mobile number.'
-        });
-        return;
-      }
+
+//last
+      // // Simple validation
+      // if (!jsonData.name || !jsonData.email || !jsonData.password || !jsonData.confirmPassword || !jsonData.phonenumber) {
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     title: 'Missing Fields',
+      //     text: 'All fields are required!'
+      //   });
+      //   return;
+      // }
+
+      // // Email validation
+      // const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      // if (!emailPattern.test(jsonData.email)) {
+      //   Swal.fire({
+      //     icon: "warning",
+      //     title: "Invalid Email",
+      //     text: "Please enter a valid email address."
+      //   });
+      //   return;
+      // }
+
+      // // Password match validation
+      // if (jsonData.password !== jsonData.confirmPassword) {
+      //   Swal.fire({
+      //     icon: 'error',
+      //     title: 'Password Mismatch',
+      //     text: 'Passwords do not match!'
+      //   });
+      //   return;
+      // }
+
+      // // Phone number validation (Indian format)
+      // const phonePattern = /^[6-9]\d{9}$/;
+      // if (!phonePattern.test(jsonData.phonenumber)) {
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     title: 'Invalid Phone Number',
+      //     text: 'Please enter a valid 10-digit Indian mobile number.'
+      //   });
+      //   return;
+      // }
 
       try {
         // Send signup request

@@ -28,13 +28,13 @@ catch(error){
 },
 getBrands:async(req,res)=>{
     try{
-        const brandsPerPage=2
+        const brandsPerPage=5
         const page=parseInt(req.query.page)||1
         const search=req.query.search||""
         const query=search?  { name: { $regex: search, $options: "i" } } : {};
         const totalBrands=await Brands.countDocuments(query)
         //  console.log(search)
-         console.log('Page:', page, 'Search:', search)
+        //  console.log('Page:', page, 'Search:', search)
     const brand=await Brands.find(query)
     .skip((page-1)*brandsPerPage)
     .limit(brandsPerPage)

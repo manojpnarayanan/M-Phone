@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart - M Store</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        /* Reuse styles from the homepage */
+        .nav-link, .logout-btn {
+            color: white !important;
+        }
+        .logout-btn:hover {
+            color: #ccc !important;
+        }
+        .card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-img-top {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        .card-body {
+            flex-grow: 1;
+            /* text-align: center; */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+        }
+        .price-tag {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .add-to-cart {
+            margin-top: auto;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .quantity-control input {
+            width: 50px;
+            text-align: center;
+        }
+        .cart-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Navbar (Same as Homepage) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">M Store</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/dashboard/shopping">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/myprofile/<%= user._id%>">My Profile</a></li>
+                    <li class="nav-item">
+                        <form id="logoutForm" action="/user/logout" method="post">
+                            <button type="submit" class="btn btn-dark logout-btn ms-3">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Section -->
+    <div class="container my-5">
+        <h2 class="text-center mb-4">My Cart</h2>
+        <div class="row">
+            <!-- Cart Items -->
+           <!-- Cart Items Section -->
+<div class="col-md-8">
+    <% if (cartItems && cartItems.length > 0) { %>
+        <div class="row row-cols-1 row-cols-md-2 g-3"> <!-- Grid layout with 2 columns -->
+            <% cartItems.forEach(item => { %>
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="row g-0">
+                            <div class="col-md-5">
+                                <img src="/<%= item.product.image[0] %>" class="img-fluid rounded-start" alt="<%= item.product.name %>" style="height: 120px; object-fit: cover;">
+                            </div>
+                            <div class="col-md-7">
+                                <div class="card-body p-2">
+                                    <h5 class="card-title mb-1" style="font-size: 16px;"><%= item.product.name %></h5>
+                                    <p class="card-text text-truncate mb-1" style="font-size: 14px; max-width: 200px;"><%= item.product.description %></p>
+                                    <p class="price-tag mb-1" style="font-size: 16px;">₹<%= item.product.price %></p>
+                                    <div class="quantity-control mb-1">
+                                        <button class="btn btn-sm btn-outline-secondary decrease-qty" data-id="<%= item.product._id %>">-</button>
+                                        <input type="number" class="form-control qty-input" data-id="<%= item.product._id %>" value="<%= item.quantity %>" min="1" max="<%= item.product.stock %>" style="width: 50px;">
+                                        <button class="btn btn-sm btn-outline-secondary increase-qty" data-id="<%= item.product._id %>">+</button>
+                                    </div>
+                                    <p class="stock-left mt-1 mb-1" style="font-size: 14px;">Stock left: <%= item.product.stock %></p>
+                                    <button class="btn btn-danger btn-sm remove-from-cart" data-id="<%= item.product._id %>" style="font-size: 14px;">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <p class="text-center">Your cart is empty.</p>
+    <% } %>
+</div>
+
+            <!-- Cart Summary -->
+            <div class="col-md-4">
+                <div class="cart-summary">
+                    <h4>Cart Summary</h4>
+                    <hr>
+                    <p>Total Items: <span id="total-items"><%= totalItems %></span></p>
+                    <p>Total Price: ₹<span id="total-price"><%= totalPrice %></span></p>
+                    <button id="proceedtocheckout" class="btn btn-primary w-100" >Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer (Same as Homepage) -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <h5>Customer Support</h5>
+                    <p>Email: support@mstore.com</p>
+                    <p>Phone: +91 98765 43210</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h5>Quick Links</h5>
+                    <a href="#" class="text-white d-block">Home</a>
+                    <a href="#" class="text-white d-block">Shop</a>
+                    <a href="#" class="text-white d-block">Contact</a>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h5>We Accept</h5>
+                    <img src="/assets/imgs/payment-methods.png" width="150" alt="Payment Methods">
+                </div>
+            </div>
+            <hr class="bg-light">
+            <p class="text-center">&copy; 2025 M Store. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Quantity Control Logic
+document.querySelectorAll('.quantity-control').forEach(control => {
+    const input = control.querySelector('.qty-input');
+    const decreaseBtn = control.querySelector('.decrease-qty');
+    const increaseBtn = control.querySelector('.increase-qty');
+
+    decreaseBtn.addEventListener('click', () => {
+        if (input.value > 1) {
+            input.value = parseInt(input.value) - 1;
+            updateCart(input.dataset.id, input.value);
+        }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+        if (input.value < parseInt(input.max)) {
+            input.value = parseInt(input.value) + 1;
+            updateCart(input.dataset.id, input.value);
+        }
+    });
+
+    input.addEventListener('change', () => {
+        if (input.value < 1) input.value = 1;
+        if (input.value > parseInt(input.max)) input.value = input.max;
+        updateCart(input.dataset.id, input.value);
+    });
+});
+
+        // Remove Item Logic
+        document.querySelectorAll('.remove-from-cart').forEach(button => {
+            button.addEventListener('click', () => {
+                const productId = button.dataset.id;
+                removeFromCart(productId);
+            });
+        });
+
+        // Update Cart Function
+async function updateCart(productId, quantity) {
+    try {
+        const response = await fetch(`/user/dashboard/addtocart/update/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ quantity })
+        });
+        const data = await response.json();
+        if (data.success) {
+            location.reload(); // Refresh the page to reflect changes
+        }
+    } catch (error) {
+        console.error('Error updating cart:', error);
+    }
+}
+
+       // Remove from Cart Function
+async function removeFromCart(productId) {
+    try {
+        const response = await fetch(`/user/dashboard/addtocart/remove/${productId}`, { method: 'POST' });
+        const data = await response.json();
+        if (data.success) {
+            location.reload(); // Refresh the page to reflect changes
+        }
+    } catch (error) {
+        console.error('Error removing from cart:', error);
+    }
+}
+     // Attach event listeners to remove buttons
+document.querySelectorAll('.remove-from-cart').forEach(button => {
+    button.addEventListener('click', () => {
+        const productId = button.dataset.id;
+        removeFromCart(productId);
+    });
+});        
+
+    document.getElementById("proceedtocheckout").addEventListener("click",function(){
+        window.location.href="/user/myprofile/checkout/<%=user._id%>"
+    })
+        // Checkout Function
+        // function checkout() {
+        //     alert('Proceeding to checkout...');
+            // Redirect to checkout page or handle payment logic
+        // }
+    </script>
+</body>
+</html>
