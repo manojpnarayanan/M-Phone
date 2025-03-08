@@ -9,6 +9,8 @@ const profilecontroller = require("../../controller/user/profilecontroller")
 const checkOutController=require("../../controller/user/checkoutcontroller")
 const wishlistController=require("../../controller/user/wishcontroller")
 const walletController=require("../../controller/user/walletcontroller")
+const reviewController=require("../../controller/user/reviewcontroller")
+
 
 router.get("/addaddress/:id",profileController.loadAddressPage)
 router.post("/addaddress/:id",profileController.saveAddress)
@@ -25,6 +27,9 @@ router.post("/order-placed",orderController.placeOrder)
 router.get("/order-confirmed/:id",orderController.getOrderConfirmationPage)
 router.post("/cancel-order/:id",orderController.cancelOrder)
 router.post("/return-order/:id",orderController.returnOrder)
+
+router.get("/write-review/:id",reviewController.loadReviewPage)
+router.post("/write-review/:id",reviewController.submitReview)
 
 router.post("/create-wallet",walletController.createWallet)
 router.get("/wallet",walletController.getWallet)

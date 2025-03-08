@@ -1,8 +1,8 @@
-const User=require("../../model/user")
-const bcryptjs=require("bcryptjs")
-const generator=require("./otpgenerator")
-const otpgenerator=require("otp-generator")
-const nodemailer=require("nodemailer") 
+const User = require("../../model/user")
+const bcryptjs = require("bcryptjs")
+const generator = require("./otpgenerator")
+const otpgenerator = require("otp-generator")
+const nodemailer = require("nodemailer")
 
 // function generateOTP() {
 //   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -18,12 +18,12 @@ const nodemailer=require("nodemailer")
 // const signupController={
 //   signup:async (req,res)=>{
 //     console.log(req.body)
-    
+
 //     const{name,email,password,confirmPassword,phonenumber}=req.body
 //     if(!name|| !email || !password|| !confirmPassword ||!phonenumber){
 
 //       return res.status(400).json({ message: "All Fields are required" });
-     
+
 //     }
 
 //     // console.log(name,email,password,confirmPassword,phonenumber)
@@ -42,8 +42,8 @@ const nodemailer=require("nodemailer")
 
 //      const{otp,otpExpiry}=createOtp()
 //      console.log(otp);
-     
-         
+
+
 
 //          const newUser = new User({
 //              name:name,
@@ -52,7 +52,7 @@ const nodemailer=require("nodemailer")
 //              phonenumber:phonenumber,
 //              otp,
 //              otpExpiry
- 
+
 //          });
 //          await newUser.save()
 
@@ -69,17 +69,17 @@ const nodemailer=require("nodemailer")
 //                   subject:"Your otp for Login",
 //                   text:`Your OTP is :${otp}`
 //               }
-              
+
 //                 const info=await transporter.sendMail(mailoptions)
 //                 console.log("otp Sent:"+ info.response);
 //                 return res.json({message:"OTP Sent",email})
 
 
-    
-     
-    
+
+
+
 //   }
-  
+
 // }
 // Helper function to create an OTP and its expiry time
 
@@ -90,76 +90,76 @@ function createOtp() {
   return { otp, otpExpiry };
 }
 
-const signupController={
-signup : async (req, res) => {
-  try {
-    console.log("Request Body:", req.body);
-    const { name, email, password, confirmPassword, phonenumber } = req.body;
+const signupController = {
+  signup: async (req, res) => {
+    try {
+      console.log("Request Body:", req.body);
+      const { name, email, password, confirmPassword, phonenumber } = req.body;
 
-    // Validate all fields are present
-    if (!name || !email || !password || !confirmPassword || !phonenumber) {
-      return res.status(400).json({ message: "All Fields are required" });
+      // Validate all fields are present
+      if (!name || !email || !password || !confirmPassword || !phonenumber) {
+        return res.status(400).json({ message: "All Fields are required" });
+      }
+
+      // Validate password match
+      if (password !== confirmPassword) {
+        return res.status(400).json({ message: "Passwords do not match" });
+      }
+
+      // Check if user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Validate phone number (Indian format)
+      if (!/^[6-9]\d{9}$/.test(phonenumber)) {
+        return res.status(400).json({ message: "Invalid Phone Number" });
+      }
+
+      // Hash the password before saving
+      const hashedPassword = await bcryptjs.hash(password, 10);
+
+      // Generate OTP and expiry time
+      const { otp, otpExpiry } = createOtp();
+      console.log("Generated OTP:", otp);
+
+      // Create the new user with OTP details
+      const newUser = new User({
+        name,
+        email,
+        password: hashedPassword,
+        phonenumber,
+        otp,
+        otpExpiry,
+      });
+      await newUser.save();
+
+      // Set up the Nodemailer transporter to send OTP via email
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: process.env.GMAIL_USER,
+        to: email,
+        subject: "Your OTP for Verification",
+        text: `Your OTP is: ${otp}`,
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log("OTP Sent:", info.response);
+
+      // Return response with email for OTP verification
+      return res.json({ message: "OTP Sent", email });
+    } catch (error) {
+      console.error("Signup Error:", error);
+      return res.status(500).json({ message: "Error during sign up" });
     }
-
-    // Validate password match
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match" });
-    }
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    // Validate phone number (Indian format)
-    if (!/^[6-9]\d{9}$/.test(phonenumber)) {
-      return res.status(400).json({ message: "Invalid Phone Number" });
-    }
-
-    // Hash the password before saving
-    const hashedPassword = await bcryptjs.hash(password, 10);
-
-    // Generate OTP and expiry time
-    const { otp, otpExpiry } = createOtp();
-    console.log("Generated OTP:", otp);
-
-    // Create the new user with OTP details
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      phonenumber,
-      otp,
-      otpExpiry,
-    });
-    await newUser.save();
-
-    // Set up the Nodemailer transporter to send OTP via email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.GMAIL_USER,
-      to: email,
-      subject: "Your OTP for Verification",
-      text: `Your OTP is: ${otp}`,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("OTP Sent:", info.response);
-
-    // Return response with email for OTP verification
-    return res.json({ message: "OTP Sent", email });
-  } catch (error) {
-    console.error("Signup Error:", error);
-    return res.status(500).json({ message: "Error during sign up" });
   }
 }
-}
-module.exports=signupController
+module.exports = signupController

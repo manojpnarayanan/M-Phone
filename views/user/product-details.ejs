@@ -176,6 +176,23 @@
 .related-products .col-auto {
     margin-bottom: 15px;
 }
+.review {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.review strong {
+    font-size: 16px;
+    color: #333;
+}
+
+.review p {
+    margin: 5px 0;
+    color: #555;
+}
     </style>
 </head>
 <body>
@@ -263,41 +280,20 @@
 
         <h4 class="mt-5">Reviews</h4>
         <div id="reviews">
-            <% if (product.reviews && product.reviews.length > 0) { %>
-                <% product.reviews.forEach(review => { %>
+            <% if (reviews && reviews.length > 0) { %>
+                <% reviews.forEach(review => { %>
                     <div class="review mb-3 p-3">
-                        <strong><%= review.user %></strong>
+                        <strong><%= review.user.name %></strong>
                         <p>⭐ <%= review.rating %> / 5</p>
                         <p class="mb-0"><%= review.comment %></p>
                     </div>
                 <% }) %>
             <% } else { %>
-                <p>No reviews yet.</p>
+                <p>No reviews yet. Be the first to review this product!</p>
             <% } %>
         </div>
 
-        <div class="card mt-4 mb-5">
-            <div class="card-body">
-                <h5>Add a Review</h5>
-                <form action="/product/<%= product._id %>/add-review" method="POST">
-                    <div class="mb-3">
-                        <label for="rating" class="form-label">Rating</label>
-                        <select name="rating" id="rating" class="form-select" required>
-                            <option value="5">5 - Excellent</option>
-                            <option value="4">4 - Very Good</option>
-                            <option value="3">3 - Good</option>
-                            <option value="2">2 - Fair</option>
-                            <option value="1">1 - Poor</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="comment" class="form-label">Review</label>
-                        <textarea name="comment" id="comment" rows="3" class="form-control" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Review</button>
-                </form>
-            </div>
-        </div>
+       
 
         <!-- <h4 class="mt-5">Related Products</h4> -->
         <h4 class="mt-5">Related Products</h4>

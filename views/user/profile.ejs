@@ -918,7 +918,7 @@
     <div class="container">
         <h1 class="page-title">My Orders</h1>
         
-        <% if (!orders.length === 0) { %>
+        <% if (orders.length === 0) { %>
             <div class="empty-orders">
                 <div class="empty-icon">
                     <i class="fas fa-shopping-bag"></i>
@@ -1087,7 +1087,7 @@
                                 <% } %>
                                 <!-- <a href="/user/myprofile/cancel-order/<%= order.orderId %>" class="btn btn-primary">View Details</a> -->
                                 <% if (order.orderStatus.toLowerCase() === 'delivered') { %>
-                                    <a href="/orders/<%= order.orderId %>/review" class="btn btn-secondary">Write Review</a>
+                                    <a href="/user/myprofile/write-review/<%= order._id %>" class="btn btn-secondary">Write Review</a>
                                     <button onclick="returnOrder('<%=order._id %>')" class="btn btn-warning">Return Order</button>
                                     <button onclick="downloadInvoice('<%= order.orderId %>')" class="btn btn-secondary">Download Invoice</button>                                <% } %>
                                 <!-- <% if (order.invoice) { %>

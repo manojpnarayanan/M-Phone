@@ -6,7 +6,7 @@ const walletSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        index: true  
+        index: true
     },
     walletBalance: {
         type: Number,
@@ -49,7 +49,7 @@ const walletSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Auto-update wallet balance
-walletSchema.pre('save', function(next) {
+walletSchema.pre('save', function (next) {
     if (this.transactions.length > 0) {
         const lastTransaction = this.transactions[this.transactions.length - 1];
         if (lastTransaction.transactionType === 'credit') {

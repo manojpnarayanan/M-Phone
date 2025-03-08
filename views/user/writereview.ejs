@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write Review</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">M Store</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/user/dashboard">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/dashboard/shopping">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/myprofile">My Profile</a></li>
+                    <li class="nav-item">
+                        <form id="logoutForm" action="/user/logout" method="post">
+                            <button type="submit" class="btn btn-dark logout-btn ms-3">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <h2>Write a Review</h2>
+        <form id="reviewForm" action="/user/myprofile/write-review/<%= orderId %>" method="POST" >
+            <div class="mb-3">
+                <label for="product" class="form-label">Select Product</label>
+                <select name="productId" id="product" class="form-select" required>
+                    <% products.forEach(product => { %>
+                        <option value="<%= product.product._id %>"><%= product.product.name %></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="rating" class="form-label">Rating</label>
+                <select name="rating" id="rating" class="form-select" required>
+                    <option value="5">5 - Excellent</option>
+                    <option value="4">4 - Very Good</option>
+                    <option value="3">3 - Good</option>
+                    <option value="2">2 - Fair</option>
+                    <option value="1">1 - Poor</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="comment" class="form-label">Review</label>
+                <textarea name="comment" id="comment" rows="3" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+        </form>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('reviewForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = {
+        productId: document.getElementById('product').value,
+        rating: document.getElementById('rating').value,
+        comment: document.getElementById('comment').value
+            }
+            console.log("Form Data:", formData);
+            const orderId = window.location.pathname.split('/').pop();
+            
+            fetch(`/user/myprofile/write-review/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body:JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Review Submitted',
+                        text: 'Your review has been successfully submitted!',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href =`/user/dashboard/products/${formData.productId}` ;
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                    confirmButtonText: 'OK'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

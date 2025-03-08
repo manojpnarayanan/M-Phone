@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,396 +10,401 @@
 
     <style>
         * {
-               margin: 0;
-               padding: 0;
-               box-sizing: border-box;
-               font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-           }
-           
-           body {
-               background-color: #f1f3f6;
-               color: #212121;
-               line-height: 1.4;
-           }
-           
-           .container {
-               max-width: 1200px;
-               margin: 0 auto;
-               padding: 20px;
-           }
-           
-           /* Header Styles */
-           .header {
-               background-color: #2874f0;
-               padding: 10px 0;
-               box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-           }
-           
-           .header-content {
-               display: flex;
-               align-items: center;
-               justify-content: space-between;
-           }
-           
-           .logo {
-               color: white;
-               font-size: 24px;
-               font-weight: bold;
-               text-decoration: none;
-           }
-           
-           .secure-checkout {
-               display: flex;
-               align-items: center;
-               color: white;
-           }
-           
-           .secure-checkout i {
-               margin-right: 5px;
-               font-size: 18px;
-           }
-           
-           /* Checkout Steps */
-           .checkout-steps {
-               display: flex;
-               justify-content: space-between;
-               margin: 20px 0;
-               padding: 10px 0;
-               position: relative;
-           }
-           
-           .step {
-               width: 25%;
-               text-align: center;
-               font-weight: 500;
-           }
-           
-           .step-indicator {
-               width: 30px;
-               height: 30px;
-               border-radius: 50%;
-               background-color: #e0e0e0;
-               color: #757575;
-               display: flex;
-               align-items: center;
-               justify-content: center;
-               margin: 0 auto 8px;
-               font-weight: bold;
-           }
-           
-           .step.active .step-indicator {
-               background-color: #2874f0;
-               color: white;
-           }
-           
-           .step-name {
-               color: #757575;
-               font-size: 14px;
-           }
-           
-           .step.active .step-name {
-               color: #2874f0;
-           }
-           
-           .step-connector {
-               position: absolute;
-               top: 25px;
-               height: 2px;
-               background-color: #e0e0e0;
-               width: 75%;
-               left: 12.5%;
-               z-index: -1;
-           }
-           
-           /* Main Content Layout */
-           .checkout-content {
-               display: flex;
-               flex-wrap: wrap;
-               gap: 20px;
-           }
-           
-           .checkout-left {
-               flex: 3;
-               min-width: 300px;
-           }
-           
-           .checkout-right {
-               flex: 1;
-               min-width: 300px;
-           }
-           
-           /* Card Styles */
-           .card {
-               background-color: white;
-               border-radius: 4px;
-               box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-               margin-bottom: 20px;
-               overflow: hidden;
-           }
-           
-           .card-header {
-               padding: 12px 15px;
-               background-color: #f8f9fa;
-               border-bottom: 1px solid #eeeeee;
-               display: flex;
-               justify-content: space-between;
-               align-items: center;
-           }
-           
-           .card-title {
-               font-size: 16px;
-               font-weight: 500;
-               color: #212121;
-           }
-           
-           .card-body {
-               padding: 15px;
-           }
-           
-           /* Form Controls */
-           .form-group {
-               margin-bottom: 15px;
-           }
-           
-           .form-label {
-               display: block;
-               margin-bottom: 5px;
-               font-size: 14px;
-               color: #212121;
-           }
-           
-           .form-control {
-               width: 100%;
-               padding: 10px;
-               border: 1px solid #d4d5d9;
-               border-radius: 4px;
-               font-size: 14px;
-               transition: border-color 0.15s ease-in-out;
-           }
-           
-           .form-control:focus {
-               border-color: #2874f0;
-               outline: none;
-           }
-           
-           .form-row {
-               display: flex;
-               flex-wrap: wrap;
-               gap: 15px;
-           }
-           
-           .form-col {
-               flex: 1;
-               min-width: 200px;
-           }
-           
-           /* Address Card */
-           .address-card {
-               border: 1px solid #e0e0e0;
-               border-radius: 4px;
-               padding: 10px;
-               margin-bottom: 10px;
-           }
-           
-           .address-card.selected {
-               border-color: #2874f0;
-               background-color: #f0f5ff;
-           }
-           
-           .address-actions {
-               display: flex;
-               justify-content: space-between;
-               margin-top: 10px;
-           }
-           
-           /* Payment Methods */
-           .payment-option {
-               padding: 15px;
-               border-bottom: 1px solid #eeeeee;
-               display: flex;
-               align-items: center;
-           }
-           
-           .payment-option:last-child {
-               border-bottom: none;
-           }
-           
-           .payment-radio {
-               margin-right: 10px;
-           }
-           
-           .payment-logo {
-               width: 30px;
-               height: 30px;
-               margin-right: 10px;
-           }
-           
-           /* Order Summary */
-           .order-item {
-               display: flex;
-               padding: 10px 0;
-               border-bottom: 1px solid #eeeeee;
-           }
-           
-           .item-image {
-               width: 50px;
-               height: 50px;
-               object-fit: contain;
-               margin-right: 10px;
-           }
-           
-           .item-details {
-               flex: 1;
-           }
-           
-           .item-name {
-               font-size: 14px;
-               font-weight: 500;
-               margin-bottom: 5px;
-           }
-           
-           .item-variant {
-               font-size: 12px;
-               color: #757575;
-           }
-           
-           .item-price {
-               font-weight: 500;
-               text-align: right;
-           }
-           
-           .price-summary {
-               padding: 10px 0;
-           }
-           
-           .price-row {
-               display: flex;
-               justify-content: space-between;
-               margin-bottom: 10px;
-           }
-           
-           .price-label {
-               color: #757575;
-           }
-           
-           .total-row {
-               font-weight: bold;
-               font-size: 16px;
-               padding-top: 10px;
-               border-top: 1px dashed #eeeeee;
-           }
-           
-           /* Buttons */
-           .btn {
-               display: inline-block;
-               padding: 10px 20px;
-               font-size: 14px;
-               font-weight: 500;
-               text-align: center;
-               border: none;
-               border-radius: 4px;
-               cursor: pointer;
-               transition: background-color 0.2s ease;
-           }
-           
-           .btn-primary {
-               background-color: #fb641b;
-               color: white;
-           }
-           
-           .btn-primary:hover {
-               background-color: #e85f19;
-           }
-           
-           .btn-secondary {
-               background-color: #2874f0;
-               color: white;
-           }
-           
-           .btn-secondary:hover {
-               background-color: #2362c7;
-           }
-           
-           .btn-outlined {
-               background-color: white;
-               color: #2874f0;
-               border: 1px solid #2874f0;
-           }
-           
-           .btn-outlined:hover {
-               background-color: #f0f5ff;
-           }
-           
-           .btn-block {
-               width: 100%;
-               display: block;
-           }
-           
-           /* Delivery Info */
-           .delivery-info {
-               display: flex;
-               align-items: center;
-               margin-top: 15px;
-               font-size: 14px;
-               color: #388e3c;
-           }
-           
-           .delivery-icon {
-               margin-right: 5px;
-           }
-           
-           /* Promo Code */
-           .promo-form {
-               display: flex;
-               gap: 10px;
-           }
-           
-           .promo-input {
-               flex: 1;
-           }
-           
-           .coupons-list {
-               margin-top: 10px;
-           }
-           
-           .coupon {
-               display: flex;
-               justify-content: space-between;
-               align-items: center;
-               padding: 10px;
-               border: 1px dashed #e0e0e0;
-               border-radius: 4px;
-               margin-bottom: 10px;
-               background-color: #fafafa;
-           }
-           
-           .coupon-code {
-               font-weight: bold;
-               color: #2874f0;
-           }
-           
-           /* Responsive Adjustments */
-           @media (max-width: 768px) {
-               .checkout-content {
-                   flex-direction: column;
-               }
-               
-               .checkout-steps {
-                   overflow-x: auto;
-                   padding-bottom: 5px;
-               }
-               
-               .step {
-                   min-width: 100px;
-               }
-           }
-           .payment-logo {
-    font-size: 24px; /* Adjust size */
-    color: #2874f0; /* Adjust color */
-    margin-right: 10px; /* Adjust spacing */
-}
-   </style>
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f1f3f6;
+            color: #212121;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #2874f0;
+            padding: 10px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .secure-checkout {
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+
+        .secure-checkout i {
+            margin-right: 5px;
+            font-size: 18px;
+        }
+
+        /* Checkout Steps */
+        .checkout-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 10px 0;
+            position: relative;
+        }
+
+        .step {
+            width: 25%;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .step-indicator {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            color: #757575;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: bold;
+        }
+
+        .step.active .step-indicator {
+            background-color: #2874f0;
+            color: white;
+        }
+
+        .step-name {
+            color: #757575;
+            font-size: 14px;
+        }
+
+        .step.active .step-name {
+            color: #2874f0;
+        }
+
+        .step-connector {
+            position: absolute;
+            top: 25px;
+            height: 2px;
+            background-color: #e0e0e0;
+            width: 75%;
+            left: 12.5%;
+            z-index: -1;
+        }
+
+        /* Main Content Layout */
+        .checkout-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .checkout-left {
+            flex: 3;
+            min-width: 300px;
+        }
+
+        .checkout-right {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eeeeee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #212121;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #212121;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d4d5d9;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: #2874f0;
+            outline: none;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .form-col {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Address Card */
+        .address-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .address-card.selected {
+            border-color: #2874f0;
+            background-color: #f0f5ff;
+        }
+
+        .address-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        /* Payment Methods */
+        .payment-option {
+            padding: 15px;
+            border-bottom: 1px solid #eeeeee;
+            display: flex;
+            align-items: center;
+        }
+
+        .payment-option:last-child {
+            border-bottom: none;
+        }
+
+        .payment-radio {
+            margin-right: 10px;
+        }
+
+        .payment-logo {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        /* Order Summary */
+        .order-item {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .item-image {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-right: 10px;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .item-variant {
+            font-size: 12px;
+            color: #757575;
+        }
+
+        .item-price {
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .price-summary {
+            padding: 10px 0;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .price-label {
+            color: #757575;
+        }
+
+        .total-row {
+            font-weight: bold;
+            font-size: 16px;
+            padding-top: 10px;
+            border-top: 1px dashed #eeeeee;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: #fb641b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #e85f19;
+        }
+
+        .btn-secondary {
+            background-color: #2874f0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2362c7;
+        }
+
+        .btn-outlined {
+            background-color: white;
+            color: #2874f0;
+            border: 1px solid #2874f0;
+        }
+
+        .btn-outlined:hover {
+            background-color: #f0f5ff;
+        }
+
+        .btn-block {
+            width: 100%;
+            display: block;
+        }
+
+        /* Delivery Info */
+        .delivery-info {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #388e3c;
+        }
+
+        .delivery-icon {
+            margin-right: 5px;
+        }
+
+        /* Promo Code */
+        .promo-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .promo-input {
+            flex: 1;
+        }
+
+        .coupons-list {
+            margin-top: 10px;
+        }
+
+        .coupon {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px dashed #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            background-color: #fafafa;
+        }
+
+        .coupon-code {
+            font-weight: bold;
+            color: #2874f0;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .checkout-content {
+                flex-direction: column;
+            }
+
+            .checkout-steps {
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+
+            .step {
+                min-width: 100px;
+            }
+        }
+
+        .payment-logo {
+            font-size: 24px;
+            /* Adjust size */
+            color: #2874f0;
+            /* Adjust color */
+            margin-right: 10px;
+            /* Adjust spacing */
+        }
+    </style>
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
@@ -412,7 +417,7 @@
             </div>
         </div>
     </header>
-    
+
     <!-- Main Content -->
     <div class="container">
         <!-- Checkout Steps -->
@@ -435,7 +440,7 @@
                 <div class="step-name">Payment</div>
             </div>
         </div>
-        
+
         <!-- Checkout Content -->
         <div class="checkout-content">
             <!-- Left Section -->
@@ -444,57 +449,68 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Delivery Address</h3>
-                        <a href="#" class="btn btn-outlined">+ Add New Address</a>
+                        <!-- <a href="#" class="btn btn-outlined">+ Add New Address</a> -->
                     </div>
                     <div class="card-body">
-                        <% if (addresses && addresses.length > 0) { %>
-                            <% addresses.forEach((address, index) => { %>
+                        <% if (addresses && addresses.length> 0) { %>
+                            <% addresses.forEach((address, index)=> { %>
                                 <div class="address-card <%= index === 0 ? 'selected' : '' %>">
-                                    <input type="radio" name="address" id="address<%= index %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
+                                    <input type="radio" name="address" id="address<%= index %>"
+                                        value="<%= address._id %>" <%=index===0 ? 'checked' : '' %>>
                                     <label for="address<%= index %>">
-                                        <strong><%= address.name %></strong>
+                                        <strong>
+                                            <%= address.name %>
+                                        </strong>
                                         <p>
-                                            <%= address.housename %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %><br>
-                                            Phone: <%= address.mobilenumber %><br>
-                                            Type: <%= address.addresstype %>
+                                            <%= address.housename %>, <%= address.city %>, <%= address.state %> - <%=
+                                                            address.pincode %><br>
+                                                            Phone: <%= address.mobilenumber %><br>
+                                                                Type: <%= address.addresstype %>
                                         </p>
                                     </label>
-                                    <div class="address-actions">
+                                    <!-- <div class="address-actions">
                                         <button class="btn btn-outlined">Edit</button>
                                         <button class="btn btn-outlined">Remove</button>
-                                    </div>
+                                    </div> -->
                                 </div>
-                            <% }) %>
-                        <% } else { %>
-                            <p>No addresses found. Please add one.</p>
-                        <% } %>
+                                <% }) %>
+                                    <% } else { %>
+                                        <p>No addresses found. Please add one.</p>
+                                        <% } %>
                     </div>
                 </div>
-                
+
                 <!-- Order Items -->
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Order Items (<%= totalItems %>)</h3>
                     </div>
                     <div class="card-body">
-                        <% if (product && product.length > 0) { %>
-                            <% product.forEach(item => { %>
+                        <% if (product && product.length> 0) { %>
+                            <% product.forEach(item=> { %>
                                 <div class="order-item">
-                                    <img src="/<%= item.product.image[0] %>" alt="<%= item.product.name %>" class="item-image">
+                                    <img src="/<%= item.product.image[0] %>" alt="<%= item.product.name %>"
+                                        class="item-image">
                                     <div class="item-details">
-                                        <div class="item-name"><%= item.product.name %></div>
-                                        <div class="item-variant"><%= item.product.variant %></div>
+                                        <div class="item-name">
+                                            <%= item.product.name %>
+                                        </div>
+                                        <div class="item-variant">
+                                            <%= item.product.variant %>
+                                        </div>
                                         <div class="delivery-info">
                                             <span class="delivery-icon">📦</span>
                                             Delivery by <%= item.product.estimatedDeliveryDate %>
                                         </div>
                                     </div>
-                                    <div class="item-price">₹<%= (item.product.price - item.product.discount) * item.quantity %></div>
+                                    <div class="item-price">₹<%= (item.product.price - item.product.discount) *
+                                            item.quantity %>
+                                    </div>
                                 </div>
-                            <% }) %>
-                        <% } else { %>
-                            <p>No items in the cart.</p>
-                        <% } %>
+                                <% }) %>
+                                    <% } else { %>
+                                        <p>No items in the cart.</p>
+                                        <% } %>
                     </div>
                 </div>
                 <!-- Payment Options -->
@@ -526,14 +542,15 @@
                             <img src="/api/placeholder/30/30" alt="Wallet" class="payment-logo">
                             <label for="wallet">Wallet</label>
                         </div> -->
-                        
+
                         <div class="payment-option">
-                            <input type="radio" name="paymentMethod" id="cod" value="cash_on_delivery" class="payment-radio">
+                            <input type="radio" name="paymentMethod" id="cod" value="cash_on_delivery"
+                                class="payment-radio">
                             <!-- <img src="/api/placeholder/30/30" alt="Cash on Delivery" class="payment-logo"> -->
-                            <i class="fas fa-money-bill-wave payment-logo"></i> 
+                            <i class="fas fa-money-bill-wave payment-logo"></i>
                             <label for="cod">Cash on Delivery</label>
                         </div>
-                        
+
                         <!-- Card Details Form (shown when card payment is selected) -->
                         <!-- <div class="form-group" style="margin-top: 15px;">
                             <label for="cardNumber" class="form-label">Card Number</label>
@@ -556,57 +573,63 @@
                             <input type="text" id="nameOnCard" class="form-control" placeholder="John Doe">
                         </div> -->
 
-                         
-                
-                            
-                            <button onclick="placeOrder()" class="btn btn-primary btn-block  style="margin-top: 20px;">Pay ₹<%= (totalPrice - totalDiscount + deliveryCharges + gst).toFixed(2) %></button>
-                        </div>
+
+
+
+                        <button onclick="placeOrder()" class="btn btn-primary btn-block  style=" margin-top: 20px;">Pay
+                            ₹<%= (totalPrice - totalDiscount + deliveryCharges + gst).toFixed(2) %></button>
                     </div>
                 </div>
-             
-                    <!-- Right Section -->
-                    <div class="checkout-right">
-                        <!-- Order Summary -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Price Details</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="price-summary">
-                                    <div class="price-row">
-                                        <div class="price-label">Price (<%= totalItems %> items)</div>
-                                        <div class="price-value">₹<%= totalPrice %></div>
+            </div>
+
+            <!-- Right Section -->
+            <div class="checkout-right">
+                <!-- Order Summary -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Price Details</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="price-summary">
+                            <div class="price-row">
+                                <div class="price-label">Price (<%= totalItems %> items)</div>
+                                <div class="price-value">₹<%= totalPrice %>
+                                </div>
                             </div>
                             <div class="price-row">
                                 <div class="price-label">Discount</div>
-                                <div class="price-value" style="color: #388e3c;">-₹<%= totalDiscount %></div>
+                                <div class="price-value" style="color: #388e3c;">-₹<%= totalDiscount %>
+                                </div>
                             </div>
                             <div class="price-row">
                                 <div class="price-label">Delivery Charges</div>
                                 <div class="price-value" style="color: #388e3c;">
-                                    <% if (totalPrice > 50000) { %>
+                                    <% if (totalPrice> 50000) { %>
                                         FREE
-                                    <% } else { %>
-                                        ₹100
-                                    <% } %>
+                                        <% } else { %>
+                                            ₹100
+                                            <% } %>
                                 </div>
                             </div>
                             <div class="price-row">
                                 <div class="price-label">GST (18%)</div>
-                                <div class="price-value">₹<%= gst.toFixed(2) %></div>
+                                <div class="price-value">₹<%= gst.toFixed(2) %>
+                                </div>
                             </div>
                             <div class="price-row total-row">
                                 <div class="price-label">Total Amount</div>
-                                <div class="price-value">₹<%= (totalPrice - totalDiscount + deliveryCharges + gst).toFixed(2) %></div>
+                                <div class="price-value">₹<%= (totalPrice - totalDiscount + deliveryCharges +
+                                        gst).toFixed(2) %>
+                                </div>
                             </div>
                         </div>
-                        
+
                         <div style="color: #388e3c; margin-top: 10px; font-weight: 500;">
                             You will save ₹<%= totalDiscount %> on this order
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Promo Code -->
                 <div class="card">
                     <div class="card-header">
@@ -617,7 +640,7 @@
                             <input type="text" class="form-control promo-input" placeholder="Enter promo code">
                             <button class="btn btn-secondary">Apply</button>
                         </div>
-                        
+
                         <div class="coupons-list">
                             <div class="coupon">
                                 <div>
@@ -626,7 +649,7 @@
                                 </div>
                                 <button class="btn btn-outlined">Apply</button>
                             </div>
-                            
+
                             <div class="coupon">
                                 <div>
                                     <div class="coupon-code">WELCOME10</div>
@@ -641,6 +664,7 @@
         </div>
     </div>
 </body>
+
 </html>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -649,25 +673,25 @@
     async function placeOrder() {
         try {
             // Check if a payment method is selected
-        const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-        if (!selectedPaymentMethod) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Please select a payment method.'
-            });
-            return; // Stop execution if no payment method is selected
-        }
-        // Check if an address is selected
-        const selectedAddress = document.querySelector('input[name="address"]:checked');
-        if (!selectedAddress) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Please select a delivery address.'
-            });
-            return; // Stop execution if no address is selected
-        }
+            const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+            if (!selectedPaymentMethod) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select a payment method.'
+                });
+                return; // Stop execution if no payment method is selected
+            }
+            // Check if an address is selected
+            const selectedAddress = document.querySelector('input[name="address"]:checked');
+            if (!selectedAddress) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select a delivery address.'
+                });
+                return; // Stop execution if no address is selected
+            }
             // Gather data from the page
             const orderData = {
                 userId: "<%= user._id %>",
@@ -677,11 +701,11 @@
                 finalAmount: "<%= (totalPrice - totalDiscount + deliveryCharges + gst).toFixed(2) %>",
                 products: [
                     <% product.forEach((item, index) => { %>
-                        {
-                            product: "<%= item.product._id %>",
-                            quantity: "<%= item.quantity %>",
-                            price: "<%= item.product.price %>"
-                        },
+                {
+                    product: "<%= item.product._id %>",
+                    quantity: "<%= item.quantity %>",
+                    price: "<%= item.product.price %>"
+                },
                     <% }) %>
                 ],
                 // paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value

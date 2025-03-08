@@ -1,131 +1,133 @@
 
-const Product=require("../model/addproduct")
+const Product = require("../model/addproduct")
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
-const Brands=require("../model/brandschema")
-const Category=require("../model/createcategory")
+const Brands = require("../model/brandschema")
+const Category = require("../model/createcategory")
 
-const addproducts={
-    addProduct:async (req,res)=>{
-        try{
-              const {name, description,price,stock,isActive,brand,croppedImages,category,discount,availability,deliveryTime,tags}=req.body
-              console.log(req.body)
-            if (!croppedImages) {
-              return res.status(400).send("Product adding Failed, Add At Least 3 images");
-          }
-             
-            const croppedImagesArray = JSON.parse(croppedImages);
-            if (croppedImagesArray.length < 3) {
-                return res.status(400).send("Product adding Failed, Add At Least 3 images");
-            }
-            let imagePaths = [];
-            const uploadDir = "public/uploads/product-images/";
-            for (let i = 0; i < croppedImagesArray.length; i++) {
-              const base64Data = croppedImagesArray[i].replace(/^data:image\/\w+;base64,/, "");
-              const imageName = `image-${Date.now()}-${i}.jpg`;
-              const imagePath = `${uploadDir}${imageName}`;
-              fs.writeFileSync(imagePath, Buffer.from(base64Data, "base64"));
-
-              // Optimize image using sharp
-              await sharp(imagePath)
-                  .resize(500, 500) // Resize to 500x500px
-                  .toFile(`${uploadDir}optimized-${imageName}`);
-
-              imagePaths.push(`uploads/product-images/optimized-${imageName}`);
-          }
-            const product=new Product({
-                    name,
-                    description,
-                    price,
-                    brand,
-                    category,
-                    isActive:isActive? true:false,
-                    image:imagePaths,
-                    stock,discount,availability,deliveryTime,tags
-                 })
-                
-                 await product.save();
-                 
-                 res.redirect("/admin/dashboard/productlist")
-
-           }catch(error){
-            console.log(error)
-            res.status(400).send("Failed to add products")
-           }
-    },
-
-    getProduct:async(req,res)=>{
-      try{
-        const productsPerPage=3
-        const search=req.query.search||""
-        const page=parseInt(req.query.page)||1
-        const query=search?  {name:{$regex:search,$options:"i"}}: {};
-
-      
-        const totalProducts=await Product.countDocuments(query)
-        const products= await Product.find(query)
-        .skip((page-1)*productsPerPage)
-        .limit(productsPerPage)
-        .sort({createdAt:-1})
-        .lean()
-        const categories=await Category.find({isActive:true})
-        console.log(categories)
-        res.render("admin/page-products-list",{
-          products,
-          search,
-          categories,
-          currentPage:page,
-          totalPages:Math.ceil(totalProducts / productsPerPage)
-        })
-      }catch(error){
-        console.log(error)
-        res.status(500).send("error fectching products")
+const addproducts = {
+  addProduct: async (req, res) => {
+    try {
+      const { name, description, price, stock, isActive, brand, croppedImages, category, discount, availability, deliveryTime, tags } = req.body
+      // console.log(req.body)
+      if (!croppedImages) {
+        return res.status(400).send("Product adding Failed, Add At Least 3 images");
       }
-    },
-blockProduct: async (req,res)=>{
-  try{
-    const blockProduct= await Product.findById(req.params.id)
-    // console.log(blockProduct)
-    if(!blockProduct){
-      return res.status(404).json({message:"Product not Found"})
-    }
-    blockProduct.isActive = ! blockProduct.isActive;  // Toggle the boolean value
-    await blockProduct.save();
 
-    res.status(200).json({ message: `Product ${blockProduct.isActive ? "unblocked" : "blocked"} successfully`,
-      isActive: blockProduct.isActive })
-           
-    }catch(error){
+      const croppedImagesArray = JSON.parse(croppedImages);
+      if (croppedImagesArray.length < 3) {
+        return res.status(400).send("Product adding Failed, Add At Least 3 images");
+      }
+      let imagePaths = [];
+      const uploadDir = "public/uploads/product-images/";
+      for (let i = 0; i < croppedImagesArray.length; i++) {
+        const base64Data = croppedImagesArray[i].replace(/^data:image\/\w+;base64,/, "");
+        const imageName = `image-${Date.now()}-${i}.jpg`;
+        const imagePath = `${uploadDir}${imageName}`;
+        fs.writeFileSync(imagePath, Buffer.from(base64Data, "base64"));
+
+        // Optimize image using sharp
+        await sharp(imagePath)
+          .resize(500, 500) // Resize to 500x500px
+          .toFile(`${uploadDir}optimized-${imageName}`);
+
+        imagePaths.push(`uploads/product-images/optimized-${imageName}`);
+      }
+      const product = new Product({
+        name,
+        description,
+        price,
+        brand,
+        category,
+        isActive: isActive ? true : false,
+        image: imagePaths,
+        stock, discount, availability, deliveryTime, tags
+      })
+
+      await product.save();
+
+      res.redirect("/admin/dashboard/productlist")
+
+    } catch (error) {
       console.log(error)
-      res.status(500).json({message:"Internal server error"})
+      res.status(400).send("Failed to add products")
     }
   },
-  editProduct: async (req,res)=>{
-    const product=await Product.findById(req.params.id)
-    const Brand=await Brands.find()
-    const category=await Category.find()
-    if(!product){
+
+  getProduct: async (req, res) => {
+    try {
+      const productsPerPage = 3
+      const search = req.query.search || ""
+      const page = parseInt(req.query.page) || 1
+      const query = search ? { name: { $regex: search, $options: "i" } } : {};
+
+
+      const totalProducts = await Product.countDocuments(query)
+      const products = await Product.find(query)
+        .skip((page - 1) * productsPerPage)
+        .limit(productsPerPage)
+        .sort({ createdAt: -1 })
+        .lean()
+      const categories = await Category.find({ isActive: true })
+      // console.log(categories)
+      res.render("admin/page-products-list", {
+        products,
+        search,
+        categories,
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / productsPerPage)
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).send("error fectching products")
+    }
+  },
+  blockProduct: async (req, res) => {
+    try {
+      const blockProduct = await Product.findById(req.params.id)
+      // console.log(blockProduct)
+      if (!blockProduct) {
+        return res.status(404).json({ message: "Product not Found" })
+      }
+      blockProduct.isActive = !blockProduct.isActive;  // Toggle the boolean value
+      await blockProduct.save();
+
+      res.status(200).json({
+        message: `Product ${blockProduct.isActive ? "unblocked" : "blocked"} successfully`,
+        isActive: blockProduct.isActive
+      })
+
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ message: "Internal server error" })
+    }
+  },
+  editProduct: async (req, res) => {
+    const product = await Product.findById(req.params.id)
+    const Brand = await Brands.find()
+    const category = await Category.find()
+    if (!product) {
       return res.status(400).send("Product not found")
     }
-    res.render("admin/editproducts",{Brand,category,product})
+    res.render("admin/editproducts", { Brand, category, product })
   },
- 
-  
 
-  updateEditProduct:async (req, res) => {
+
+
+  updateEditProduct: async (req, res) => {
     try {
       // Destructure fields from the form body
       const { name, description, price, stock, category, brand, tags, isActive } = req.body;
-      console.log("updateEditProduct req.body:", req.body);
+      // console.log("updateEditProduct req.body:", req.body);
 
       // Find the product in the database
       const product = await Product.findById(req.params.id);
       if (!product) {
         return res.status(404).send("Product not found");
       }
-      const categoryDoc=await Category.findOne({parent:category})
-      console.log("categoryDoc",categoryDoc)
+      const categoryDoc = await Category.findOne({ parent: category })
+      // console.log("categoryDoc",categoryDoc)
       if (!categoryDoc) {
         return res.status(400).send("Category not found");
       }
@@ -205,40 +207,40 @@ blockProduct: async (req,res)=>{
       res.status(500).send("Error updating product");
     }
   },
-  loadAddProductForm:async (req,res)=>{
-    try{
-      const categories=await Category.find({isActive:true})
-       res.render("admin/page-form-product-1",{categories})
+  loadAddProductForm: async (req, res) => {
+    try {
+      const categories = await Category.find({ isActive: true })
+      res.render("admin/page-form-product-1", { categories })
 
-    }catch(error){
-     console.log(error)
+    } catch (error) {
+      console.log(error)
     }
   }
-//   updateEditProduct: async (req, res) => {
-//     try {
-//         const productId = req.params.id;
-//         const { name, description, price, category, brand, stock } = req.body;
-//         console.log(req.body);
-        
+  //   updateEditProduct: async (req, res) => {
+  //     try {
+  //         const productId = req.params.id;
+  //         const { name, description, price, category, brand, stock } = req.body;
+  //         console.log(req.body);
 
-//         // Find product and update
-//         const updatedProduct = await Product.findByIdAndUpdate(
-//             productId,
-//             { name, description, price, category, brand, stock },
-//             { new: true }
-//         );
 
-//         if (!updatedProduct) {
-//             return res.status(404).json({ success: false, message: "Product not found" });
-//         }
+  //         // Find product and update
+  //         const updatedProduct = await Product.findByIdAndUpdate(
+  //             productId,
+  //             { name, description, price, category, brand, stock },
+  //             { new: true }
+  //         );
 
-//         res.redirect("/admin/dashboard/productlist"); // Redirect after successful update
-//     } catch (error) {
-//         console.error("Error updating product:", error);
-//         res.status(500).json({ success: false, message: "Internal server error" });
-//     }
-// }
+  //         if (!updatedProduct) {
+  //             return res.status(404).json({ success: false, message: "Product not found" });
+  //         }
 
-}  
+  //         res.redirect("/admin/dashboard/productlist"); // Redirect after successful update
+  //     } catch (error) {
+  //         console.error("Error updating product:", error);
+  //         res.status(500).json({ success: false, message: "Internal server error" });
+  //     }
+  // }
 
-module.exports=addproducts
+}
+
+module.exports = addproducts
