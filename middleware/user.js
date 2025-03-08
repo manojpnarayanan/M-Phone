@@ -52,7 +52,32 @@ const verifyUser={
     }
     
 
-  }
+  },
+  isVerifiedtrue:async(req,res,next)=>{
+    try{
+      const token=req.cookies.token
+      const decoded=jwt.verify(token,process.env.JWT_SECRET)
+      const user= await User.findById(decoded.id)
   
+      if(!user||!user.isActive||!user.isVerified){
+        res.clearCookie("token")
+       return res.status(403).redirect("user/login")
+       
+      }
+      next()
+    }catch(error){
+      console.log(error)
+       // Handle specific JWT errors
+    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+      res.clearCookie("token"); // Clear the invalid or expired token
+      return res.status(401).redirect("/user/login");
+    }
+
+    // Pass other errors to the error-handling middleware
+    next(error);
+    }
+   
+  
+}
 }
 module.exports=verifyUser

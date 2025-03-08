@@ -29,7 +29,7 @@ router.post("/reset-password", userController.resetPassword);
 
 
 router.get("/dashboard",middleware.existUser,userController.loadDashboard)
-router.use("/dashboard",userDashboard)
+router.use("/dashboard",middleware.isVerifiedtrue,userDashboard)
 router.use("/myprofile",profile)
 
 router.post("/logout",(req,res)=>{res.clearCookie("token"),res.redirect("/user/login")})

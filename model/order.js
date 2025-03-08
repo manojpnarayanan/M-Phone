@@ -75,6 +75,10 @@ const orderSchema = new mongoose.Schema({
     couponApplied: {
         type: Boolean,
         default: false
+    },
+    invoice: {
+        type: String, // Path or URL to the invoice file
+        default: null, // Default value is null
     }
 }, { timestamps: true });
 

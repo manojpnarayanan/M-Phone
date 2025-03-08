@@ -192,7 +192,7 @@
                                                     </td>
                                                     <td><%= order.totalAmount.toFixed(2) %></td>
                                                     <td>
-                                                        <select class="form-select status-dropdown" data-order-id="<%= order._id %>">
+                                                        <select class="form-select status-dropdown" data-order-id="<%= order._id %>" <%= order.orderStatus === 'Returned' ? 'disabled' : ''%>>
                                                             <option value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
                                                             <option value="Processing" <%= order.orderStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
                                                             <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>

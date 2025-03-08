@@ -692,6 +692,26 @@
                 min-width: 100px;
             }
         }
+        /* Custom CSS for Wallet Transactions Table */
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table tbody td {
+    vertical-align: middle;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f3f5;
+}
     </style>
 
   </style>
@@ -751,6 +771,7 @@
             <a href="#my-orders" class="nav-link">My Orders</a>
             <a href="#manage-addresses" class="nav-link">Manage Addresses</a>
             <a href="#wishlist" class="nav-link">Wishlist</a>
+            <a href="#wallet" class="nav-link">Wallet</a>
             <a href="#coupons" class="nav-link">Coupons</a>
             <hr />
             <a href="#" class="nav-link text-danger">Logout</a>
@@ -833,7 +854,7 @@
 
             <div class="change-password">
               <h6>Change Password</h6>
-              <form action="/user/change-password" method="post">
+              <form action="/user/myprofile/change-password" method="post">
                 <div class="mb-3 row">
                   <label
                     for="currentPassword"
@@ -890,13 +911,14 @@
             <h5>My Orders</h5>
             <p>Your order history will be displayed here.</p>
           </div> -->
+         
   
        
 <div id="my-orders" class="content-section">
     <div class="container">
         <h1 class="page-title">My Orders</h1>
         
-        <% if (orders.length === 0) { %>
+        <% if (!orders.length === 0) { %>
             <div class="empty-orders">
                 <div class="empty-icon">
                     <i class="fas fa-shopping-bag"></i>
@@ -983,7 +1005,7 @@
                                 <% order.products.forEach(item => { %>
                                     <div class="product-item">
                                         <div class="product-image">
-                                            <% if (item.product.image) { %>
+                                            <% if (item.product && item.product.image) { %>
                                                 <img src="/<%= item.product.image[0] %>" alt="<%= item.product.name %>">
                                             <% } else { %>
                                                 <i class="fas fa-box" style="font-size: 24px; color: #ccc;"></i>
@@ -1059,17 +1081,18 @@
                             
                             <div class="order-actions">
                                 <% if (order.orderStatus.toLowerCase() !== 'delivered' && order.orderStatus.toLowerCase() !== 'cancelled') { %>
-                                    <form action="/orders/<%= order.orderId %>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
-                                        <button type="submit" class="btn btn-secondary">Cancel Order</button>
-                                    </form>
+                                    <!-- <form action="/user/myprofile/cancel-order/<%= order.orderId %>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');"> -->
+                                        <button onclick="cancelOrder('<%= order._id %>')" class="btn btn-secondary">Cancel Order</button>
+                                    <!-- </form> -->
                                 <% } %>
-                                <a href="/orders/<%= order.orderId %>" class="btn btn-primary">View Details</a>
+                                <!-- <a href="/user/myprofile/cancel-order/<%= order.orderId %>" class="btn btn-primary">View Details</a> -->
                                 <% if (order.orderStatus.toLowerCase() === 'delivered') { %>
                                     <a href="/orders/<%= order.orderId %>/review" class="btn btn-secondary">Write Review</a>
-                                <% } %>
-                                <% if (order.invoice) { %>
+                                    <button onclick="returnOrder('<%=order._id %>')" class="btn btn-warning">Return Order</button>
+                                    <button onclick="downloadInvoice('<%= order.orderId %>')" class="btn btn-secondary">Download Invoice</button>                                <% } %>
+                                <!-- <% if (order.invoice) { %>
                                     <a href="<%= order.invoice %>" class="btn btn-secondary" target="_blank">Download Invoice</a>
-                                <% } %>
+                                <% } %> -->
                             </div>
                         </div>
                     </div>
@@ -1138,7 +1161,10 @@
                         <p class="product-price"><strong>Price:</strong> $<%= product.price %></p>
                         <p class="product-description"><strong>Description:</strong> <%= product.description %></p>
                         <div class="product-actions">
-                          <button class="btn btn-primary">Add to Cart</button>
+                           
+
+                                <button onclick="addtocartfromwishlist('<%=product._id%>')" data-product-id="<%= product._id %> " class="btn btn-primary">Add to Cart</button>
+                            
                           <button class="btn btn-danger remove-from-wishlist" data-product-id="<%= product._id %>">Remove</button>
                         </div>
                       </div>
@@ -1150,13 +1176,85 @@
               <% } %>
             </ul>
           </div>
-          <!-- <div id="wishlist" class="content-section" style="display: none;">
-            <h5>Wishlist</h5>
-            <p>Your wishlist items will be displayed here.</p>
+
+           <!-- Wallet Link -->
+          <!-- <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#walletModal">Wallet</a> -->
+          <!-- <div id="wallet" class="content-section" style="display: none;">
+            <h5>Wallet</h5>
+            <p>Your wallet details will be displayed here.</p>
             <ul id="wishlist-items">
-                 Wishlist items will be dynamically inserted here -->
-              <!-- </ul>
+                 Wallet items will be dynamically inserted here 
+               </ul>
           </div>  -->
+        
+          <div id="wallet" class="content-section">
+            <h5>Wallet</h5>
+            <% if (wallet) { %>
+                <!-- Wallet Balance and Add Funds Button -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <p class="mb-0">Your wallet balance: <strong>₹<%= wallet.walletBalance %></strong></p>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFundsModal">
+                        Add Funds
+                    </button>
+                </div>
+        
+                <!-- Transaction History -->
+                <h6>Transaction History</h6>
+                <% if (wallet.transactions.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% wallet.transactions.forEach(transaction => { %>
+                                    <tr>
+                                        <td><%= transaction.transactionDescription %></td>
+                                        <td>₹<%= transaction.transactionAmount %></td>
+                                        <td><%= transaction.transactionType %></td>
+                                        <td><%= transaction.transactionDate.toDateString() %></td>
+                                        <td><%= transaction.transactionStatus %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <p class="text-muted">No transactions found.</p>
+                <% } %>
+            <% } else { %>
+                <p class="text-danger">No wallet found. Please contact support.</p>
+            <% } %>
+        </div>
+        
+        <!-- Add Funds Modal -->
+        <div class="modal fade" id="addFundsModal" tabindex="-1" aria-labelledby="addFundsModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addFundsModalLabel">Add Funds to Wallet</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addFundsForm">
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="amount" min="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Funds</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+  
+          
 
           <!-- Coupons (Hidden by Default) -->
           <div id="coupons" class="content-section" style="display: none;">
@@ -1240,64 +1338,302 @@
 
   <!-- JavaScript for Dynamic Content Switching -->
   <script>
-     
-     document.querySelectorAll(".remove-from-wishlist").forEach(button => {
-  button.addEventListener("click", async function () {
-    const productId = this.getAttribute("data-product-id");
-    console.log("Product ID to remove:", productId);
-
-    // Confirmation Dialog
-    const confirmRemove = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to remove this product from your wishlist?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#007bff',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Yes, remove it!',
-      cancelButtonText: 'Cancel',
-    });
-
-    if (confirmRemove.isConfirmed) {
-      try {
-        // Send DELETE request to remove the product
-        const response = await fetch(`/user/myprofile/deletewishlist/${productId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+    async function downloadInvoice(orderId) {
+    try {
+        const response = await fetch(`/user/myprofile/${orderId}/download-invoice`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
         });
 
-        const data = await response.json();
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || "Failed to download invoice");
+        }
 
-        if (response.ok && data.success) {
-          // Show success message
-          Swal.fire({
-            title: 'Success!',
-            text: data.message,
-            icon: 'success',
-            confirmButtonColor: '#007bff',
-          }).then(() => {
-            // Reload the page or update the wishlist dynamically
-            window.location.reload(); // Reload the page to reflect changes
-          });
+        // Trigger the download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `invoice_${orderId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: error.message || "Failed to download invoice",
+            confirmButtonText: "OK",
+        });
+    }
+}
+
+document.getElementById('addFundsForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const amount = document.getElementById('amount').value;
+
+        // if (!amount || amount <= 0) {
+        //     alert('Please enter a valid amount.');
+        //     return;
+        // }
+
+        try {
+            const response = await fetch('/user/myprofile/wallet/add-funds', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ amount }),
+            });
+
+            const data = await response.json();
+            console.log(data)
+
+            if (response.ok) {
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message,
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    // Reload the page to reflect the updated wallet balance
+                    window.location.reload();
+                });
+            } else {
+                // Show error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: data.message || 'Failed to add funds.',
+                    confirmButtonText: 'OK',
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'An error occurred while adding funds.',
+                confirmButtonText: 'OK',
+            });
+        }
+    });
+
+
+
+     function returnOrder(orderId) {
+    console.log(orderId);
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to return this order?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, return it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/user/myprofile/return-order/${orderId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Return Request Submitted',
+                        text: 'Your return request has been successfully submitted!',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Reload the page or update the UI
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+    });
+}
+    
+    
+    async function cancelOrder(orderId) {
+            try {
+                const response = await fetch(`/user/myprofile/cancel-order/${orderId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json", // Corrected header name
+                    },
+                });
+                const result = await response.json();
+                console.log(result);
+
+                if (response.ok) {
+                    // SweetAlert2 success alert
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Order cancelled successfully!',
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        // Optionally, refresh the page or update the UI
+                        window.location.reload(); // Reload the page to reflect changes
+                    });
+                } else {
+                    // SweetAlert2 error alert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed!',
+                        text: result.message || 'Failed to cancel order.',
+                        confirmButtonText: 'OK',
+                    });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                // SweetAlert2 error alert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred while cancelling the order.',
+                    confirmButtonText: 'OK',
+                });
+            }
+        }
+
+       async function addtocartfromwishlist(productId){
+            console.log(productId)
+            
+            try{
+                const response=await fetch(`/user/myprofile/${productId}`,{
+                method:"POST",
+                headers:{
+                         "Content-Type":"application/json",
+                },
+                credentials:"include"
+            })
+            console.log("Response status:", response.status);
+            if (!response.ok) {
+            throw new Error(`Failed to add product to cart: ${response.statusText}`);
+        }
+            const data=await response.json()
+            if(data.success){
+                Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: data.message || 'Product added to cart successfully!',
+                confirmButtonText: 'OK',
+            }).then(() => {
+                // Optionally, redirect to the cart page or update the UI
+                window.location.href = "/user/dashboard/addtocart"; // Redirect to cart page
+            });
         } else {
-          // Show error message
+            // Show error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed!',
+                text: data.message || 'Failed to add product to cart.',
+                confirmButtonText: 'OK',
+            });
+            }
+
+            }catch(error){
+                console.error("Error:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'An error occurred while adding the product to the cart.',
+            confirmButtonText: 'OK',
+        });
+
+            }
+            
+
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+  // Event delegation for removing items from the wishlist
+  document.getElementById('wishlist-items').addEventListener('click', async function (e) {
+    if (e.target.classList.contains('remove-from-wishlist')) {
+      const productId = e.target.getAttribute('data-product-id');
+      console.log("Product ID to remove:", productId);
+
+      // Confirmation Dialog
+      const confirmRemove = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to remove this product from your wishlist?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#007bff',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Yes, remove it!',
+        cancelButtonText: 'Cancel',
+      });
+
+      if (confirmRemove.isConfirmed) {
+        try {
+          // Send DELETE request to remove the product
+          const response = await fetch(`/user/myprofile/deletewishlist/${productId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            // Show success message
+            Swal.fire({
+              title: 'Success!',
+              text: data.message,
+              icon: 'success',
+              confirmButtonColor: '#007bff',
+            }).then(() => {
+              // Reload the page or update the wishlist dynamically
+              window.location.reload(); // Reload the page to reflect changes
+            });
+          } else {
+            // Show error message
+            Swal.fire({
+              title: 'Error!',
+              text: data.message || 'Failed to remove product from wishlist',
+              icon: 'error',
+              confirmButtonColor: '#007bff',
+            });
+          }
+        } catch (error) {
+          console.error('Error:', error);
           Swal.fire({
             title: 'Error!',
-            text: data.message || 'Failed to remove product from wishlist',
+            text: 'An error occurred while removing the product',
             icon: 'error',
             confirmButtonColor: '#007bff',
           });
         }
-      } catch (error) {
-        console.error('Error:', error);
-        Swal.fire({
-          title: 'Error!',
-          text: 'An error occurred while removing the product',
-          icon: 'error',
-          confirmButtonColor: '#007bff',
-        });
       }
     }
   });
@@ -1342,40 +1678,66 @@
 
     async function fetchWishlist() {
     try {
-      const response = await fetch("/wishlist/loadWishlist", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Include cookies in the request
-      });
+        const response = await fetch("/user/myprofile/wishlist", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include", // Include cookies for authentication
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch wishlist");
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        const wishlistItems = document.getElementById("wishlist-items");
-        wishlistItems.innerHTML = ""; // Clear existing items
-
-        if (data.wishlist.length > 0) {
-          data.wishlist.forEach((product) => {
-            const listItem = document.createElement("li");
-            listItem.textContent = product.name; // Assuming product has a 'name' property
-            wishlistItems.appendChild(listItem);
-          });
-        } else {
-          wishlistItems.innerHTML = "<li>Your wishlist is empty.</li>";
+        if (!response.ok) {
+            throw new Error("Failed to fetch wishlist");
         }
-      } else {
-        console.error("Failed to load wishlist:", data.message);
-      }
+
+        const data = await response.json();
+
+        if (data.success) {
+            const wishlistItems = document.getElementById("wishlist-items");
+            wishlistItems.innerHTML = ""; // Clear existing items
+
+            if (data.wishlist.length > 0) {
+                data.wishlist.forEach((product) => {
+                    // Create a wishlist item with full product details
+                    const listItem = document.createElement("li");
+                    listItem.className = "wishlist-item";
+
+                    listItem.innerHTML = `
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="/${product.image && product.image.length > 0 ? product.image[0] : 'images/default.png'}" alt="${product.name}" />
+                            </div>
+                            <div class="product-details">
+                                <h6 class="product-name">${product.name}</h6>
+                                <p class="product-price"><strong>Price:</strong> $${product.price}</p>
+                                <p class="product-description"><strong>Description:</strong> ${product.description}</p>
+                                 <div class="product-actions">
+                                     <button onclick="addtocartfromwishlist('${product._id}')" class="btn btn-primary">Add to Cart</button>
+                                     <button class="btn btn-danger remove-from-wishlist" data-product-id="${product._id}">Remove</button>
+                                    
+                                 </div>
+                            </div>
+                        </div>
+                    `;
+
+                    wishlistItems.appendChild(listItem);
+                });
+            } else {
+                wishlistItems.innerHTML = "<li class='empty-wishlist'>Your wishlist is empty.</li>";
+            }
+        } else {
+            console.error("Failed to load wishlist:", data.message);
+        }
     } catch (error) {
-      console.error("Error fetching wishlist:", error);
+        console.error("Error fetching wishlist:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'Failed to fetch wishlist. Please try again later.',
+            confirmButtonText: 'OK',
+        });
     }
-  }
+}
         
 
 //   document.querySelectorAll(".profile-nav .nav-link").forEach(link => {

@@ -3,6 +3,7 @@ const bcryptjs=require("bcryptjs")
 const jwt=require("jsonwebtoken")
 const nodemailer = require('nodemailer');
 const Product=require("../../model/addproduct")
+const Cart=require("../../model/cart")
 
 const userController={
     login: async(req,res)=>{
@@ -44,7 +45,6 @@ const userController={
            
             const decoded=jwt.verify(token,process.env.JWT_SECRET)
             // console.log("token decoded",decoded)
-           
            const user=await User.findById(decoded.id)
         //    console.log(userId)
             let query={}
@@ -57,8 +57,11 @@ const userController={
                 }
             }
         const products=await Product.find(query);
-        
-        res.render("user/home",{user,products,searchQuery:req.query.search || ""})
+        const cart= await Cart.findOne({user:decoded.id})
+        const cartItemCount=cart.products.length
+
+        // console.log(cartItemCount)
+        res.render("user/home",{user,products,cartItemCount,searchQuery:req.query.search || ""})
         }catch(error){
             console.log(error)
             res.status(500).send("Error fetching Data")

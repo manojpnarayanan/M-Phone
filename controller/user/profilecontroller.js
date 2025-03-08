@@ -4,6 +4,7 @@ const Address=require("../../model/address")
 const mongoose = require("mongoose");
 const multer=require("multer")
 const path=require("path")
+const bcryptjs=require("bcryptjs")
 
 const profilecontroller={
 loadAddressPage:async(req,res)=>{
@@ -126,6 +127,24 @@ loadAddressPage:async(req,res)=>{
   },
   userProfileUpdate:async(req,res)=>{
     console.log(req.body)
+  },
+  changePassword:async(req,res)=>{
+    try{
+        console.log("changepassword:", req.body)
+    const {currentPassword,newPassword,confirmPassword}=req.body
+    const hashedpassword=await bcryptjs.hash(newPassword, 10)
+    const token=req.cookies.token
+    const decoded=jwt.verify(token,process.env.JWT_SECRET)
+    const user=await User.findByIdAndUpdate(decoded.id,
+        {password:hashedpassword},
+        {new:true}
+)
+req.flash("success", "Password changed successfully");    
+ res.redirect("/user/myprofile")
+    }catch(error){
+        console.log(error)
+    }
+    
   }
   
 }

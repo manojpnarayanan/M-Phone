@@ -27,8 +27,8 @@ const ordermanagement={
         try{
             const {orderStatus}=req.body
             const orderId=req.params.id;
-            console.log("update status",orderId)
-            console.log("updatestatus",req.body)
+            // console.log("update status",orderId)
+            // console.log("updatestatus",req.body)
             const order = await Order.findByIdAndUpdate(orderId,
                 {orderStatus},
                 {new:true}

@@ -235,8 +235,8 @@
                     <p class="text-success">Discount: <%= product.discount %>% OFF</p>
                 <% } %>
                 <% if (product.stock > 0) { %>
-                    <form action="/user/dashboard/addtocart/<%= product._id %>" method="POST">
-                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                    <form id="addToCartForm" action="/user/dashboard/addtocart/<%= product._id %>" method="POST">
+                        <button id="addToCart" type="submit" class="btn btn-primary">Add to Cart</button>
                     </form>
                      <p class="text-success stock-status">In Stock: <%= product.stock %> left</p>
                     <!--<a href="/user/dashboard/addtocart/<%=product._id%>">  <button class="btn btn-primary btn-lg mb-3">Add to Cart</button></a> -->
@@ -332,6 +332,7 @@
             <p class="mb-0">&copy; 2025 M Store. All rights reserved.</p>
         </div>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- <script>
         const mainImage = document.getElementById('mainImage');
@@ -571,7 +572,53 @@
             
             // Initialize zoom on page load
             initZoom();
-        });
+
+
+            const addtoCartForm=document.getElementById("addToCartForm")
+            if(addToCartForm){
+                addToCartForm.addEventListener("submit",function(event){
+                    event.preventDefault()
+                    const formData=new FormData(addToCartForm)
+                    fetch(addtoCartForm.action,{
+                        method:"POST",
+                        body:formData,
+                        headers:{
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response=>response.json())
+                    .then(data=>{
+                        if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Product Added to Cart',
+                        text: 'Your product has been successfully added to the cart!',
+                        confirmButtonText: 'OK'
+                    })
+                }else{
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Adding quantitty is limited to 5 per products',
+                        confirmButtonText: 'OK'
+                    });
+
+                }
+            })
+            .catch(error=>{
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!',
+                    confirmButtonText: 'OK'
+                });
+            })
+                })
+
+            }
+            
+ });
     
         </script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->

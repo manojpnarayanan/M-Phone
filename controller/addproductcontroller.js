@@ -124,13 +124,17 @@ blockProduct: async (req,res)=>{
       if (!product) {
         return res.status(404).send("Product not found");
       }
-
+      const categoryDoc=await Category.findOne({parent:category})
+      console.log("categoryDoc",categoryDoc)
+      if (!categoryDoc) {
+        return res.status(400).send("Category not found");
+      }
       // Update text/numeric/boolean fields
       product.name = name;
       product.description = description;
       product.price = Number(price);
       product.stock = Number(stock);
-      product.category = category;
+      product.category = categoryDoc._id;
       product.brand = brand;
       product.tags = tags ? tags.split(",") : [];
       product.isActive = isActive === "on";

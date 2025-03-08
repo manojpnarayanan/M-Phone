@@ -43,8 +43,8 @@ const userSchema=new mongoose.Schema({
         default:null
     },
     photo: {
-        type: String, // Store the filename of the user's profile photo
-        default:"/uploads/profile-pictures/default.png" // Default profile photo
+        type: String,
+        default:"/uploads/profile-pictures/default.png"
       },
    
 },{timestamps:true});

@@ -13,6 +13,10 @@ router.get("/login",(req,res)=>{
 router.post("/login",admincontroller.login)
 router.get("/dashboard",middleware.verifyAdmin,admincontroller.loadDashboard)
 router.use("/dashboard",middleware.verifyAdmin,dashBoard);
+router.get("/logout",(req,res)=>{
+    res.clearCookie("token");
+    res.redirect("/admin/login"); 
+})
 
 
 

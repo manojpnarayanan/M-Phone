@@ -72,7 +72,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/user/dashboard">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="/user/dashboard/shopping">Shop</a></li>
                     <li class="nav-item"><a class="nav-link" href="/user/myprofile/<%= user._id%>">My Profile</a></li>
                     <li class="nav-item">
@@ -179,15 +179,31 @@ document.querySelectorAll('.quantity-control').forEach(control => {
     });
 
     increaseBtn.addEventListener('click', () => {
-        if (input.value < parseInt(input.max)) {
+        if (input.value < 5) {
             input.value = parseInt(input.value) + 1;
             updateCart(input.dataset.id, input.value);
+        }else {
+            // Show SweetAlert error message
+            Swal.fire({
+                icon: 'error',
+                title: 'Quantity Limit Exceeded',
+                text: 'You can only add up to 5 units of this product to your cart.',
+                confirmButtonText: 'OK',
+            });
         }
     });
 
     input.addEventListener('change', () => {
         if (input.value < 1) input.value = 1;
-        if (input.value > parseInt(input.max)) input.value = input.max;
+        if (input.value > 5) {
+        input.value = 5;
+        Swal.fire({
+                icon: 'error',
+                title: 'Quantity Limit Exceeded',
+                text: 'You can only add up to 5 units of this product to your cart.',
+                confirmButtonText: 'OK',
+            });
+        }
         updateCart(input.dataset.id, input.value);
     });
 });

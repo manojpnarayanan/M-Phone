@@ -6,6 +6,7 @@ const Cart=require("../../model/cart")
 const Address=require("../../model/address")
 const Wishlist=require("../../model/wishlist")
 const Order=require("../../model/order")
+const Wallet = require("../../model/wallet")
 
 
 
@@ -33,8 +34,9 @@ const userViews={
     loadShoppingPage:async (req,res)=>{
         let {page,search}=req.query
         const{category,brand,price}=req.query
+        console.log("loadshopping page",req.query)
          page=parseInt(page)||1
-        const limit=3
+        const limit=4
         const skip=(page-1)*limit;
         let query={}
         if(search){
@@ -44,8 +46,12 @@ const userViews={
         }
         if (category && category !== "all") {
             const categoryDoc = await Category.findOne({ name: new RegExp(req.query.category, 'i') });
-  if (categoryDoc) {
+             console.log("categoryDoc",categoryDoc)
+            if (categoryDoc) {
     query.category = categoryDoc._id;
+  }else {
+    // If the category is not found, return an empty result
+    query.category = null;
   }
             // query.category = category;
         }
@@ -57,7 +63,7 @@ const userViews={
         }
 
         const sort=req.query.sort;
-        let sortOption={}
+        let sortOption={createdAt:-1}
         if(sort==="price_high_to_low"){
             sortOption={price:-1}
            
@@ -95,29 +101,43 @@ const userViews={
     loadMyProfile:async(req,res)=>{
         try{
             const userId=req.params.id
-            console.log("User ID in loadMyProfile:",userId)
+            // console.log("User ID in loadMyProfile:",userId)
             const user=await User.findById(userId)
             // console.log("userId in profile",user)
             // const addresses=await address.findOne(user)
         const address=await Address.find({user:userId})
-            //    console.log("Addresses:", address);
+               console.log("Addresses:", address);
         const wishlist=await Wishlist.findOne({user:userId}).populate("wishlist")
-        console.log("wishlist from loadprofile",wishlist)     
+        // console.log("wishlist from loadprofile",wishlist)     
         const wishlists = wishlist ? wishlist.wishlist: [];
         const orders=await Order.find({user:userId})
         .populate("products.product")
         .populate("shippingAddress")
+        .sort({createdAt:-1})
         console.log("loadprofile",orders)
+        const wallet=await Wallet.findOne({userId})
+         // Process orders to handle null/undefined products
+    const processedOrders = orders.map(order => {
+        order.products = order.products.map(item => {
+          if (!item.product) {
+            item.product = { name: 'Product Not Available', image: [] }; // Default product data
+          }
+          return item;
+        });
+        return order;
+      });
         if(!address||!wishlist){
             res.render("user/profile",{user,
                 addresses:null,
                 wishlist:null,
-            orders:null
+                orders:null,
         })
             }else{
                 res.render("user/profile",{user,addresses:address,
                      wishlist:wishlists,
-                    orders
+                    orders:processedOrders,
+                    wallet: wallet || { walletBalance: 0, transactions: [] }
+
                 })
             }         
                 
@@ -132,23 +152,23 @@ const userViews={
              return   res.status(401).json({ message: "User not found" });
             }
             const decoded=jwt.verify(token,process.env.JWT_SECRET) 
-            console.log("add to cart",decoded)
+            // console.log("add to cart",decoded)
             const userId=decoded.id
-            console.log(userId)
+            // console.log(userId)
             const productId=req.params.id
-             console.log(productId)
+            //  console.log(productId)
             const user=await User.findById(userId)
-            console.log(user)
+            // console.log(user)
             if(!user){
                 return res.status(404).json({ message: "User not found" });
             }
             const product=await Product.findById(productId)
-            console.log(product)
+            // console.log(product)
             if(!product){
                 res.status(404).json({ message: "Product not found" });
             }
             let cart=await Cart.findOne({user:userId})
-            console.log("cart:",cart)
+            // console.log("cart:",cart)
             if(!cart){
                 cart=new Cart({
                     user:userId,
@@ -157,8 +177,12 @@ const userViews={
                     }]
                 })
             }else{
+                
                 const existingProduct=cart.products.find(item=>item.product.toString()===productId)
                 if(existingProduct){
+                    if(existingProduct.quantity>=5){
+                        return res.status(400).json({success:false,message:"minimum items per products is limited to 5"})
+                    }
                     existingProduct.quantity+=1
                 }else{
                     cart.products.push({product:productId,
@@ -167,8 +191,8 @@ const userViews={
                 }
             }
             await cart.save();
-            res.redirect("/user/dashboard/addtocart")
-
+            // res.redirect("/user/dashboard/addtocart")
+             res.status(200).json({success: true,message:"Product added successfully"})
         }catch(error){
             console.log(error)
             res.status(500).json({ message: "Internal Server Error" });
@@ -230,6 +254,9 @@ const userViews={
         const product=cart.products.find(item=>item.product.toString()===productId)
         if(!product){
             return res.status(404).json({message:"Product not found"})
+        }
+        if(quantity>5){
+            return res.status(400).json({success:false,message:"you can add only 5 units of this product"})
         }
         product.quantity=quantity
         await cart.save();

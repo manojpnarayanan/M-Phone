@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - M Store</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
         * {
                margin: 0;
@@ -391,6 +393,11 @@
                    min-width: 100px;
                }
            }
+           .payment-logo {
+    font-size: 24px; /* Adjust size */
+    color: #2874f0; /* Adjust color */
+    margin-right: 10px; /* Adjust spacing */
+}
    </style>
 </head>
 <body>
@@ -443,7 +450,7 @@
                         <% if (addresses && addresses.length > 0) { %>
                             <% addresses.forEach((address, index) => { %>
                                 <div class="address-card <%= index === 0 ? 'selected' : '' %>">
-                                    <input type="radio" name="address" id="address<%= index %>" <%= index === 0 ? 'checked' : '' %>>
+                                    <input type="radio" name="address" id="address<%= index %>" value="<%= address._id %>" <%= index === 0 ? 'checked' : '' %>>
                                     <label for="address<%= index %>">
                                         <strong><%= address.name %></strong>
                                         <p>
@@ -522,7 +529,8 @@
                         
                         <div class="payment-option">
                             <input type="radio" name="paymentMethod" id="cod" value="cash_on_delivery" class="payment-radio">
-                            <img src="/api/placeholder/30/30" alt="Cash on Delivery" class="payment-logo">
+                            <!-- <img src="/api/placeholder/30/30" alt="Cash on Delivery" class="payment-logo"> -->
+                            <i class="fas fa-money-bill-wave payment-logo"></i> 
                             <label for="cod">Cash on Delivery</label>
                         </div>
                         
@@ -650,10 +658,20 @@
             });
             return; // Stop execution if no payment method is selected
         }
+        // Check if an address is selected
+        const selectedAddress = document.querySelector('input[name="address"]:checked');
+        if (!selectedAddress) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please select a delivery address.'
+            });
+            return; // Stop execution if no address is selected
+        }
             // Gather data from the page
             const orderData = {
                 userId: "<%= user._id %>",
-                shippingAddress: "<%= addresses[0]._id %>",
+                shippingAddress: selectedAddress.value,
                 totalAmount: "<%= totalPrice %>",
                 discount: "<%= totalDiscount %>",
                 finalAmount: "<%= (totalPrice - totalDiscount + deliveryCharges + gst).toFixed(2) %>",
@@ -666,7 +684,9 @@
                         },
                     <% }) %>
                 ],
-                paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value
+                // paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value
+                paymentMethod: selectedPaymentMethod.value
+
             };
 
             // Send the order data to the backend using Fetch API

@@ -2,6 +2,7 @@ const Product=require("../../model/addproduct")
 const User=require("../../model/user")
 const jwt=require("jsonwebtoken")
 const Wishlist=require("../../model/wishlist")
+const Cart=require("../../model/cart")
 
 const wishlistcontroller={
     loadWishlist:async (req,res)=>{
@@ -105,6 +106,55 @@ const wishlistcontroller={
             }catch(error){ 
             console.log(error)
         }
+      },
+      addToCartFromWishlist:async(req,res)=>{
+        try{
+            const productId=req.params.id
+            console.log("addToCartFromWishlist",productId)
+          const token=req.cookies.token
+          const decoded=jwt.verify(token,process.env.JWT_SECRET)
+          const userId=decoded.id
+          console.log(userId)
+                      const product=await Product.findById(productId)
+                      if(!product){
+                          res.status(404).json({ message: "Product not found" });
+                      }
+                      let cart=await Cart.findOne({user:userId})
+               if(!cart){
+                              cart=new Cart({
+                                  user:userId,
+                                  products:[{product:productId,
+                                      quantity:1
+                                  }]
+                              })
+                          }else{
+                              const existingProduct=cart.products.find(item=>item.product.toString()===productId)
+                              if(existingProduct){
+                                  existingProduct.quantity+=1
+                              }else{
+                                  cart.products.push({product:productId,
+                                      quantity:1
+                                  })
+                              }
+                          }
+                          await cart.save()
+                          await Wishlist.findOneAndUpdate(
+                              { user: userId },
+                              { $pull: { wishlist: productId } }
+                            );
+                            res.status(200).json({
+                              success: true,
+                              message: "Product added to cart from wishlist",
+                            });
+
+        }catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to add product to cart: " + error.message,
+    });
+  }
+         
       }
 }
 
