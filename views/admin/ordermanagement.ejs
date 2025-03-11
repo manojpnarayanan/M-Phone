@@ -16,6 +16,33 @@
     <!-- Template CSS -->
     <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+     <style>
+        .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+}
+
+.table-bordered {
+    border: 1px solid #dee2e6;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #dee2e6;
+}
+
+.table-bordered thead th,
+.table-bordered thead td {
+    border-bottom-width: 2px;
+}
+     </style>
+
 </head>
 
 <body>
@@ -39,13 +66,13 @@
             </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
-                <ul class="nav">
+                <!-- <ul class="nav">
                     <li class="nav-item">
                         <a class="nav-link btn-icon" href="#">
                             <i class="material-icons md-notifications animation-shake"></i>
                             <span class="badge rounded-pill">3</span>
                         </a>
-                    </li>
+                    </li> -->
                     <!-- <li class="nav-item">
                         <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
                     </li>
@@ -152,31 +179,25 @@
                         <!-- </div> col// -->
                     </div> <!-- row // -->
                     <div class="row">
-                        <div class="col-lg-7">
+                        <!-- <div class="col-lg-7"> -->
                             <div class="table-responsive">
-                                <table class="table">
-                                    <!-- <thead>
-                                        <tr>
-                                            <th width="40%">Product</th>
-                                            <th width="20%">Price</th>
-                                            <th width="20%">Quantity</th>
-                                            <th width="20%">Status</th>
-                                            <th width="20%" class="text-end">Total</th>
-                                        </tr>
-                                    </thead> -->
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <!-- <th>Order ID</th> -->
+                                            <th>Sl. No</th>
                                             <th>Customer</th>
                                             <th>Products</th>
+                                            <th>Shipping Address</th>
+                                            <th>Ordered Date</th>
                                             <th>Total Amount</th>
                                             <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <% if (orders && orders.length > 0) { %>
-                                            <% orders.forEach(order => { %>
+                                            <% orders.forEach((order, index) => { %>
                                                 <tr>
+                                                    <td><%= index + 1 %></td> <!-- Sl. No -->
                                                     <td>
                                                         <%= order.user.name %><br>
                                                         <%= order.user.email %><br>
@@ -190,6 +211,12 @@
                                                             </div>
                                                         <% }) %>
                                                     </td>
+                                                    <td>
+                                                        <%= order.shippingAddress.housename %><br>
+                                                        <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %><br>
+                                                        <%= order.shippingAddress.pincode %>
+                                                    </td>
+                                                    <td><%= new Date(order.createdAt).toLocaleDateString() %></td> <!-- Ordered Date -->
                                                     <td><%= order.totalAmount.toFixed(2) %></td>
                                                     <td>
                                                         <select class="form-select status-dropdown" data-order-id="<%= order._id %>" <%= order.orderStatus === 'Returned' ? 'disabled' : ''%>>
@@ -206,47 +233,21 @@
                                             <% }) %>
                                         <% } else { %>
                                             <tr>
-                                                <td colspan="5" class="text-center">No orders found.</td>
+                                                <td colspan="7" class="text-center">No orders found.</td>
                                             </tr>
                                         <% } %>
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="3" class="text-end"><strong>Total Amount of All Orders:</strong></td>
-                                            <td><strong><%= orders.reduce((total, order) => total + order.totalAmount, 0).toFixed(2) %></strong></td>
+                                            <td colspan="5" class="text-end"><strong>Total Amount of All Orders:</strong></td>
+                                            <td colspan="2"><strong><%= orders.reduce((total, order) => total + order.totalAmount, 0).toFixed(2) %></strong></td>
                                         </tr>
                                     </tfoot>
-                                        
-                                            <!-- <td colspan="4">
-                                                <article class="float-end">
-                                                    <dl class="dlist">
-                                                        <dt>Subtotal:</dt>
-                                                        <dd>$973.35</dd>
-                                                    </dl>
-                                                    <dl class="dlist">
-                                                        <dt>Shipping cost:</dt>
-                                                        <dd>$10.00</dd>
-                                                    </dl>
-                                                    <dl class="dlist">
-                                                        <dt>Grand total:</dt>
-                                                        <dd> <b class="h5">$983.00</b> </dd>
-                                                    </dl>
-                                                   
-                                                    <dl class="dlist">
-                                                        <dt class="text-muted">Status:</dt>
-                                                        <dd>
-                                                            <span class="badge rounded-pill alert-success text-success">Payment done</span>
-                                                        </dd>
-                                                    </dl>
-                                                </article>
-                                            </td> -->
-                                        <!-- </tr>
-                                    </tbody> -->
                                 </table>
                             </div> <!-- table-responsive// -->
                             <!-- <a class="btn btn-primary" href="page-orders-tracking.html">View Order Tracking</a> -->
                             
-                        </div> <!-- col// -->
+                        <!-- </div> col// -->
                         <div class="col-lg-1"></div>
                         <div class="mt-4">
                             <h4>Download Invoice</h4>

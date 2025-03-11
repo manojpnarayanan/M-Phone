@@ -54,7 +54,7 @@ const addproducts = {
       res.status(400).send("Failed to add products")
     }
   },
-
+  
   getProduct: async (req, res) => {
     try {
       const productsPerPage = 3
@@ -215,31 +215,9 @@ const addproducts = {
     } catch (error) {
       console.log(error)
     }
-  }
-  //   updateEditProduct: async (req, res) => {
-  //     try {
-  //         const productId = req.params.id;
-  //         const { name, description, price, category, brand, stock } = req.body;
-  //         console.log(req.body);
-
-
-  //         // Find product and update
-  //         const updatedProduct = await Product.findByIdAndUpdate(
-  //             productId,
-  //             { name, description, price, category, brand, stock },
-  //             { new: true }
-  //         );
-
-  //         if (!updatedProduct) {
-  //             return res.status(404).json({ success: false, message: "Product not found" });
-  //         }
-
-  //         res.redirect("/admin/dashboard/productlist"); // Redirect after successful update
-  //     } catch (error) {
-  //         console.error("Error updating product:", error);
-  //         res.status(500).json({ success: false, message: "Internal server error" });
-  //     }
-  // }
+  },
+  
+ 
 
 }
 

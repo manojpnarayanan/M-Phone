@@ -17,7 +17,10 @@ const userViews = {
             const token = req.cookies.token
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
             const userId = decoded.id
+            const user=await User.findById(userId)
             const productId = req.params.id
+            const cart= await Cart.findOne({user:userId})
+            const cartItemCount=cart? cart.products.length:0
             const product = await Product.findById(req.params.id)
             // console.log(product)
             if (!product) {
@@ -33,8 +36,12 @@ const userViews = {
             }
             )
             // console.log( relatedProducts)
+        
+
             res.render("user/product-details", {
                 product,
+                user,
+                cartItemCount,
                 relatedProducts,
                 reviews
             })
@@ -59,7 +66,7 @@ const userViews = {
         }
         if (category && category !== "all") {
             const categoryDoc = await Category.findOne({ name: new RegExp(req.query.category, 'i') });
-            console.log("categoryDoc", categoryDoc)
+            // console.log("categoryDoc", categoryDoc)
             if (categoryDoc) {
                 query.category = categoryDoc._id;
             } else {
@@ -96,9 +103,13 @@ const userViews = {
 
             const totalProducts = await Product.countDocuments(query)
             const totalPages = Math.ceil(totalProducts / limit)
+             
+            const cart=await Cart.findOne({user:decoded.id})
+            const cartItemCount=cart? cart.products.length : 0
+            
 
             res.render("user/shop", {
-                user, products,
+                user, products,cartItemCount,
                 sort,
                 totalPages,
                 search,
@@ -158,8 +169,11 @@ const userViews = {
 
             //             })
             //         }   
+           const cart=await Cart.findOne({user:userId})
+           const cartItemCount=cart? cart.products.length : 0
             res.render("user/profile", {
                 user,
+                cartItemCount,
                 addresses: address || [],
                 wishlist: wishlist ? wishlist.wishlist : [],
                 orders: safeOrders,
@@ -273,35 +287,95 @@ const userViews = {
         }
 
     },
+    // updateCart: async (req, res) => {
+    //     try {
+    //         const productId = req.params.id
+    //         const { quantity } = req.body
+    //         const token = req.cookies.token
+    //         if (!token) {
+    //             return res.status(401).json({ success: false, message: "User not found" })
+    //         }
+    //         // console.log("reachged")
+    //         const Products=await Product.findById(productId)
+    //         // console.log("Product.stock",Products.stock)
+    //         const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    //         const userId = decoded.id
+    //         const cart = await Cart.findOne({ user: userId })
+    //         if (!cart) {
+    //             return res.status(404).json({success: false, message: "Cart not found" })
+    //         }
+    //         const product = cart.products.find(item => item.product.toString() === productId)
+    //         if (!product) {
+    //             return res.status(404).json({success: false, message: "Product not found" })
+    //         }
+    //         if(quantity>Products.stock){
+    //             return res.status(200).json({success: false, message:`only ${Products.stock} left`})
+    //         }
+    //         if (quantity > 5) {
+    //             return res.status(400).json({ success: false, message: "you can add only 5 units of this product" })
+    //         }
+    //         product.quantity = quantity
+    //         await cart.save();
+    //         res.json({ success: true })
+    //     } catch (error) {
+    //         console.log(error)
+    //         res.status(500).json({success: false, message: "Internal Server Error" });
+    //     }
+    // },
+    
     updateCart: async (req, res) => {
         try {
-            const productId = req.params.id
-            const { quantity } = req.body
-            const token = req.cookies.token
+            const productId = req.params.id;
+            const { quantity } = req.body;
+            const token = req.cookies.token;
+    
             if (!token) {
-                return res.status(401).json({ message: "User not found" })
+                return res.status(401).json({ success: false, message: "User not found" });
             }
-            const decoded = jwt.verify(token, process.env.JWT_SECRET)
-            const userId = decoded.id
-            const cart = await Cart.findOne({ user: userId })
-            if (!cart) {
-                return res.status(404).json({ message: "Cart not found" })
-            }
-            const product = cart.products.find(item => item.product.toString() === productId)
+    
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const userId = decoded.id;
+    
+            // Fetch the product to check stock
+            const product = await Product.findById(productId);
             if (!product) {
-                return res.status(404).json({ message: "Product not found" })
+                return res.status(404).json({ success: false, message: "Product not found" });
             }
+    
+            // Fetch the user's cart
+            const cart = await Cart.findOne({ user: userId });
+            if (!cart) {
+                return res.status(404).json({ success: false, message: "Cart not found" });
+            }
+    
+            // Find the product in the cart
+            const cartProduct = cart.products.find(item => item.product.toString() === productId);
+            if (!cartProduct) {
+                return res.status(404).json({ success: false, message: "Product not found in cart" });
+            }
+    
+            // Check if the new quantity exceeds the stock
+            if (quantity > product.stock) {
+                return res.status(200).json({ success: false, message: `Only ${product.stock} units left in stock` });
+            }
+    
+            // Check if the new quantity exceeds the maximum allowed (5)
             if (quantity > 5) {
-                return res.status(400).json({ success: false, message: "you can add only 5 units of this product" })
+                return res.status(200).json({ success: false, message: "You can add only 5 units of this product" });
             }
-            product.quantity = quantity
+    
+            // Update the quantity
+            cartProduct.quantity = quantity;
             await cart.save();
-            res.json({ success: true })
+    
+            res.json({ success: true });
         } catch (error) {
-            console.log(error)
-            res.status(500).json({ message: "Internal Server Error" });
+            console.log(error);
+            res.status(500).json({ success: false, message: "Internal Server Error" });
         }
     },
+    
+    
     removeFromCart: async (req, res) => {
         try {
             const productId = req.params.id

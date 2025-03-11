@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Evara Dashboard - Edit Product</title>
+    <title>M Phone Dashboard - Edit Product</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
     <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
@@ -106,6 +106,7 @@
     <script src="/assets/js/vendors/jquery.fullscreen.min.js"></script>
     <!-- Main Script -->
     <script src="/assets/js/main.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- <script>
        
     document.addEventListener("DOMContentLoaded",()=>{
@@ -297,7 +298,48 @@ cropBtn.addEventListener("click", function () {
 
 </script> -->
 
+ <!-- <script>
+  document.getElementById("editProductForm").addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevent default form submission
 
+    const formData = new FormData(this); // Get form data
+    const productId = "<%= product._id %>"; // Get product ID from EJS
+
+    try {
+      const response = await fetch(`/admin/dashboard/products/edit/${productId}`, {
+        method: "POST",
+        body: formData, // Send form data as multipart/form-data
+      });
+
+      const result = await response.json(); // Parse JSON response
+
+      if (result.success) {
+        // Show success alert
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Product updated successfully!",
+        }).then(() => {
+          window.location.href = "/admin/dashboard/productlist"; // Redirect after success
+        });
+      } else {
+        // Show error alert
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: result.message || "Failed to update product.",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "An error occurred while updating the product.",
+      });
+    }
+  });
+</script>  -->
 
 
 

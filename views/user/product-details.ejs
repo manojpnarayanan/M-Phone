@@ -193,6 +193,25 @@
     margin: 5px 0;
     color: #555;
 }
+.cart-icon {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 1rem; /* Add padding to ensure proper spacing */
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px; /* Adjust this value to move the badge up or down */
+  right: -5px; /* Adjust this value to move the badge left or right */
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #dc3545; /* Red background for the badge */
+  color: white; /* White text color */
+  border-radius: 50%; /* Make the badge circular */
+  min-width: 20px; /* Ensure the badge has a minimum width */
+  text-align: center; /* Center the text inside the badge */
+  line-height: 1; /* Adjust line height for better alignment */
+}
     </style>
 </head>
 <body>
@@ -206,8 +225,17 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="/user/dashboard">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="/user/dashboard/shopping">Shop</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Support</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/user/myprofile">My Profile</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link cart-icon" href="/user/dashboard/addtocart">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                            <path d="M0 1.5A.5.5 0 0 1 .5 1h1a.5.5 0 0 1 .485.379L2.89 5H14.5a.5.5 0 0 1 .49.598l-1.5 7A.5.5 0 0 1 13 13H4a.5.5 0 0 1-.491-.408L1.01 3H.5a.5.5 0 0 1-.5-.5zm3.14 4l1.25 5h8.22l1.25-5H3.14zM5.5 14a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                          </svg>
+                          <span class="badge bg-danger cart-badge">
+                            <%= typeof cartItemCount !== 'undefined' ? cartItemCount : 0 %>
+                          </span>
+                        </a>
+                      </li>
+                    <li class="nav-item"><a class="nav-link" href="/user/myprofile/<%= user._id %>">My Profile</a></li>
                 </ul>
             </div>
         </div>
@@ -591,6 +619,11 @@
                         text: 'Your product has been successfully added to the cart!',
                         confirmButtonText: 'OK'
                     })
+                    const cartBadge = document.querySelector('.cart-badge');
+                    if (cartBadge) {
+                        const currentCount = parseInt(cartBadge.textContent) || 0;
+                        cartBadge.textContent = currentCount + 1;
+                    }
                 }else{
                     Swal.fire({
                         icon: 'error',
