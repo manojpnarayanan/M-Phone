@@ -141,6 +141,58 @@ const orderController = {
             res.status(500).json({ success: false, message: 'Internal Server Error' });
         }
     },
+    cancelIndividualProduct: async (req, res) => {
+        try {
+            const { orderId, productId } = req.params;
+            const { quantity } = req.body;
+    
+            const order = await Order.findById(orderId);
+            if (!order) {
+                return res.status(404).json({ message: "Order not found" });
+            }
+    
+            // Find the product in the order
+            const productIndex = order.products.findIndex(item => item.product.toString() === productId);
+            if (productIndex === -1) {
+                return res.status(404).json({ message: "Product not found in the order" });
+            }
+    
+            const product = order.products[productIndex];
+    
+            // Add the product to cancelledProducts
+            order.cancelledProducts.push({
+                product: product.product,
+                quantity: quantity || product.quantity, // Allow partial cancellation
+                price: product.price
+            });
+    
+            // Update the product stock
+            await Product.findByIdAndUpdate(
+                product.product,
+                { $inc: { stock: quantity || product.quantity } },
+                { new: true }
+            );
+    
+            // Remove the product from the order or reduce its quantity
+            if (quantity && quantity < product.quantity) {
+                order.products[productIndex].quantity -= quantity;
+            } else {
+                order.products.splice(productIndex, 1);
+            }
+    
+            // If all products are cancelled, mark the order as cancelled
+            if (order.products.length === 0) {
+                order.orderStatus = "Cancelled";
+            }
+    
+            await order.save();
+    
+            res.status(200).json({ message: "Product cancelled successfully" });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+    },
 
 
 
@@ -181,8 +233,8 @@ const orderController = {
             }
 
             for (const item of order.products) {
-                const productId = item.product._id;
-                const quantity = item.quantity;
+                // const productId = item.product._id;
+                // const quantity = item.quantity;
 
                 await Product.findByIdAndUpdate(
                     productId,

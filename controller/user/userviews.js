@@ -202,7 +202,7 @@ const userViews = {
                 return res.status(404).json({ message: "User not found" });
             }
             const product = await Product.findById(productId)
-            // console.log(product)
+            console.log("product.stock",product.stock)
             if (!product) {
                 res.status(404).json({ message: "Product not found" });
             }
@@ -218,17 +218,47 @@ const userViews = {
                 })
             } else {
 
-                const existingProduct = cart.products.find(item => item.product.toString() === productId)
+                const existingProduct = cart.products.find(item => item.product.toString() === productId.toString())
+                console.log(existingProduct)
+                // if (existingProduct) {
+                //     if (existingProduct.quantity >= 5 || existingProduct.quantity > product.stock) {
+                //         return res.status(400).json({ success: false,
+                //              message:existingProduct.quantity >= 5 
+                //              ? "Maximum items per product is limited to 5" 
+                //              : `Only ${product.stock} units available in stock` })
+                //     }
+                //     existingProduct.quantity += 1
+                // } else {
+                //     cart.products.push({
+                //         product: productId,
+                //         quantity: 1
+                //     })
+                // }
                 if (existingProduct) {
-                    if (existingProduct.quantity >= 5) {
-                        return res.status(400).json({ success: false, message: "minimum items per products is limited to 5" })
+                    // Check if NEW quantity (current + 1) exceeds limits
+                    const newQuantity = existingProduct.quantity + 1;
+                    
+                    // Check stock and maximum quantity constraints
+                    if (newQuantity > 5) {
+                        return res.status(400).json({ 
+                            success: false, 
+                            message: "Maximum items per product is limited to 5" 
+                        });
                     }
-                    existingProduct.quantity += 1
+                    
+                    if (newQuantity > product.stock) {
+                        return res.status(400).json({ 
+                            success: false, 
+                            message: `Only ${product.stock} units available in stock` 
+                        });
+                    }
+                    
+                    existingProduct.quantity = newQuantity;
                 } else {
                     cart.products.push({
                         product: productId,
                         quantity: 1
-                    })
+                    });
                 }
             }
             await cart.save();

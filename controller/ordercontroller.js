@@ -2,6 +2,11 @@ const User = require("../model/user")
 const product = require("../model/addproduct")
 const Order = require("../model/order")
 const { generateInvoice } = require("../utils/invoiceGenerator"); // Assume you have a utility to generate invoices
+const fs = require('fs');
+const PDFDocument = require('pdfkit');
+const path = require('path');
+
+
 
 
 const ordermanagement = {
@@ -85,7 +90,38 @@ const ordermanagement = {
             console.log(error)
             res.status(500).json({ message: "Internal Server Error" });
         }
+    },
+    generateInvoice : async (orders, period, date) => {
+        // Create a new PDF document
+        const doc = new PDFDocument();
+    
+        // Set the file path for the generated PDF
+        const invoicePath = `./invoices/invoice-${period}-${date}.pdf`;
+    
+        // Pipe the PDF to a writable stream (save to file)
+        doc.pipe(fs.createWriteStream(invoicePath));
+    
+        // Add content to the PDF
+        doc.fontSize(25).text(`Invoice for ${period} - ${date}`, 100, 80);
+    
+        // Add order details
+        let y = 150;
+        orders.forEach((order, index) => {
+            doc.fontSize(12)
+                .text(`Order ID: ${order._id}`, 100, y)
+                .text(`Customer: ${order.user.name}`, 100, y + 20)
+                .text(`Total Amount: $${order.totalAmount.toFixed(2)}`, 100, y + 40)
+                .moveDown();
+            y += 80; // Move down for the next order
+        });
+    
+        // Finalize the PDF
+        doc.end();
+    
+        // Return the path to the generated PDF
+        return invoicePath;
     }
+    
 
 }
 module.exports = ordermanagement
