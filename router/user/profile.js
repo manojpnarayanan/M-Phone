@@ -22,7 +22,10 @@ router.delete("/deleteaddress/:id",profilecontroller.deleteAddress)
 router.get("/wishlist",wishlistController.loadWishlist)
 router.delete("/deletewishlist/:id",wishlistController.deleteWishlistItems)
 router.get("/checkout/:id",checkOutController.getCheckOutPage)
+router.post("/checkout/:id/coupon-applied",checkOutController.applyCoupon)
+
 router.post("/update-email",upload.single("photo"),profileController.userProfileUpdate)
+
 router.post("/order-placed",orderController.placeOrder)
 router.get("/order-confirmed/:id",orderController.getOrderConfirmationPage)
 router.post("/cancel-order/:id",orderController.cancelOrder)

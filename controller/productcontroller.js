@@ -7,10 +7,13 @@ const productupdates = {
     addCategory: async (req, res) => {
         try {
             let { name, slug, parent, description, isActive } = req.body
-            //  console.log("Categories from :",req.body)
+             console.log("Categories from :",req.body)
             const existingCategory = await Category.findOne({ slug })
             if (existingCategory) {
-                return res.status(400).send("Already Exists...")
+                // return res.status(400).send("Already Exists...")
+                req.flash('error', 'Category already exists');
+                return res.redirect("/admin/dashboard/products/categories");
+
             }
             //  parent=parent&&mongoose.Types.ObjectId.isValid(parent)? new mongoose.Types.ObjectId(parent):null;
             //  console.log(parent)
@@ -23,9 +26,11 @@ const productupdates = {
             })
 
             await category.save()
+            req.flash('success', 'Category created successfully');
             res.redirect("/admin/dashboard/products/categories")
         } catch (error) {
             console.log(error)
+            req.flash('error', 'An error occurred while creating the category');
         }
     },
     //  getCategory: async (req,res)=>{
@@ -66,7 +71,7 @@ const productupdates = {
     updateCategory: async (req, res) => {
         try {
             const { name, slug, parent, description } = req.body;
-            console.log(req.body)
+            // console.log(req.body)
             const updatedCategory = await Category.findByIdAndUpdate(req.params.id, {
                 name,
                 slug,
@@ -89,9 +94,9 @@ const productupdates = {
     blockCategory: async (req, res) => {
         try {
             const categoryId = req.params.id
-            console.log(categoryId)
+            // console.log(" blockCategory",categoryId)
             const categories = await Category.findById(categoryId)
-            console.log(categories)
+            // console.log(categories)
 
             if (!categories) {
                 res.status(400).send("Category not Found")

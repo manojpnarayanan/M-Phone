@@ -632,10 +632,49 @@
 
                 <!-- Promo Code -->
                 <div class="card">
-                    <div class="card-header">
+                    <!-- <div class="card-header">
                         <h3 class="card-title">Promo Code</h3>
-                    </div>
-                    <div class="card-body">
+                    </div> -->
+                    <div class="card">
+                        <div class="card-header">
+                          <h3 class="card-title">Promo Code</h3>
+                        </div>
+                        <div class="card-body">
+                          <!-- <div class="promo-form">
+                            <input type="text" class="form-control promo-input" id="couponInput" placeholder="Enter promo code">
+                            <button class="btn btn-secondary" id="applyCouponBtn">Apply</button>
+                          </div> -->
+                      
+                          <div class="coupons-list">
+                            <% if (coupons && coupons.length > 0) { %>
+                              <% coupons.forEach(coupon => { %>
+                                <div class="coupon" data-code="<%= coupon.code %>">
+                                  <div>
+                                    <div class="coupon-code"><%= coupon.code %></div>
+                                    <div>
+                                      <% if (coupon.discountType === 'percentage') { %>
+                                        <%= coupon.discountValue %>% off
+                                        <% if (coupon.maxDiscountAmount) { %>
+                                          up to <%= coupon.maxDiscountAmount %>
+                                        <% } %>
+                                      <% } else { %>
+                                        $<%= coupon.discountValue %> off
+                                      <% } %>
+                                      <% if (coupon.minOrderAmount > 0) { %>
+                                        (Min. order: <%= coupon.minOrderAmount %>)
+                                      <% } %>
+                                    </div>
+                                  </div>
+                                  <button onclick="applyCoupon('<%= coupon._id %>' ,'<%= user._id %>')" class="btn btn-outlined coupon-apply-btn">Apply</button>
+                                </div>
+                              <% }); %>
+                            <% } else { %>
+                              <div class="no-coupons">No active coupons available</div>
+                            <% } %>
+                          </div>
+                        </div>
+                      </div>
+                    <!-- <div class="card-body">
                         <div class="promo-form">
                             <input type="text" class="form-control promo-input" placeholder="Enter promo code">
                             <button class="btn btn-secondary">Apply</button>
@@ -658,7 +697,7 @@
                                 <button class="btn btn-outlined">Apply</button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -755,4 +794,52 @@
             });
         }
     }
+           
+    async function applyCoupon(couponId,userId){
+        console.log(couponId)
+        console.log(userId)
+        try{
+            Swal.fire({
+                icon:'success',
+            title: 'Applying coupon...',
+        });
+            
+            const response= await fetch(`/user/myprofile/checkout/${userId}/coupon-applied`,{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({couponId,userId})
+            })
+
+            const result= await response.json()
+
+            if(response.ok){
+                Swal.fire({
+                icon: 'success',
+                title: 'Coupon Applied!',
+                text: result.message,
+                timer: 2000
+            })
+            .then(()=>{
+                window.location.reload();
+            })
+            }else{
+                console.error("Error applying coupon:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An unexpected error occurred. Please try again.'
+        });
+            }
+
+        }catch(error){
+            console.log(error)
+        }
+    }
+
+    
+
+
+
 </script>

@@ -1,6 +1,7 @@
 const dotenv=require("dotenv")
 dotenv.config()
 const express=require("express")
+const session = require('express-session');
 // const helmet=require("helmet")
 const app=express()
 // app.use(helmet());
@@ -17,13 +18,24 @@ const middleware=require("./middleware/admin")
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+app.use(session({
+    secret: 'your_secret_key',
+    resave: false, 
+    saveUninitialized: false,
+    cookie: { secure: false, maxAge: 1000 * 60 * 60 } // 1-hour session expiry
+}));
+
+
 app.use(express.urlencoded({limit:"50mb",extended:true}));
 app.use(express.json({limit:"50mb"}));
 app.use(cookieParser())
 app.use(express.static("public"))
 app.use(nocache())
 app.use(flash());
-
+app.use((req, res, next) => {
+    res.locals.messages = req.flash();
+    next();
+});
 
 
 app.use(passport.initialize());

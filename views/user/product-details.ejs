@@ -598,55 +598,98 @@
             initZoom();
 
 
-            const addtoCartForm=document.getElementById("addToCartForm")
-            if(addToCartForm){
-                addToCartForm.addEventListener("submit",function(event){
-                    event.preventDefault()
-                    const formData=new FormData(addToCartForm)
-                    fetch(addtoCartForm.action,{
-                        method:"POST",
-                        body:formData,
-                        headers:{
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response=>response.json())
-                    .then(data=>{
-                        if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Product Added to Cart',
-                        text: 'Your product has been successfully added to the cart!',
-                        confirmButtonText: 'OK'
-                    })
-                    const cartBadge = document.querySelector('.cart-badge');
-                    if (cartBadge) {
-                        const currentCount = parseInt(cartBadge.textContent) || 0;
-                        cartBadge.textContent = currentCount + 1;
-                    }
-                }else{
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Adding quantitty is limited to 5 per products ',
-                        confirmButtonText: 'OK'
-                    });
+            // const addtoCartForm=document.getElementById("addToCartForm")
+            // if(addToCartForm){
+            //     addToCartForm.addEventListener("submit",function(event){
+            //         event.preventDefault()
+            //         const formData=new FormData(addToCartForm)
+            //         fetch(addtoCartForm.action,{
+            //             method:"POST",
+            //             body:formData,
+            //             headers:{
+            //                 'X-Requested-With': 'XMLHttpRequest'
+            //             }
+            //         })
+            //         .then(response=>response.json())
+            //         .then(data=>{
+            //             if (data.success) {
+            //         Swal.fire({
+            //             icon: 'success',
+            //             title: 'Product Added to Cart',
+            //             text: 'Your product has been successfully added to the cart!',
+            //             confirmButtonText: 'OK'
+            //         })
+            //         const cartBadge = document.querySelector('.cart-badge');
+            //         if (cartBadge) {
+            //             const currentCount = parseInt(cartBadge.textContent) || 0;
+            //             cartBadge.textContent = currentCount + 1;
+            //         }
+            //     }else{
+            //         Swal.fire({
+            //             icon: 'error',
+            //             title: 'Oops...',
+            //             text: 'Adding quantitty is limited to 5 per products ',
+            //             confirmButtonText: 'OK'
+            //         });
 
-                }
-            })
-            .catch(error=>{
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Something went wrong!',
-                    confirmButtonText: 'OK'
-                });
-            })
-                })
+            //     }
+            // })
+            // .catch(error=>{
+            //     console.error('Error:', error);
+            //     Swal.fire({
+            //         icon: 'error',
+            //         title: 'Oops...',
+            //         text: 'Something went wrong!',
+            //         confirmButtonText: 'OK'
+            //     });
+            // })
+            //     })
 
+            // }
+            // Inside the event listener for the form submission
+addToCartForm.addEventListener("submit", function(event) {
+    event.preventDefault()
+    const formData = new FormData(addToCartForm)
+    fetch(addToCartForm.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Product Added to Cart',
+                text: 'Your product has been successfully added to the cart!',
+                confirmButtonText: 'OK'
+            })
+            const cartBadge = document.querySelector('.cart-badge');
+            if (cartBadge) {
+                const currentCount = parseInt(cartBadge.textContent) || 0;
+                cartBadge.textContent = currentCount + 1;
             }
-            
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message || 'Something went wrong!',
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            confirmButtonText: 'OK'
+        });
+    })
+})
  });
     
         </script>

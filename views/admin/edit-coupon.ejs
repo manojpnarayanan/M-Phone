@@ -1,0 +1,224 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Evara Dashboard - Edit Coupon</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <div class="screen-overlay"></div>
+    <%- include('./partials/nav') %>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <!-- Search form removed as in the original template -->
+            </div>
+        </header>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Edit Coupon</h2>
+                    <p>Update existing coupon details</p>
+                </div>
+                <div>
+                    <a href="/admin/dashboard/coupons" class="btn btn-light">Back to Coupons</a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8 mx-auto">
+                            <form id="editCouponForm" action="/admin/dashboard/coupons/edit/<%= coupon._id %>" method="post">
+                                <div class="mb-3">
+                                    <label for="coupon_name" class="form-label">Name</label>
+                                    <input type="text" name="name" placeholder="Coupon Name" class="form-control" id="coupon_name" value="<%= coupon.name %>" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="coupon_code" class="form-label">Code</label>
+                                    <input type="text" name="code" placeholder="SUMMER20" class="form-control" id="coupon_code" value="<%= coupon.code %>" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Discount Type</label>
+                                    <select name="discountType" class="form-select" id="discountTypeSelect" required>
+                                        <option value="percentage" <%= coupon.discountType === 'percentage' ? 'selected' : '' %>>Percentage</option>
+                                        <option value="fixed" <%= coupon.discountType === 'fixed' ? 'selected' : '' %>>Fixed Amount</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="discount_value" class="form-label">Discount Value</label>
+                                    <input type="number" name="discountValue" placeholder="10" class="form-control" id="discount_value" value="<%= coupon.discountValue %>" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="min_order" class="form-label">Minimum Order Amount</label>
+                                    <input type="number" name="minOrderAmount" placeholder="100" class="form-control" id="min_order" value="<%= coupon.minOrderAmount %>" required />
+                                </div>
+                                <div class="mb-3" id="maxDiscountContainer">
+                                    <label for="max_discount" class="form-label">Maximum Discount Amount</label>
+                                    <input type="number" name="maxDiscountAmount" placeholder="50" class="form-control" id="max_discount" value="<%= coupon.maxDiscountAmount %>" <%= coupon.discountType === 'percentage' ? 'required' : '' %> />
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="valid_from" class="form-label">Valid From</label>
+                                        <input type="date" name="validFrom" class="form-control" id="valid_from" value="<%= new Date(coupon.validFrom).toISOString().split('T')[0] %>" required />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="valid_until" class="form-label">Valid Until</label>
+                                        <input type="date" name="validUntil" class="form-control" id="valid_until" value="<%= new Date(coupon.validUntil).toISOString().split('T')[0] %>" required />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="usage_limit" class="form-label">Usage Limit (0 for unlimited)</label>
+                                    <input type="number" name="usageLimit" placeholder="0" class="form-control" id="usage_limit" value="<%= coupon.usageLimit || 0 %>" />
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="coupon_status" name="isActive" <%= coupon.isActive ? 'checked' : '' %>>
+                                        <label class="form-check-label" for="coupon_status">Active Status</label>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <a href="/admin/dashboard/coupons" class="btn btn-secondary">Cancel</a>
+                                    <button type="submit" class="btn btn-primary">Update Coupon</button>
+                                </div>
+                            </form>
+                        </div> <!-- .col// -->
+                    </div> <!-- .row // -->
+                </div> <!-- card body .// -->
+            </div> <!-- card .// -->
+        </section> <!-- content-main end// -->
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                    document.write(new Date().getFullYear())
+                    </script> ©, Evara - HTML Ecommerce Template .
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <script src="/assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/vendors/select2.min.js"></script>
+    <script src="/assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="/assets/js/main.js" type="text/javascript"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Show/hide max discount amount field based on discount type
+        const discountTypeSelect = document.getElementById('discountTypeSelect');
+        const maxDiscountContainer = document.getElementById('maxDiscountContainer');
+        
+        if (discountTypeSelect && maxDiscountContainer) {
+            discountTypeSelect.addEventListener('change', function() {
+                if (this.value === 'percentage') {
+                    maxDiscountContainer.style.display = 'block';
+                    document.getElementById('max_discount').setAttribute('required', 'required');
+                } else {
+                    maxDiscountContainer.style.display = 'none';
+                    document.getElementById('max_discount').removeAttribute('required');
+                }
+            });
+            
+            // Trigger on page load
+            if (discountTypeSelect.value === 'fixed') {
+                maxDiscountContainer.style.display = 'none';
+                document.getElementById('max_discount').removeAttribute('required');
+            }
+        }
+
+        // Edit coupon form submission
+        const editCouponForm = document.getElementById('editCouponForm');
+        if (editCouponForm) {
+            editCouponForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                
+                // Show loading state
+                Swal.fire({
+                    title: 'Updating coupon...',
+                    html: 'Please wait while we update your coupon',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Collect form data
+                const formData = new FormData(this);
+                const formDataObj = {};
+                formData.forEach((value, key) => {
+                    if (key === 'isActive') {
+                        formDataObj[key] = true;
+                    } else {
+                        formDataObj[key] = value;
+                    }
+                });
+                
+                // If isActive checkbox is unchecked, it won't be in formData
+                if (!formData.has('isActive')) {
+                    formDataObj.isActive = false;
+                }
+                
+                // Submit form using Fetch API
+                fetch(editCouponForm.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formDataObj)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Coupon updated successfully!',
+                            showConfirmButton: true
+                        }).then(() => {
+                            // Redirect back to coupon list
+                            window.location.href = '/admin/dashboard/coupons';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: data.message || 'Failed to update coupon',
+                            showConfirmButton: true
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'An unexpected error occurred',
+                        showConfirmButton: true
+                    });
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

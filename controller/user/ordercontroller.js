@@ -77,6 +77,10 @@ const orderController = {
         try {
             const { userId, products, shippingAddress, paymentMethod, totalAmount, discount, finalAmount } = req.body;
 
+            if(!products || products.length===0){
+                return res.status(400).json({success:false, message:"Cart is empty"})
+            }
+
             // Validate products and stock
             for (const item of products) {
                 const product = await Product.findById(item.product);

@@ -21,8 +21,13 @@ const addproducts = {
       }
       let imagePaths = [];
       const uploadDir = "public/uploads/product-images/";
+
       for (let i = 0; i < croppedImagesArray.length; i++) {
         const base64Data = croppedImagesArray[i].replace(/^data:image\/\w+;base64,/, "");
+        if (!base64Data || base64Data.trim() === "") {
+          return res.status(400).send("Invalid image data detected");
+        }
+       
         const imageName = `image-${Date.now()}-${i}.jpg`;
         const imagePath = `${uploadDir}${imageName}`;
         fs.writeFileSync(imagePath, Buffer.from(base64Data, "base64"));

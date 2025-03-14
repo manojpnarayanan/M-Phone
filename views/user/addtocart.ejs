@@ -86,6 +86,20 @@
         </div>
     </nav>
 
+    <% if (messages.success) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= messages.success %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+    
+    <% if (messages.error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= messages.error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+             <% } %>
+
     <!-- Cart Section -->
     <div class="container my-5">
         <h2 class="text-center mb-4">My Cart</h2>
@@ -125,6 +139,8 @@
         <p class="text-center">Your cart is empty.</p>
     <% } %>
 </div>
+
+
 
             <!-- Cart Summary -->
             <div class="col-md-4">

@@ -100,6 +100,9 @@ const signupController = {
       if (!name || !email || !password || !confirmPassword || !phonenumber) {
         return res.status(400).json({ message: "All Fields are required" });
       }
+      if(/^\s*$/.test(name)){
+        return res.status(400).json({message:"Empty spaces not allowed"})
+      }
 
       // Validate password match
       if (password !== confirmPassword) {

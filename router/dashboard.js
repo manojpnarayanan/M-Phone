@@ -12,6 +12,8 @@ const upload=require("../multer/allmulter")
 const orderController=require("../controller/ordercontroller")
 const ordermanage=require("../router/ordermanage")
 const salesController=require("../controller/salescontroller")
+const couponController=require("../controller/couponcontroller")
+const copounrouter=require("../router/coupon")
 
 router.get("/productlist",addproductController.getProduct)
 router.patch("/productlist/:id",addproductController.blockProduct)
@@ -30,7 +32,10 @@ router.get("/orderdetails",(req,res)=>{res.render("admin/page-orders-detail")})
 router.get("/sales-report",salesController.loadsalesreport)
 router.get("/sales-report/download-invoice", salesController.downloadInvoice);
 
+router.get("/coupons",couponController.loadCoupon)
+router.post("/coupons",couponController.createCoupon)
 
+router.use("/coupons",copounrouter)
 router.use("/products",productRoute)
 router.use("/brands",Brands)
 router.use("/orders",userList)
