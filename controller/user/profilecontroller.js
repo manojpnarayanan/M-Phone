@@ -49,6 +49,19 @@ const profilecontroller = {
       if (!user || !token) {
         return res.status(401).json({ message: "User not found" })
       }
+      const nameRegex = /^[A-Za-z\s\-]+$/; 
+      if (!nameRegex.test(name)) {
+        return res.status(400).json({ message: "Name should only contain letters, spaces, and hyphens" });
+      }
+      const pincodeRegex = /^\d{6}$/; 
+      if (!pincodeRegex.test(pincode)) {
+        return res.status(400).json({ message: "Pincode must be exactly 6 digits" });
+      }
+      const phoneRegex = /^\d{10}$/; // Exactly 10 digits
+      if (!phoneRegex.test(mobilenumber)) {
+        return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
+      }
+
       const address = new Address({
         user: user._id,
         name,
@@ -127,6 +140,31 @@ const profilecontroller = {
   },
   userProfileUpdate: async (req, res) => {
     console.log(req.body)
+    const { fullName, currentEmail, changedEmail, phone } = req.body;
+    const token=req.cookies.token;
+    const decoded=jwt.verify(token,process.env.JWT_SECRET)
+    // console.log(req.file)
+    try{
+      const updateData={
+        name:fullName,
+        // email:changedEmail || currentEmail,
+        // phone:phone
+      };
+      if(req.file){
+        updateData.photo= `/uploads/profile-pictures/${req.file.filename}`;
+      }
+      const updateUser=await User.findByIdAndUpdate(decoded.id, updateData,{new:true})
+
+      // res.status(200).json({success:true, message:"photo added successfully"})
+      req.flash("success","Photo added successfully")
+      res.redirect(`/user/myprofile/${decoded.id}`)
+
+    }catch(error){
+      res.status(500).json({ success: false, message: error.message });
+
+
+    }
+
   },
   changePassword: async (req, res) => {
     try {

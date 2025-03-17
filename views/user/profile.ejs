@@ -778,6 +778,21 @@
   </nav>
   <!-- ======================== END NAVBAR ======================== -->
 
+  <% if (messages.success) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <%= messages.success %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+<% } %>
+
+<% if (messages.error) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <%= messages.error %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+         <% } %>
+
+
   <!-- Main Profile Layout -->
   <div class="container my-4">
     <div class="row">

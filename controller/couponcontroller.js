@@ -73,6 +73,42 @@ const couponController={
             console.log(error)
             return res.status(500).json({ success: false, message: 'Internal server error' });
         }
+    },
+    updateEditCoupon: async (req,res)=>{
+        try{
+            const{ name,code,discountType,discountValue,minOrderAmount,maxDiscountAmount,validFrom, validUntil,usageLimit,isActive}=req.body
+            const couponId=req.params.id
+            const coupon=await Coupon.findById(couponId)
+            console.log("couponId",couponId)
+            // console.log("coupon",coupon)
+            if(!coupon){
+                return res.status(400).json({success:false,message:"Coupon not found"})
+            }
+           
+            // console.log(req.body)
+            coupon.name = name;
+            coupon.code = code;
+            coupon.discountType = discountType;
+            coupon.discountValue = discountValue;
+            coupon.minOrderAmount = minOrderAmount;
+            coupon.maxDiscountAmount = maxDiscountAmount;
+            coupon.validFrom = validFrom;
+            coupon.validUntil = validUntil;
+            coupon.usageLimit = usageLimit || 0;
+            coupon.isActive = isActive;
+            await coupon.save();
+            res.status(200).json({success:true,  messsage:"Coupon updated successfully"})
+
+
+        }catch(error){
+            console.log(error)
+            return res.status(500).json({ 
+                success: false, 
+                message: "An error occurred while updating the coupon",
+                error: error.message
+            });
+
+        }
     }
 }
 module.exports=couponController

@@ -46,7 +46,7 @@
                 <option value="">None</option>
                 <% categories.forEach(cat => { %>
                     <option value="<%= cat._id %>" <%= category.parent && category.parent.toString() === cat._id.toString() ? 'selected' : '' %>>
-                        <%= cat.name %>
+                        <%= cat.parent %>
                     </option>
                 <% }); %>
             </select>

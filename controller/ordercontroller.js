@@ -14,9 +14,12 @@ const ordermanagement = {
         try {
 
             const orders = await Order.find()
+                 .sort({createdAt:-1})
                 .populate("user", "name price phone")
                 .populate("products.product", "name price image")
-                .populate('shippingAddress');
+                .populate('shippingAddress')
+                
+                
             if (!orders || orders.lengthv === 0) {
                 return res.status(404).json({ message: 'Order not found' });
             }

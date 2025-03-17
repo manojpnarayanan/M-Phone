@@ -28,11 +28,22 @@ const checkoutcontroller = {
             cart.products.forEach(item => {
                 totalItems += item.quantity;
                 totalPrice += item.quantity * item.product.price;
-                totalDiscount += item.quantity * item.product.discount;
+                // totalDiscount += item.quantity * item.product.discount;
+                totalDiscount += item.quantity * (item.product.price * (item.product.discount / 100));
+
             });
             const gst = totalPrice * 0.18;
             const deliveryCharges = totalPrice > 50000 ? 0 : 100;
+            let couponDiscount = 0;
+            let appliedCouponCode = '';
 
+            if (cart.appliedCoupon && cart.appliedCoupon.discountAmount) {
+                couponDiscount = cart.appliedCoupon.discountAmount;
+                appliedCouponCode = cart.appliedCoupon.code;
+
+            }
+
+             console.log("couponDiscount",couponDiscount)
             const activeCoupon=await Coupon.find({
                 isActive:true,
                 validFrom:{$lte:new Date()},
@@ -54,7 +65,9 @@ const checkoutcontroller = {
                 totalDiscount,
                 totalPrice,
                 gst,
-                deliveryCharges
+                deliveryCharges,
+                couponDiscount,
+                appliedCouponCode
 
 
             })

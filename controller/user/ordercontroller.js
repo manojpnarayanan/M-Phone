@@ -237,8 +237,8 @@ const orderController = {
             }
 
             for (const item of order.products) {
-                // const productId = item.product._id;
-                // const quantity = item.quantity;
+                const productId = item.product._id;
+                const quantity = item.quantity;
 
                 await Product.findByIdAndUpdate(
                     productId,

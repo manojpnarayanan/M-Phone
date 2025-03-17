@@ -109,6 +109,14 @@ const signupController = {
         return res.status(400).json({ message: "Passwords do not match" });
       }
 
+      const userVerified=await User.findOne({email})
+      console.log(userVerified)
+      if(userVerified && userVerified.isVerified===false){
+        await User.deleteOne({email})
+console.log("deleted email:",email)
+
+      }
+
       // Check if user already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {

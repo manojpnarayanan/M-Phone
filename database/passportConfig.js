@@ -21,6 +21,7 @@ passport.use(new googleStrategy({
                 name: profile.displayName,
                 email: profile.emails[0].value,
                 phonenumber: "",
+                isVerified:true,
             })
             await newUser.save();
             done(null, newUser)

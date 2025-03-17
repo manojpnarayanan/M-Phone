@@ -11,7 +11,8 @@ const walletSchema = new mongoose.Schema({
     walletBalance: {
         type: Number,
         required: true,
-        min: 0
+        min: 0,
+        default:0
     },
     transactions: [{
         orderId: {
@@ -21,7 +22,9 @@ const walletSchema = new mongoose.Schema({
         transactionId: {
             type: String,
             default: uuidv4,
-            unique: true
+            unique: true,
+            sparse:true
+
         },
         transactionType: {
             type: String,

@@ -101,6 +101,8 @@
                                             <th> min Price</th>
                                             <th>Status</th>
                                             <th>Actions</th>
+                                            <th>Block/Unblock</th>
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -129,11 +131,15 @@
                                                     <td>
                                                         <div class="d-flex gap-2">
                                                             <a href="/admin/dashboard/coupons/edit/<%= coupon._id %>" class="btn btn-sm btn-primary">Edit</a>
-                                                            <button class="btn btn-sm <%= coupon.isActive ? 'btn-danger' : 'btn-success' %> toggle-coupon" 
-                                                                data-id="<%= coupon._id %>">
-                                                                <%= coupon.isActive ? 'Deactivate' : 'Activate' %>
-                                                            </button>
+                                                            
                                                         </div>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-sm <%= coupon.isActive ? 'btn-danger' : 'btn-success' %> toggle-coupon" 
+                                                            data-id="<%= coupon._id %>">
+                                                            <%= coupon.isActive ? 'Deactivate' : 'Activate' %>
+                                                        </button>
+
                                                     </td>
                                                 </tr>
                                             <% }); %>

@@ -25,6 +25,12 @@ const categorySchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    discount:{
+        type:Number,
+        min:0,
+        max:100,
+        default:0
     }
 
 }, { timestamps: true })

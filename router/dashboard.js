@@ -24,6 +24,8 @@ router.get("/productgrid",(req,res)=>{res.render("admin/page-products-grid")})
 router.get("/brands",brandController.getBrands,)
 router.get("/categories",productController.getCategory,(req,res)=>{res.render("admin/page-categories")})
 router.post("/categories/:id",productController.blockCategory)
+router.put("/categories/add-offer/:id",productController.addOffer)
+router.put("/categories/remove-offer/:id",productController.removeOffer)
 
 router.get("/orders",clientController.loadUserList)
 router.get("/ordermanage",orderController.loadOrderDetails)

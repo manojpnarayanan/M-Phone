@@ -142,8 +142,16 @@ const userViews = {
                 .sort({ createdAt: -1 })
             console.log("loadprofile", orders)
 
-            const wallet = await Wallet.findOne({ userId })
+            let wallet = await Wallet.findOne({ userId })
+            if(!wallet){
+                wallet= new Wallet({
+                    userId,
+                    // walletBalance: 0,
 
+                    transactions:[]
+                })
+                await wallet.save();
+            }
             // Process orders to handle null/undefined products
             const processedOrders = orders.map(order => {
                 order.products = order.products.map(item => {
@@ -177,7 +185,8 @@ const userViews = {
                 addresses: address || [],
                 wishlist: wishlist ? wishlist.wishlist : [],
                 orders: safeOrders,
-                wallet: wallet || { walletBalance: 0, transactions: [] }
+                wallet
+               // wallet: wallet || { walletBalance: 0, transactions: [] }
             });
 
         } catch (error) {
@@ -288,10 +297,17 @@ const userViews = {
             if (user.isActive == false) {
                 return res.status(401).json({ message: "User is Blocked Contact support team" });
             }
-            const cart = await Cart.findOne({ user: decoded.id }).populate('products.product')
+            let cart = await Cart.findOne({ user: decoded.id }).populate('products.product')
             // console.log(user,cart)
             // console.log(user)
-
+            if(!cart){
+                cart=new Cart({
+                    user:user._id,
+                    products:[]
+                })
+                await cart.save();
+                // console.log("Cart created",cart);
+            }
             // if(!cart){
             //   return  res.render("user/addtocart",{user,cartItems:cart,totalItems,totalPrice})
 
@@ -422,7 +438,8 @@ const userViews = {
 
             cart.products = cart.products.filter(item => item.product.toString() !== productId);
             await cart.save();
-            res.json({ success: true });
+            res.json({ success: true , message:"Item removed "});
+            
 
         } catch (error) {
             console.log(error)

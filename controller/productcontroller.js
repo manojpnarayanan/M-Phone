@@ -142,6 +142,46 @@ const productupdates = {
             console.log(error);
             res.status(500).send("Error fetching categories");
         }
+    },
+    addOffer:async(req,res)=>{
+        try{
+            const categoryId=req.params.id
+            // console.log(categoryId)
+            const {offerPercentage}=req.body
+            // console.log(offerPercentage)
+            const category=await Category.findById(categoryId)
+            if(!category){
+                return res.status(400).json({success:false, message:"Category not found"})
+            }
+            category.discount=offerPercentage
+            await category.save();
+            
+            res.json({success: true, message:"Offer added successfully"})
+
+
+
+        }catch(error){
+            console.log(error)
+            res.status(500).json({ success: false, message: "Internal server error" });
+
+        }
+    },
+    removeOffer:async(req,res)=>{
+        try{
+            const categoryId=req.params.id
+            // console.log(categoryId)
+            const category=await Category.findById(categoryId)
+            if(!category){
+                return res.status(400).json({success:false, message:"Category not found"})
+            }
+            category.discount=0
+            await category.save();
+            
+            res.json({success: true, message:"Offer removed successfully"})
+
+        }catch(error){
+
+        }
     }
 
 }

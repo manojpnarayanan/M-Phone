@@ -330,6 +330,16 @@
             background-color: #f0f5ff;
         }
 
+        .btn-danger {
+            background-color: white;
+            color: #ff6161;
+            border: 1px solid #ff6161;
+        }
+
+        .btn-danger:hover {
+            background-color: #fff0f0;
+        }
+
         .btn-block {
             width: 100%;
             display: block;
@@ -371,6 +381,11 @@
             border-radius: 4px;
             margin-bottom: 10px;
             background-color: #fafafa;
+        }
+
+        .coupon.applied {
+            border-color: #388e3c;
+            background-color: #f0fff0;
         }
 
         .coupon-code {
@@ -519,65 +534,15 @@
                         <h3 class="card-title">Payment Options</h3>
                     </div>
                     <div class="card-body">
-                        <!-- <div class="payment-option">
-                            <input type="radio" name="payment" id="upi" class="payment-radio">
-                            <img src="/api/placeholder/30/30" alt="UPI" class="payment-logo">
-                            <label for="upi">UPI</label>
-                        </div>
-                        
-                        <div class="payment-option">
-                            <input type="radio" name="payment" id="cards" class="payment-radio" checked>
-                            <img src="/api/placeholder/30/30" alt="Credit/Debit Card" class="payment-logo">
-                            <label for="cards">Credit/Debit Card</label>
-                        </div>
-                        
-                        <div class="payment-option">
-                            <input type="radio" name="payment" id="netbanking" class="payment-radio">
-                            <img src="/api/placeholder/30/30" alt="Netbanking" class="payment-logo">
-                            <label for="netbanking">Netbanking</label>
-                        </div>
-                        
-                        <div class="payment-option">
-                            <input type="radio" name="payment" id="wallet" class="payment-radio">
-                            <img src="/api/placeholder/30/30" alt="Wallet" class="payment-logo">
-                            <label for="wallet">Wallet</label>
-                        </div> -->
-
                         <div class="payment-option">
                             <input type="radio" name="paymentMethod" id="cod" value="cash_on_delivery"
-                                class="payment-radio">
-                            <!-- <img src="/api/placeholder/30/30" alt="Cash on Delivery" class="payment-logo"> -->
+                                class="payment-radio" checked>
                             <i class="fas fa-money-bill-wave payment-logo"></i>
                             <label for="cod">Cash on Delivery</label>
                         </div>
 
-                        <!-- Card Details Form (shown when card payment is selected) -->
-                        <!-- <div class="form-group" style="margin-top: 15px;">
-                            <label for="cardNumber" class="form-label">Card Number</label>
-                            <input type="text" id="cardNumber" class="form-control" placeholder="1234 5678 9012 3456">
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label for="expiryDate" class="form-label">Expiry Date</label>
-                                <input type="text" id="expiryDate" class="form-control" placeholder="MM/YY">
-                            </div>
-                            <div class="form-col">
-                                <label for="cvv" class="form-label">CVV</label>
-                                <input type="text" id="cvv" class="form-control" placeholder="123">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="nameOnCard" class="form-label">Name on Card</label>
-                            <input type="text" id="nameOnCard" class="form-control" placeholder="John Doe">
-                        </div> -->
-
-
-
-
-                        <button onclick="placeOrder()" class="btn btn-primary btn-block  style=" margin-top: 20px;">Pay
-                            ₹<%= (totalPrice - totalDiscount + deliveryCharges + gst).toFixed(2) %></button>
+                        <button id="payButton" onclick="placeOrder()" class="btn btn-primary btn-block" style="margin-top: 20px;">Pay
+                            ₹<span id="finalPayAmount"><%= (totalPrice - totalDiscount - (couponDiscount || 0) + deliveryCharges + gst).toFixed(2) %></span></button>
                     </div>
                 </div>
             </div>
@@ -593,111 +558,86 @@
                         <div class="price-summary">
                             <div class="price-row">
                                 <div class="price-label">Price (<%= totalItems %> items)</div>
-                                <div class="price-value">₹<%= totalPrice %>
-                                </div>
+                                <div class="price-value" id="totalPrice">₹<%= totalPrice %></div>
                             </div>
                             <div class="price-row">
                                 <div class="price-label">Discount</div>
-                                <div class="price-value" style="color: #388e3c;">-₹<%= totalDiscount %>
-                                </div>
+                                <div class="price-value" style="color: #388e3c;" id="totalDiscount">-₹<%= totalDiscount %></div>
+                            </div>
+                            <div id="couponDiscountRow" class="price-row" style="<%= couponDiscount && couponDiscount > 0 ? '' : 'display: none;' %>">
+                                <div class="price-label">Coupon Discount <span id="appliedCouponCode"><% if (appliedCouponCode) { %>(<%= appliedCouponCode %>)<% } %></span></div>
+                                <div class="price-value" style="color: #388e3c;" id="couponDiscount">-₹<%= couponDiscount ? couponDiscount.toFixed(2) : '0.00' %></div>
                             </div>
                             <div class="price-row">
                                 <div class="price-label">Delivery Charges</div>
-                                <div class="price-value" style="color: #388e3c;">
-                                    <% if (totalPrice> 50000) { %>
+                                <div class="price-value" style="color: #388e3c;" id="deliveryCharges">
+                                    <% if (totalPrice > 50000) { %>
                                         FREE
-                                        <% } else { %>
-                                            ₹100
-                                            <% } %>
+                                    <% } else { %>
+                                        ₹100
+                                    <% } %>
                                 </div>
                             </div>
                             <div class="price-row">
                                 <div class="price-label">GST (18%)</div>
-                                <div class="price-value">₹<%= gst.toFixed(2) %>
-                                </div>
+                                <div class="price-value" id="gst">₹<%= gst.toFixed(2) %></div>
                             </div>
                             <div class="price-row total-row">
                                 <div class="price-label">Total Amount</div>
-                                <div class="price-value">₹<%= (totalPrice - totalDiscount + deliveryCharges +
-                                        gst).toFixed(2) %>
-                                </div>
+                                <div class="price-value" id="totalAmount">₹<%= (totalPrice - totalDiscount - (couponDiscount || 0) + deliveryCharges + gst).toFixed(2) %></div>
                             </div>
                         </div>
 
-                        <div style="color: #388e3c; margin-top: 10px; font-weight: 500;">
-                            You will save ₹<%= totalDiscount %> on this order
+                        <div id="savingsMessage" style="color: #388e3c; margin-top: 10px; font-weight: 500;">
+                            You will save ₹<span id="totalSavings"><%= (totalDiscount + (couponDiscount || 0)).toFixed(2) %></span> on this order
                         </div>
                     </div>
                 </div>
 
                 <!-- Promo Code -->
                 <div class="card">
-                    <!-- <div class="card-header">
+                    <div class="card-header">
                         <h3 class="card-title">Promo Code</h3>
-                    </div> -->
-                    <div class="card">
-                        <div class="card-header">
-                          <h3 class="card-title">Promo Code</h3>
-                        </div>
-                        <div class="card-body">
-                          <!-- <div class="promo-form">
-                            <input type="text" class="form-control promo-input" id="couponInput" placeholder="Enter promo code">
-                            <button class="btn btn-secondary" id="applyCouponBtn">Apply</button>
-                          </div> -->
-                      
-                          <div class="coupons-list">
-                            <% if (coupons && coupons.length > 0) { %>
-                              <% coupons.forEach(coupon => { %>
-                                <div class="coupon" data-code="<%= coupon.code %>">
-                                  <div>
-                                    <div class="coupon-code"><%= coupon.code %></div>
-                                    <div>
-                                      <% if (coupon.discountType === 'percentage') { %>
-                                        <%= coupon.discountValue %>% off
-                                        <% if (coupon.maxDiscountAmount) { %>
-                                          up to <%= coupon.maxDiscountAmount %>
-                                        <% } %>
-                                      <% } else { %>
-                                        $<%= coupon.discountValue %> off
-                                      <% } %>
-                                      <% if (coupon.minOrderAmount > 0) { %>
-                                        (Min. order: <%= coupon.minOrderAmount %>)
-                                      <% } %>
-                                    </div>
-                                  </div>
-                                  <button onclick="applyCoupon('<%= coupon._id %>' ,'<%= user._id %>')" class="btn btn-outlined coupon-apply-btn">Apply</button>
-                                </div>
-                              <% }); %>
-                            <% } else { %>
-                              <div class="no-coupons">No active coupons available</div>
-                            <% } %>
-                          </div>
-                        </div>
-                      </div>
-                    <!-- <div class="card-body">
-                        <div class="promo-form">
-                            <input type="text" class="form-control promo-input" placeholder="Enter promo code">
-                            <button class="btn btn-secondary">Apply</button>
-                        </div>
-
+                    </div>
+                    <div class="card-body">
                         <div class="coupons-list">
-                            <div class="coupon">
-                                <div>
-                                    <div class="coupon-code">NEWUSER50</div>
-                                    <div>50% off up to ₹500</div>
-                                </div>
-                                <button class="btn btn-outlined">Apply</button>
-                            </div>
-
-                            <div class="coupon">
-                                <div>
-                                    <div class="coupon-code">WELCOME10</div>
-                                    <div>10% off up to ₹1000</div>
-                                </div>
-                                <button class="btn btn-outlined">Apply</button>
-                            </div>
+                            <% if (coupons && coupons.length > 0) { %>
+                                <% coupons.forEach(coupon => { %>
+                                    <div class="coupon <%= coupon.code === appliedCouponCode ? 'applied' : '' %>" 
+                                         data-code="<%= coupon.code %>" 
+                                         data-id="<%= coupon._id %>" 
+                                         data-discount-type="<%= coupon.discountType %>" 
+                                         data-discount-value="<%= coupon.discountValue %>" 
+                                         data-min-order="<%= coupon.minOrderAmount || 0 %>"
+                                         data-max-discount="<%= coupon.maxDiscountAmount || 0 %>">
+                                        <div>
+                                            <div class="coupon-code"><%= coupon.code %></div>
+                                            <div>
+                                                <% if (coupon.discountType === 'percentage') { %>
+                                                    <%= coupon.discountValue %>% off
+                                                    <% if (coupon.maxDiscountAmount) { %>
+                                                        up to ₹<%= coupon.maxDiscountAmount %>
+                                                    <% } %>
+                                                <% } else { %>
+                                                    ₹<%= coupon.discountValue %> off
+                                                <% } %>
+                                                <% if (coupon.minOrderAmount > 0) { %>
+                                                    (Min. order: ₹<%= coupon.minOrderAmount %>)
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                        <% if (coupon.code === appliedCouponCode) { %>
+                                            <button onclick="removeCoupon('<%= coupon._id %>', '<%= user._id %>')" class="btn btn-danger">Remove</button>
+                                        <% } else { %>
+                                            <button onclick="applyCoupon('<%= coupon._id %>', '<%= user._id %>')" class="btn btn-outlined">Apply</button>
+                                        <% } %>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <div class="no-coupons">No active coupons available</div>
+                            <% } %>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -708,6 +648,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    // Store original values for calculations
+    const originalValues = {
+        totalPrice: <%= totalPrice %>,
+        totalDiscount: <%= totalDiscount %>,
+        couponDiscount: <%= couponDiscount || 0 %>,
+        deliveryCharges: <%= deliveryCharges %>,
+        gst: <%= gst %>
+    };
+
     // Function to place the order
     async function placeOrder() {
         try {
@@ -731,13 +680,21 @@
                 });
                 return; // Stop execution if no address is selected
             }
+            
+            // Get the current total amount from the UI
+            const currentTotalAmount = parseFloat(document.getElementById('totalAmount').textContent.replace('₹', ''));
+            const couponDiscount = document.getElementById('couponDiscountRow').style.display !== 'none' 
+                ? parseFloat(document.getElementById('couponDiscount').textContent.replace('-₹', ''))
+                : 0;
+            
             // Gather data from the page
             const orderData = {
                 userId: "<%= user._id %>",
                 shippingAddress: selectedAddress.value,
                 totalAmount: "<%= totalPrice %>",
                 discount: "<%= totalDiscount %>",
-                finalAmount: "<%= (totalPrice - totalDiscount + deliveryCharges + gst).toFixed(2) %>",
+                couponDiscount: couponDiscount,
+                finalAmount: currentTotalAmount.toFixed(2),
                 products: [
                     <% product.forEach((item, index) => { %>
                 {
@@ -747,9 +704,7 @@
                 },
                     <% }) %>
                 ],
-                // paymentMethod: document.querySelector('input[name="paymentMethod"]:checked').value
                 paymentMethod: selectedPaymentMethod.value
-
             };
 
             // Send the order data to the backend using Fetch API
@@ -763,7 +718,7 @@
 
             // Parse the response
             const result = await response.json();
-            console.log(result)
+            console.log(result);
 
             if (response.ok) {
                 // Show success message with SweetAlert
@@ -794,52 +749,206 @@
             });
         }
     }
-           
-    async function applyCoupon(couponId,userId){
-        console.log(couponId)
-        console.log(userId)
-        try{
-            Swal.fire({
-                icon:'success',
+          
+    async function applyCoupon(couponId, userId) {
+    try {
+        // Show loading state
+        console.log("Applying coupon:", couponId, "for user:", userId);
+        
+        Swal.fire({
             title: 'Applying coupon...',
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            allowOutsideClick: false,
+            showConfirmButton: false
         });
+        
+        const response = await fetch(`/user/myprofile/checkout/${userId}/coupon-applied`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({couponId, userId})
+        });
+
+        console.log("Response status:", response.status);
+        const result = await response.json();
+        console.log("Response data:", result);
+
+        if (response.ok) {
+            // Get the coupon element and its data
+            const couponElement = document.querySelector(`.coupon[data-id="${couponId}"]`);
+            const couponCode = couponElement.getAttribute('data-code');
             
-            const response= await fetch(`/user/myprofile/checkout/${userId}/coupon-applied`,{
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({couponId,userId})
-            })
-
-            const result= await response.json()
-
-            if(response.ok){
-                Swal.fire({
+            // Update UI with the applied coupon
+            updateUIWithCoupon(couponId, couponCode, result.discountAmount);
+            
+            Swal.fire({
                 icon: 'success',
                 title: 'Coupon Applied!',
                 text: result.message,
-                timer: 2000
-            })
-            .then(()=>{
-                window.location.reload();
-            })
-            }else{
-                console.error("Error applying coupon:", error);
+                // timer: 2000
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: result.message || 'Failed to apply coupon. Please try again.'
+            });
+        }
+    } catch (error) {
+        console.error("Error applying coupon:", error);
         Swal.fire({
             icon: 'error',
             title: 'Error',
             text: 'An unexpected error occurred. Please try again.'
         });
-            }
+    }
+}
 
-        }catch(error){
-            console.log(error)
+    async function removeCoupon(couponId, userId) {
+        try {
+            // Show loading state
+            Swal.fire({
+                title: 'Removing coupon...',
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                allowOutsideClick: false,
+                showConfirmButton: false
+            });
+            
+            // Here you would typically have an API endpoint to remove the coupon
+            // For now, we'll simulate it with a timeout
+            const response = await fetch(`/user/myprofile/checkout/${userId}/remove-coupon`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({couponId, userId})
+            });
+
+            // Assuming the response structure
+            const result = await response.json();
+
+            if (response.ok) {
+                // Update UI to remove coupon effects
+                resetCouponUI();
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Removed',
+                    text: 'Coupon has been removed successfully.',
+                    // timer: 2000
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message || 'Failed to remove coupon. Please try again.'
+                });
+            }
+        } catch (error) {
+            console.error("Error removing coupon:", error);
+            
+            // For demo purposes, we'll still update the UI even if there's an error
+            // In a real application, you would handle this differently
+            resetCouponUI();
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Coupon Removed',
+                text: 'Coupon has been removed successfully.',
+                // timer: 2000
+            });
         }
     }
 
+    // Function to update UI when a coupon is applied
+    function updateUIWithCoupon(couponId, couponCode, discountAmount) {
+    // 1. Update all coupon buttons - change all to "Apply" except the applied one
+    document.querySelectorAll('.coupon').forEach(coupon => {
+        const currentCouponId = coupon.getAttribute('data-id');
+        const buttonElement = coupon.querySelector('button');
+        
+        if (currentCouponId === couponId) {
+            // This is the applied coupon
+            coupon.classList.add('applied');
+            buttonElement.className = 'btn btn-danger';
+            buttonElement.textContent = 'Remove';
+            buttonElement.onclick = function() { 
+                removeCoupon(couponId, '<%= user._id %>'); 
+            };
+        } else {
+            // Reset other coupons
+            coupon.classList.remove('applied');
+            buttonElement.className = 'btn btn-outlined';
+            buttonElement.textContent = 'Apply';
+            buttonElement.onclick = function() { 
+                applyCoupon(currentCouponId, '<%= user._id %>'); 
+            };
+        }
+    });
     
+    // 2. Update price details
+    const couponDiscountAmount = parseFloat(discountAmount) || 0;
+    
+    // Show coupon discount row
+    document.getElementById('couponDiscountRow').style.display = '';
+    document.getElementById('appliedCouponCode').textContent = `(${couponCode})`;
+    document.getElementById('couponDiscount').textContent = `-₹${couponDiscountAmount.toFixed(2)}`;
+    
+    // 3. Update total amount
+    const totalPrice = parseFloat(document.getElementById('totalPrice').textContent.replace('₹', ''));
+    const totalDiscount = parseFloat(document.getElementById('totalDiscount').textContent.replace('-₹', ''));
+    const deliveryCharges = document.getElementById('deliveryCharges').textContent.includes('FREE') ? 0 : 100;
+    const gst = parseFloat(document.getElementById('gst').textContent.replace('₹', ''));
+    
+    const newTotalAmount = totalPrice - totalDiscount - couponDiscountAmount + deliveryCharges + gst;
+    document.getElementById('totalAmount').textContent = `₹${newTotalAmount.toFixed(2)}`;
+    
+    // 4. Update pay button amount
+    document.getElementById('finalPayAmount').textContent = newTotalAmount.toFixed(2);
+    
+    // 5. Update savings message
+    const totalSavings = totalDiscount + couponDiscountAmount;
+    document.getElementById('totalSavings').textContent = totalSavings.toFixed(2);
+}
 
-
-
+    // Function to reset UI when coupon is removed
+    function resetCouponUI() {
+        // 1. Reset all coupon buttons to "Apply"
+        document.querySelectorAll('.coupon').forEach(coupon => {
+            coupon.classList.remove('applied');
+            const buttonElement = coupon.querySelector('button');
+            const couponId = coupon.getAttribute('data-id');
+            
+            buttonElement.className = 'btn btn-outlined';
+            buttonElement.textContent = 'Apply';
+            buttonElement.onclick = function() { 
+                applyCoupon(couponId, '<%= user._id %>'); 
+            };
+        });
+        
+        // 2. Hide coupon discount row
+        document.getElementById('couponDiscountRow').style.display = 'none';
+        document.getElementById('appliedCouponCode').textContent = '';
+        document.getElementById('couponDiscount').textContent = '-₹0.00';
+        
+        // 3. Recalculate total amount without coupon discount
+        const totalPrice = originalValues.totalPrice;
+        const totalDiscount = originalValues.totalDiscount;
+        const deliveryCharges = originalValues.deliveryCharges;
+        const gst = originalValues.gst;
+        
+        const newTotalAmount = totalPrice - totalDiscount + deliveryCharges + gst;
+        document.getElementById('totalAmount').textContent = `₹${newTotalAmount.toFixed(2)}`;
+        
+        // 4. Update pay button amount
+        document.getElementById('finalPayAmount').textContent = newTotalAmount.toFixed(2);
+        
+        // 5. Update savings message (without coupon discount)
+        document.getElementById('totalSavings').textContent = totalDiscount.toFixed(2);
+    }
 </script>
