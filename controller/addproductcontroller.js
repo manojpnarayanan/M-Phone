@@ -221,6 +221,44 @@ const addproducts = {
       console.log(error)
     }
   },
+  addOffer:async(req,res)=>{
+    try{
+      const productId=req.params.id
+      // console.log(productId)
+      const {offerPercentage}=req.body
+      // console.log(offerPercentage)
+      const product=await Product.findById(productId)
+      if(!product){
+        return res.status(404).json({success:false, message:"Product not found"})
+      }
+      product.discount=offerPercentage
+      await product.save()
+      res.status(200).json({success:true, message:"Offer added successfully"})
+
+
+    }catch(error){
+      console.log(error)
+      res.status(500).json({success:false, message:"Failed to add offer"})
+
+        }
+  },
+  removeOffer:async(req,res)=>{
+    try{
+      const productId=req.params.id
+      const product=await Product.findById(productId)
+      if(!product){
+        return res.status(404).json({success:false, message:"Product not found"})
+      }
+      product.discount=0
+      await product.save()
+      res.status(200).json({success:true, message:"Offer removed successfully"})
+    }catch(error){
+      console.log(error)
+      res.status(500).json({success:false, message:"Failed to remove offer"})
+
+    }
+   
+  }
   
  
 

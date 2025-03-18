@@ -15,6 +15,8 @@
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
     <!-- Template CSS -->
     <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body>
@@ -133,7 +135,10 @@
                                 <th scope="col">Price</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Date Added</th>
+                                <th scope="col">status</th>
                                 <th scope="col">Actions</th>
+                                <th scope="col">Add Offer</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -156,6 +161,11 @@
                                     </td>
                                     <td><%= new Date(product.createdAt).toLocaleDateString() %></td>
                                     <td>
+                                        <span class="badge rounded-pill alert-<%= product.discount ? 'success' : 'warning' %>">
+                                            <%= product.discount ? product.discount : 0 %>%
+                                        </span>
+                                    </td>
+                                    <td>
                                         <a href="/admin/dashboard/products/edit/<%= product._id %>" class="btn btn-sm font-sm rounded btn-brand">
                                             <i class="material-icons md-edit"></i> Edit
                                         </a>
@@ -165,6 +175,14 @@
                                             <%= product.isActive ? "Block" : "unblock" %>
                                         </button>
                                     </td>
+                                    <td>
+                                        <button class="btn <%= product.discount ? 'btn-danger': 'btn-success'  %> toggle-offer-btn"
+                                            data-id="<%= product._id %>">
+                                            <%= product.discount ?   'Remove':'Add' %>
+                                        </button>
+
+                                    </td>
+                                    
                                 </tr>
                             <% }) %>
                         </tbody>
@@ -243,6 +261,161 @@
    
    
     <script>
+
+
+document.querySelectorAll(".toggle-offer-btn").forEach(button => {
+    button.addEventListener("click", function() {
+        const productId = this.getAttribute("data-id");
+        const isRemoveAction = this.textContent.trim() === 'Remove';
+        console.log(productId);
+        
+        if (isRemoveAction) {
+            // Handle Remove Offer action
+            Swal.fire({
+                title: `Are you sure you want to remove the offer from this product?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, remove it!"
+            })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/dashboard/products/remove-offer/${productId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Network response was not ok');
+                    })
+                    .then(data => {
+                        // Update the offer badge to show 0%
+                        const offerBadge = this.closest('tr').querySelector('.badge[data-id]');
+                        if (offerBadge) {
+                            offerBadge.textContent = '0%';
+                            offerBadge.classList.remove('bg-success');
+                            offerBadge.classList.add('bg-danger');
+                        }
+                        
+                        // Update the button to "Add"
+                        this.textContent = 'Add';
+                        this.classList.remove('btn-danger');
+                        this.classList.add('btn-success');
+                        
+                        Swal.fire(
+                            'Success!',
+                            'Offer has been removed successfully.',
+                            'success'
+                        );
+                        window.location.reload()
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire(
+                            'Error!',
+                            'Failed to remove offer.',
+                            'error'
+                        );
+                    });
+                }
+            });
+        } else {
+            // Handle Add Offer action (existing code)
+            Swal.fire({
+                title: `Are you sure you want to add Offer to this product?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, proceed!"
+            })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    // Show a second Swal modal to get the percentage input
+                    Swal.fire({
+                        title: 'Enter Offer Percentage',
+                        input: 'number',
+                        inputLabel: 'Percentage',
+                        inputPlaceholder: 'Enter percentage (e.g., 10)',
+                        showCancelButton: true,
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'Please enter a percentage!';
+                            }
+                            if (value < 0 || value > 100) {
+                                return 'Percentage must be between 0 and 100';
+                            }
+                        }
+                    })
+                    .then((offerValue) => {
+                        if (offerValue.isConfirmed) {
+                            const offerPercentage = offerValue.value;
+                            fetch(`/admin/dashboard/products/add-offer/${productId}`, {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({ offerPercentage })
+                            })
+                            .then(response => {
+                                if (response.ok) {
+                                    return response.json();
+                                }
+                                throw new Error('Network response was not ok');
+                            })
+                            .then(data => {
+                                // Update the offer badge to show the new percentage
+                                const offerBadge = this.closest('tr').querySelector('.badge[data-id]');
+                                if (offerBadge) {
+                                    offerBadge.textContent = `${offerPercentage}%`;
+                                    offerBadge.classList.remove('bg-danger');
+                                    offerBadge.classList.add('bg-success');
+                                }
+                                
+                                // Update the button to "Remove"
+                                this.textContent = 'Remove';
+                                this.classList.remove('btn-success');
+                                this.classList.add('btn-danger');
+
+                                // window.location.reload();
+
+                                
+                                Swal.fire(
+                                    'Success!',
+                                    'Offer has been added successfully.',
+                                    'success'
+                                );
+                                // window.location.reload();
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire(
+                                    'Error!',
+                                    'Failed to add offer.',
+                                    'error'
+                                );
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
       document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".blockbtn").forEach(button => {
         button.addEventListener("click", async function () {

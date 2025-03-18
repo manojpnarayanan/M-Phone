@@ -1005,7 +1005,7 @@
                         </div>
                         
                         <div class="order-body">
-                            <% if (order.orderStatus.toLowerCase() !== 'cancelled') { %>
+                            <% if (order.orderStatus.toLowerCase() !== 'cancelled' &&  order.orderStatus.toLowerCase() !== 'returned') { %>
                                 <div class="order-progress">
                                     <div class="progress-track">
                                         <% 

@@ -19,6 +19,9 @@ router.get("/productlist",addproductController.getProduct)
 router.patch("/productlist/:id",addproductController.blockProduct)
 router.get("/products/edit/:id",addproductController.editProduct)
 router.post("/products/edit/:id", upload.any(), addproductController.updateEditProduct)
+router.put("/products/add-offer/:id",addproductController.addOffer)
+router.put("/products/remove-offer/:id",addproductController.removeOffer)
+
 
 router.get("/productgrid",(req,res)=>{res.render("admin/page-products-grid")})
 router.get("/brands",brandController.getBrands,)
