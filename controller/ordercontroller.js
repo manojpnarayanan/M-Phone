@@ -49,6 +49,41 @@ const ordermanagement = {
             res.status(500).json({ message: "Internal Server Error" });
         }
     },
+    updateProductStatus:async(req,res)=>{
+        try{
+            const orderId = req.params.orderId;
+            const productId = req.params.productId;
+            const { productStatus, productIndex } = req.body;
+
+            const order = await Order.findById(orderId);
+            
+            if (!order) {
+                return res.status(404).json({ message: "Order not found" });
+            }
+            if (order.products[productIndex] && 
+                order.products[productIndex].product.toString() === productId) {
+                order.products[productIndex].status = productStatus;
+                const allSameStatus = order.products.every(item => item.status === productStatus);
+                if (allSameStatus) {
+                    order.orderStatus = productStatus;
+                } else {
+                    // If products have different statuses, set a mixed status
+                    order.orderStatus = "Processing";
+                } 
+                await order.save();
+                
+                return res.status(200).json({ 
+                    message: "Product status updated successfully", 
+                    order 
+                });
+            } else {
+                return res.status(404).json({ message: "Product not found in order" });
+            }
+
+        }catch(error){
+            console.log(error)
+        }
+    },
     downloadInvoice: async (req, res) => {
         try {
             const { period, date } = req.query;

@@ -10,7 +10,7 @@ const checkOutController=require("../../controller/user/checkoutcontroller")
 const wishlistController=require("../../controller/user/wishcontroller")
 const walletController=require("../../controller/user/walletcontroller")
 const reviewController=require("../../controller/user/reviewcontroller")
-
+const razorpayController=require("../../controller/user/razorpaycontroller")
 
 router.get("/addaddress/:id",profileController.loadAddressPage)
 router.post("/addaddress/:id",profileController.saveAddress)
@@ -27,9 +27,17 @@ router.post("/checkout/:id/coupon-applied",checkOutController.applyCoupon)
 router.post("/update-email",upload.single("photo"),profileController.userProfileUpdate)
 
 router.post("/order-placed",orderController.placeOrder)
+router.post("/create-razorpay-order",razorpayController.razorpayOrder)
+router.post("/verify-razorpay-payment",razorpayController.verifyRazorpayOrder)
+router.post("/create-failed-order",razorpayController.createFailedOrder)
+router.get("/failed-payment/:orderId",razorpayController.loadFailedpaymentPage)
+router.post("/retry-payment",razorpayController.retryPayment)
+
+
 router.get("/order-confirmed/:id",orderController.getOrderConfirmationPage)
 router.post("/cancel-order/:id",orderController.cancelOrder)
 router.post("/return-order/:id",orderController.returnOrder)
+router.post("/cancel-product/:orderId/:productId",orderController.cancelIndividualProduct)
 
 router.get("/write-review/:id",reviewController.loadReviewPage)
 router.post("/write-review/:id",reviewController.submitReview)

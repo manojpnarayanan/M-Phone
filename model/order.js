@@ -26,7 +26,13 @@ const orderSchema = new mongoose.Schema({
         price: {
             type: Number,
             required: true
-        }
+        },
+        status: {
+            type: String,
+            required: true,
+            enum: ['Pending', 'Processing', 'Paid', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned'],
+            default: 'Pending'
+        }
     }],
     cancelledProducts: [{
         product: {
@@ -51,7 +57,7 @@ const orderSchema = new mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['credit_card', 'debit_card', 'paypal', 'cash_on_delivery'],
+        enum: ['credit_card', 'debit_card', 'razor-pay', 'cash_on_delivery'],
         required: true
     },
     paymentStatus: {
@@ -73,7 +79,7 @@ const orderSchema = new mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned'],
+        enum: ['failed','Paid','Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned'],
         default: 'Pending'
     },
     transactionId: {
@@ -89,8 +95,9 @@ const orderSchema = new mongoose.Schema({
         required: false
     },
     couponApplied: {
-        type: Boolean,
-        default: false
+        code: { type: String },
+        discountAmount: { type: Number },
+        minOrderAmount: {type: Number}
     },
     invoice: {
         type: String, // Path or URL to the invoice file

@@ -14,6 +14,26 @@ const couponController={
     createCoupon:async (req,res)=>{
         try{
             console.log(req.body)
+            const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const validFromDate = new Date(req.body.validFrom);
+        if (validFromDate < today) {
+            return res.status(400).json({
+                success: false, 
+                message: "Coupon start date must be today or a future date"
+            });
+        }
+
+        const validUntilDate = new Date(req.body.validUntil);
+        if (validUntilDate <= validFromDate) {
+            return res.status(400).json({
+                success: false, 
+                message: "End date must be after start date"
+            });
+        }
+
+
 
             const coupon =new Coupon({
                 name:req.body.name,

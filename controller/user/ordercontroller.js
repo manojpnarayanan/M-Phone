@@ -7,6 +7,7 @@ const Wallet = require("../../model/wallet")
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
+const Coupon=require("../../model/coupon")
 
 // Helper function to generate invoice
 
@@ -75,8 +76,8 @@ const orderController = {
 
     placeOrder: async (req, res) => {
         try {
-            const { userId, products, shippingAddress, paymentMethod, totalAmount, discount, finalAmount } = req.body;
-
+            const { userId, products, shippingAddress, paymentMethod, totalAmount, discount, finalAmount, couponApplied } = req.body;
+console.log("couponApplied",couponApplied)
             if(!products || products.length===0){
                 return res.status(400).json({success:false, message:"Cart is empty"})
             }
@@ -92,6 +93,18 @@ const orderController = {
                 }
 
             }
+            if (couponApplied && couponApplied.code) {
+                  await Coupon.findOneAndUpdate(
+                    { code: couponApplied.code },
+                    { 
+                        $addToSet: { usersUsed: userId },
+                        $inc: { usedCount: 1 }
+                    },
+                    { new: true }
+                );
+        
+            }
+
 
             // Create a new order
             const newOrder = new Order({
@@ -106,6 +119,10 @@ const orderController = {
                 totalAmount,
                 discount,
                 finalAmount,
+                couponApplied:couponApplied? {
+                    code:couponApplied.code,
+                    discountAmount:couponApplied.discountAmount
+                }:null,
                 orderStatus: 'Pending'
             });
 
@@ -162,6 +179,38 @@ const orderController = {
             }
     
             const product = order.products[productIndex];
+            // console.log("product",product)
+            const coupon=await Coupon.findOne({code:order.couponApplied.code})
+            console.log("coupon",coupon)
+            
+
+            let refundAmount=(quantity || product.quantity)* product.price
+            // console.log(refundAmount)
+
+            if(order.paymentMethod==='razor-pay' && order.paymentStatus==='completed'){
+                if(order.couponApplied){
+                    const newTotalAmount=order.totalAmount-refundAmount
+                    if(newTotalAmount<coupon.minOrderAmount){
+                        const adjustedRefundAmount=refundAmount-order.couponApplied.discountAmount
+
+                        refundAmount=Math.max(adjustedRefundAmount,0)
+                    }
+                }
+            }
+            const wallet=await Wallet.findOne({userId:order.user})
+            // console.log(wallet)
+            if (!wallet) {
+                return res.status(404).json({ message: "Wallet not found" });
+            }
+
+            wallet.transactions.push({
+                orderId:order._id,
+                transactionType:'credit',
+                transactionAmount:refundAmount,
+                transactionDescription:`Refund for cancelled product ${product.product.name}
+                in order${order.orderId}`
+            })
+            await wallet.save()
     
             // Add the product to cancelledProducts
             order.cancelledProducts.push({
@@ -169,6 +218,7 @@ const orderController = {
                 quantity: quantity || product.quantity, // Allow partial cancellation
                 price: product.price
             });
+            
     
             // Update the product stock
             await Product.findByIdAndUpdate(
@@ -180,13 +230,23 @@ const orderController = {
             // Remove the product from the order or reduce its quantity
             if (quantity && quantity < product.quantity) {
                 order.products[productIndex].quantity -= quantity;
+                // order.products[productIndex].partiallyCancelled = true;
+
             } else {
-                order.products.splice(productIndex, 1);
+                // order.products.
+                // order.products.splice(productIndex, 1);
+                order.products[productIndex].status = "Cancelled";
+
             }
     
             // If all products are cancelled, mark the order as cancelled
             if (order.products.length === 0) {
                 order.orderStatus = "Cancelled";
+            }
+            const allCancelled=order.products.every(item=> item.status==="Cancelled" || (item.quantity === 0))
+
+            if(allCancelled){
+                order.orderStatus="Cancelled"
             }
     
             await order.save();
@@ -225,15 +285,35 @@ const orderController = {
         try {
             const orderId = req.params.id;
             // console.log("cancel request", orderId)
-            const order = await Order.findByIdAndUpdate(
-                orderId,
-                { orderStatus: "Cancelled" },
-                { new: true }
-            )
+            const order = await Order.findByIdAndUpdate(orderId)
                 .populate("products.product");
+                console.log("order",order)
 
             if (!order) {
                 return res.status(404).json({ message: "Order not found" });
+            }
+            if (order.paymentMethod === 'razor-pay' && order.paymentStatus === 'completed') {
+                // Calculate the total refund amount
+                const totalRefundAmount = order.products.reduce((total, item) => {
+                    return total + (item.quantity * item.price);
+                }, 0);
+                console.log("totalRefundAmount",totalRefundAmount)
+    
+                // Find the user's wallet
+                const wallet = await Wallet.findOne({ userId: order.user });
+                if (!wallet) {
+                    return res.status(404).json({ message: "Wallet not found" });
+                }
+    
+                // Add the refund amount to the wallet
+                wallet.transactions.push({
+                    orderId: order._id,
+                    transactionType: 'credit',
+                    transactionAmount: totalRefundAmount,
+                    transactionDescription: `Refund for cancelled order ${order.orderId}`,
+                });
+    
+                await wallet.save();
             }
 
             for (const item of order.products) {
@@ -258,21 +338,31 @@ const orderController = {
     returnOrder: async (req, res) => {
         try {
             const orderId = req.params.id;
-            console.log("return orderid :", orderId);
-            const order = await Order.findByIdAndUpdate(
-                orderId,
-                { orderStatus: "Returned" },
-                { new: true }
-            )
+            // console.log("return orderid :", orderId);
+            const order = await Order.findById(orderId)
                 .populate('products.product');
 
             if (!order) {
                 return res.status(404).json({ success: false, message: "Order not found" });
             }
+            const returnedProducts=order.products.filter(item=>item.status==="Delivered")
+            if(returnedProducts.length===0){
+                return res.status(400).json({success:false, message:"No delivered products is in your Order"})
+            }
 
-            const totalRefundAmount = order.products.reduce((total, item) => {
+
+            const totalRefundAmount = returnedProducts.reduce((total, item) => {
                 return total + (item.quantity * item.price);
             }, 0);
+            returnedProducts.forEach(item=>item.status="Returned")
+            const allReturned=order.products.every(item=>item.status==="Returned")
+            console.log(allReturned)
+            if(allReturned){
+                order.orderStatus="Returned"
+            }
+        console.log(returnedProducts)
+        
+        await order.save()
 
             const wallet = await Wallet.findOne({ userId: order.user });
             if (!wallet) {

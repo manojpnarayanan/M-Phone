@@ -731,6 +731,37 @@
   text-align: center; /* Center the text inside the badge */
   line-height: 1; /* Adjust line height for better alignment */
 }
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
+}
+
+.product-item {
+    position: relative;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+.badge-pending { background-color: #6c757d; color: white; }  /* Pending */
+    .badge-processing { background-color: #007bff; color: white; }  /* Processing */
+    .badge-shipped { background-color: #6f42c1; color: white; }  /* Shipped */
+    .badge-paid { background-color: #6f42c1; color: white; }  /* paid */
+
+    .badge-delivered { background-color: #28a745; color: white; }  /* Delivered */
+    .badge-cancelled { background-color: #dc3545; color: white; }  /* Cancelled */
+    .badge-return-requested { background-color: #fd7e14; color: white; }  /* Return Requested */
+    .badge-returned { background-color: #ffc107; color: black; }  /* Returned */
+    </style>
     </style>
 
   </style>
@@ -1047,7 +1078,7 @@
                             
                             <div class="product-list">
                                 <% order.products.forEach(item => { %>
-                                    <div class="product-item">
+                                    <div class="product-item" data-product-id="<%= item.product._id %>">
                                         <div class="product-image">
                                             <% if (item.product && item.product.image) { %>
                                                 <img src="/<%= item.product.image[0] %>" alt="<%= item.product.name %>">
@@ -1060,6 +1091,20 @@
                                             <div class="product-name"><%= item.product.name %></div>
                                             <div class="product-meta">
                                                 <span>Qty: <%= item.quantity %></span>
+                                                <p class="product-status">
+                                                  Status: 
+                                                  <span class="badge <%= item.product.status === 'Pending' ? 'badge-pending' : 
+                                                                        item.product.status === 'Processing' ? 'badge-processing' :
+                                                                        item.product.status === 'Paid' ? 'badge-paid' : 
+ 
+                                                                        item.product.status === 'Shipped' ? 'badge-shipped' : 
+                                                                        item.product.status === 'Delivered' ? 'badge-delivered' : 
+                                                                        item.product.status === 'Cancelled' ? 'badge-cancelled' : 
+                                                                        item.product.status === 'Return Requested' ? 'badge-return-requested' : 
+                                                                        'badge-returned' %>">
+                                                      <%= item.status %>
+                                                  </span>
+                                              </p>
                                                 <% if (item.product.color) { %>
                                                     <span>Color: <%= item.product.color %></span>
                                                 <% } %>
@@ -1068,6 +1113,18 @@
                                                 <% } %>
                                             </div>
                                             <div class="product-price">$<%= item.price.toFixed(2) %></div>
+                                            
+                                            <!-- Add Cancel Individual Product Button -->
+                                            <% if (order.orderStatus.toLowerCase() !== 'delivered' && 
+                                                   order.orderStatus.toLowerCase() !== 'cancelled' && 
+                                                   item.status.toLowerCase()  !== 'cancelled' &&
+                                                   order.orderStatus.toLowerCase() !== 'returned') { %>
+                                                <button 
+                                                    onclick="cancelProduct('<%= order._id %>', '<%= item.product._id %>', <%= item.quantity %>)" 
+                                                    class="btn btn-danger btn-sm mt-2">
+                                                    Cancel This Item
+                                                </button>
+                                            <% } %>
                                         </div>
                                     </div>
                                 <% }); %>
@@ -1358,7 +1415,7 @@
       <div class="row">
         <div class="col-md-4 text-center">
           <h5>Customer Support</h5>
-          <p>Email: support@mstore.com</p>
+          <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="51222421213e2325113c22253e23347f323e3c">[email&#160;protected]</a></p>
           <p>Phone: +91 98765 43210</p>
         </div>
         <div class="col-md-4 text-center">
@@ -1378,7 +1435,7 @@
   </footer>
 
   <!-- Bootstrap JS -->
-  <script
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
   ></script>
 
@@ -1869,5 +1926,55 @@ document.querySelectorAll('.delete-address').forEach(button => {
 
 
   </script>
+  
+<script>
+async function cancelProduct(orderId, productId, quantity) {
+    try {
+        const result = await Swal.fire({
+            title: 'Cancel Product',
+            text: 'Are you sure you want to cancel this product from your order?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch(`/user/myprofile/cancel-product/${orderId}/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ quantity })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Product cancelled successfully',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // Reload the page to reflect changes
+                    window.location.reload();
+                });
+            } else {
+                throw new Error(data.message || 'Failed to cancel product');
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: error.message || 'Failed to cancel product',
+            confirmButtonText: 'OK'
+        });
+    }
+}
+</script>
 </body>
 </html>

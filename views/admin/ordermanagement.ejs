@@ -41,6 +41,56 @@
 .table-bordered thead td {
     border-bottom-width: 2px;
 }
+.product-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+.product-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.product-image {
+    margin-right: 10px;
+}
+.product-details {
+    flex-grow: 1;
+}
+.product-status {
+    margin-top: 5px;
+}
+.status-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+}
+.status-pending {
+    background-color: #f0ad4e;
+}
+.status-processing {
+    background-color: #5bc0de;
+}
+.status-shipped {
+    background-color: #0275d8;
+}
+.status-delivered {
+    background-color: #5cb85c;
+}
+.status-cancelled {
+    background-color: #d9534f;
+}
+.status-return-request {
+    background-color: #aa66cc;
+}
+.status-returned {
+    background-color: #ff4444;
+}
      </style>
 
 </head>
@@ -66,40 +116,6 @@
             </div>
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
-                <!-- <ul class="nav">
-                    <li class="nav-item">
-                        <a class="nav-link btn-icon" href="#">
-                            <i class="material-icons md-notifications animation-shake"></i>
-                            <span class="badge rounded-pill">3</span>
-                        </a>
-                    </li> -->
-                    <!-- <li class="nav-item">
-                        <a class="nav-link btn-icon darkmode" href="#"> <i class="material-icons md-nights_stay"></i> </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="requestfullscreen nav-link btn-icon"><i class="material-icons md-cast"></i></a>
-                    </li>
-                    <li class="dropdown nav-item">
-                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownLanguage" aria-expanded="false"><i class="material-icons md-public"></i></a>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownLanguage">
-                            <a class="dropdown-item text-brand" href="#"><img src="/assets/imgs/theme/flag-us.png" alt="English">English</a>
-                            <a class="dropdown-item" href="#"><img src="/assets/imgs/theme/flag-fr.png" alt="Français">Français</a>
-                            <a class="dropdown-item" href="#"><img src="/assets/imgs/theme/flag-jp.png" alt="Français">日本語</a>
-                            <a class="dropdown-item" href="#"><img src="/assets/imgs/theme/flag-cn.png" alt="Français">中国人</a>
-                        </div>
-                    </li> -->
-                    <!-- <li class="dropdown nav-item">
-                        <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false"> <img class="img-xs rounded-circle" src="assets/imgs/people/avatar2.jpg" alt="User"></a>
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
-                            <a class="dropdown-item" href="#"><i class="material-icons md-perm_identity"></i>Edit Profile</a>
-                            <a class="dropdown-item" href="#"><i class="material-icons md-settings"></i>Account Settings</a>
-                            <a class="dropdown-item" href="#"><i class="material-icons md-account_balance_wallet"></i>Wallet</a>
-                            <a class="dropdown-item" href="#"><i class="material-icons md-receipt"></i>Billing</a>
-                            <a class="dropdown-item" href="#"><i class="material-icons md-help_outline"></i>Help center</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#"><i class="material-icons md-exit_to_app"></i>Logout</a>
-                        </div>
-                    </li> -->
                 </ul>
             </div>
         </header>
@@ -107,79 +123,16 @@
             <div class="content-header">
                 <div>
                     <h2 class="content-title card-title">Order detail</h2>
-                    <!-- <p>Details for Order ID: 3453012</p> -->
                 </div>
             </div>
             <div class="card">
-                <!-- <header class="card-header"> -->
-                    <!-- <div class="row align-items-center"> -->
-                        <!-- <div class="col-lg-6 col-md-6 mb-lg-0 mb-15"> -->
                             <span>
-                                <!-- <i class="material-icons md-calendar_today"></i> <b>Wed, Aug 13, 2022, 4:34PM</b> -->
                             </span> <br>
-                            <!-- <small class="text-muted">Order ID: 3453012</small> -->
                         </div>
-                        <!-- <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200">
-                                <option>Change status</option>
-                                <option>Awaiting payment</option>
-                                <option>Confirmed</option>
-                                <option>Shipped</option>
-                                <option>Delivered</option>
-                            </select>
-                            <a class="btn btn-primary" href="#">Save</a>
-                            <a class="btn btn-secondary print ms-2" href="#"><i class="icon material-icons md-print"></i></a>
-                        </div> -->
-                       
                     </div>
-                </header> <!-- card-header end// -->
-                <!-- <div class="card-body"> -->
-                    <!-- <div class="row mb-50 mt-20 order-info-wrap"> -->
-                        <!-- <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-person"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Customer</h6>
-                                    <p class="mb-1">
-                                        John Alexander <br> alex@example.com <br> +998 99 22123456
-                                    </p>
-                                    <a href="#">View profile</a>
-                                </div>
-                            </article> -->
-                        <!-- </div> col// -->
-                        <!-- <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-local_shipping"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Order info</h6>
-                                    <p class="mb-1">
-                                        Shipping: Fargo express <br> Pay method: card <br> Status: new
-                                    </p>
-                                    <a href="#">Download info</a>
-                                </div>
-                            </article> -->
-                        <!-- </div> col// -->
-                        <!-- <div class="col-md-4">
-                            <article class="icontext align-items-start">
-                                <span class="icon icon-sm rounded-circle bg-primary-light">
-                                    <i class="text-primary material-icons md-place"></i>
-                                </span>
-                                <div class="text">
-                                    <h6 class="mb-1">Deliver to</h6>
-                                    <p class="mb-1">
-                                        City: Tashkent, Uzbekistan <br>Block A, House 123, Floor 2 <br> Po Box 10000
-                                    </p>
-                                    <a href="#">View profile</a>
-                                </div>
-                            </article> -->
-                        <!-- </div> col// -->
-                    </div> <!-- row // -->
+                </header>
+                    </div>
                     <div class="row">
-                        <!-- <div class="col-lg-7"> -->
                             <div class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
@@ -205,9 +158,13 @@
                                                     </td>
                                                     <td>
                                                         <% order.products.forEach(item => { %>
-                                                            <div>
-                                                                <img src="/<%= item.product.image[0] %>" width="40" height="40" class="img-xs" alt="Item">
-                                                                <%= item.product.name %> (Qty: <%= item.quantity %>)
+                                                            <div class="product-item">
+                                                                <div class="product-image">
+                                                                    <img src="/<%= item.product.image[0] %>" width="40" height="40" class="img-xs" alt="Item">
+                                                                </div>
+                                                                <div class="product-details">
+                                                                    <%= item.product.name %> (Qty: <%= item.quantity %>)
+                                                                </div>
                                                             </div>
                                                         <% }) %>
                                                     </td>
@@ -217,17 +174,28 @@
                                                         <%= order.shippingAddress.pincode %>
                                                     </td>
                                                     <td><%= new Date(order.createdAt).toLocaleDateString() %></td> <!-- Ordered Date -->
-                                                    <td><%= order.totalAmount.toFixed(2) %></td>
+                                                    <td><%= order.finalAmount.toFixed(2) %></td>
                                                     <td>
-                                                        <select class="form-select status-dropdown" data-order-id="<%= order._id %>" <%= order.orderStatus === 'Returned' ? 'disabled' : ''%>>
-                                                            <option value="Pending" <%= order.orderStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                                            <option value="Processing" <%= order.orderStatus === 'Processing' ? 'selected' : '' %>>Processing</option>
-                                                            <option value="Shipped" <%= order.orderStatus === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                                            <option value="Delivered" <%= order.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                            <option value="Cancelled" <%= order.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                                            <option value="Return Request" <%= order.orderStatus === 'Return Request' ? 'selected' : '' %>>Return Request</option>
-                                                            <option value="Returned" <%= order.orderStatus === 'Returned' ? 'selected' : '' %>>Returned</option>
-                                                        </select>
+                                                        <% order.products.forEach((item, productIndex) => { %>
+                                                            <div class="product-status">
+                                                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                                    <small class="text-muted"><%= item.product.name.substring(0, 15) %><%= item.product.name.length > 15 ? '...' : '' %>:</small>
+                                                                </div>
+                                                                <select class="form-select product-status-dropdown" 
+                                                                        data-order-id="<%= order._id %>" 
+                                                                        data-product-id="<%= item.product._id %>"
+                                                                        data-product-index="<%= productIndex %>"
+                                                                        <%= order.orderStatus === 'Returned' ? 'disabled' : ''%>>
+                                                                    <option value="Pending" <%= !item.status || item.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                                                    <option value="Processing" <%= item.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                                                    <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                                    <option value="Delivered" <%= item.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                                    <option value="Cancelled" <%= item.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                                    <option value="Return Request" <%= item.status === 'Return Request' ? 'selected' : '' %>>Return Request</option>
+                                                                    <option value="Returned" <%= item.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                                                </select>
+                                                            </div>
+                                                        <% }) %>
                                                     </td>
                                                 </tr>
                                             <% }) %>
@@ -244,55 +212,12 @@
                                         </tr>
                                     </tfoot>
                                 </table>
-                            </div> <!-- table-responsive// -->
-                            <!-- <a class="btn btn-primary" href="page-orders-tracking.html">View Order Tracking</a> -->
-                            
-                        <!-- </div> col// -->
-                    
-                        <!-- <div class="col-lg-1"></div>
-                       
-                        <div class="mt-4">
-                            <h4>Download Invoice</h4>
-                            <form action="/admin/dashboard/download-invoice" method="GET">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <select class="form-select" name="period" required>
-                                            <option value="">Select Period</option>
-                                            <option value="daily">Daily</option>
-                                            <option value="monthly">Monthly</option>
-                                            <option value="yearly">Yearly</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="date" class="form-control" name="date" required>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <button type="submit" class="btn btn-primary">Download Invoice</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div> -->
-                        <!-- <div class="col-lg-4">
-                            <div class="box shadow-sm bg-light">
-                                <h6 class="mb-15">Payment info</h6>
-                                <p>
-                                    <img src="/assets/imgs/card-brands/2.png" class="border" height="20"> Master Card **** **** 4768 <br>
-                                    Business name: Grand Market LLC <br>
-                                    Phone: +1 (800) 555-154-52
-                                </p>
                             </div>
-                            <div class="h-25 pt-4">
-                                <div class="mb-3">
-                                    <label>Notes</label>
-                                    <textarea class="form-control" name="notes" id="notes" placeholder="Type some note"></textarea>
-                                </div>
-                                <button class="btn btn-primary">Save note</button>
-                            </div> -->
-                        </div> <!-- col// -->
+                        </div>
                     </div>
-                </div> <!-- card-body end// -->
-            </div> <!-- card end// -->
-        </section> <!-- content-main end// -->
+                </div>
+            </div>
+        </section>
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
                 <div class="col-sm-6">
@@ -395,65 +320,61 @@
 
 
     
-    // Add event listeners to all status dropdowns
-     // Add event listeners to all status dropdowns
-     const statusDropdowns = document.querySelectorAll('.status-dropdown');
+    // Add event listeners to all product status dropdowns
+    const productStatusDropdowns = document.querySelectorAll('.product-status-dropdown');
 
-statusDropdowns.forEach(dropdown => {
-    dropdown.addEventListener('change', async (event) => {
-        const orderId = event.target.getAttribute('data-order-id'); // Get the order ID
-        console.log(orderId)
-        const newStatus = event.target.value; // Get the selected status
-          
-       
-        try {
-            const response = await fetch(`/admin/dashboard/ordermanage/${orderId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ orderStatus: newStatus }), // Send the new status
-            });
-            const result = await response.json(); // Parse the response as JSON
-            console.log(result); // Log the response for debugging
-
-
-            if (response.ok) {
-                // SweetAlert2 success alert
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: 'Order status updated successfully!',
-                    confirmButtonText: 'OK',
+    productStatusDropdowns.forEach(dropdown => {
+        dropdown.addEventListener('change', async (event) => {
+            const orderId = event.target.getAttribute('data-order-id');
+            const productId = event.target.getAttribute('data-product-id');
+            const productIndex = event.target.getAttribute('data-product-index');
+            const newStatus = event.target.value;
+            
+            try {
+                const response = await fetch(`/admin/dashboard/ordermanage/${orderId}/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        productStatus: newStatus,
+                        productIndex: productIndex
+                    }),
                 });
-            } else {
+                const result = await response.json();
+                console.log(result);
+
+                if (response.ok) {
+                    // SweetAlert2 success alert
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Product status updated successfully!',
+                        confirmButtonText: 'OK',
+                    });
+                } else {
+                    // SweetAlert2 error alert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed!',
+                        text: 'Failed to update product status.',
+                        confirmButtonText: 'OK',
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
                 // SweetAlert2 error alert
                 Swal.fire({
                     icon: 'error',
-                    title: 'Failed!',
-                    text: 'Failed to update order status.',
+                    title: 'Error!',
+                    text: 'An error occurred while updating the product status.',
                     confirmButtonText: 'OK',
                 });
             }
-        } catch (error) {
-            console.error('Error:', error);
-            // SweetAlert2 error alert
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: 'An error occurred while updating the order status.',
-                confirmButtonText: 'OK',
-            });
-        }
+        });
     });
-});
-
-
-
-
-
-
 </script>
 </body>
 
 </html>
+

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed - M Store</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f1f3f6;
+            color: #212121;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header {
+            background-color: #2874f0;
+            padding: 10px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .payment-failed-icon {
+            font-size: 60px;
+            color: #ff6161;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #212121;
+        }
+
+        p {
+            margin-bottom: 25px;
+            color: #757575;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: #fb641b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #e85f19;
+        }
+
+        .btn-secondary {
+            background-color: #2874f0;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2362c7;
+        }
+
+        .order-details {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .order-details h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .detail-label {
+            color: #757575;
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">M Store</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="payment-failed-icon">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <h1>Payment Failed</h1>
+        <p>We couldn't process your payment at this time. Don't worry, no money has been deducted from your account.</p>
+        
+        <div id="orderDetailsContainer" class="order-details">
+            <h2>Order Details</h2>
+            <div class="detail-row">
+                <span class="detail-label">Order Total:</span>
+                <span class="detail-value" id="orderAmount">₹0.00</span>
+            </div>
+        </div>
+        
+        <button id="retryPaymentBtn" class="btn btn-primary">Retry Payment</button>
+        <a href="/user/myprofile/cart" class="btn btn-secondary">Return to Cart</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Add this right before your closing </body> tag or at the top of your script section -->
+<script>
+    // Embed the order data from server directly in the page
+   
+    const serverOrderData = <%- JSON.stringify(order) %>;
+    console.log("serverOrderData",serverOrderData)
+    const razorpayKeyId = '<%= razorpayKeyId %>';
+</script>
+    <!-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Retrieve failed payment data from sessionStorage
+            const failedPaymentData = JSON.parse(sessionStorage.getItem('failedPaymentData') || '{}');
+            
+            // If there's payment data, update the order details
+            if (failedPaymentData && failedPaymentData.orderData) {
+                const orderData = failedPaymentData.orderData;
+                document.getElementById('orderAmount').textContent = `₹${orderData.finalAmount}`;
+            } else {
+                // If no payment data is found, hide the order details section
+                document.getElementById('orderDetailsContainer').style.display = 'none';
+            }
+            
+            // Set up the retry payment button
+            document.getElementById('retryPaymentBtn').addEventListener('click', function() {
+                retryRazorpayPayment();
+            });
+            
+            // Function to retry Razorpay payment
+            async function retryRazorpayPayment() {
+                try {
+                    // Retrieve failed payment data
+                    const failedPaymentData = JSON.parse(sessionStorage.getItem('failedPaymentData') || '{}');
+                    
+                    if (!failedPaymentData || !failedPaymentData.orderData) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Payment information is missing. Please return to cart and try again.'
+                        });
+                        return;
+                    }
+                    
+                    const orderData = failedPaymentData.orderData;
+                    
+                    // Show loading state
+                    Swal.fire({
+                        title: 'Initializing payment...',
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        allowOutsideClick: false,
+                        showConfirmButton: false
+                    });
+                    
+                    // If we already have a Razorpay order ID, use it
+                    // Otherwise, create a new Razorpay order
+                    let razorpayOrderId = failedPaymentData.orderId;
+                    
+                    if (!razorpayOrderId) {
+                        // Create new Razorpay order
+                        const response = await fetch('/user/myprofile/create-razorpay-order', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                amount: parseFloat(orderData.finalAmount) * 100, // Razorpay expects amount in paise
+                                currency: 'INR',
+                                receipt: 'order_' + Date.now(),
+                                orderData: orderData
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (!response.ok) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: result.message || 'Failed to create payment order. Please try again.'
+                            });
+                            return;
+                        }
+                        
+                        razorpayOrderId = result.orderId;
+                    }
+                    
+                    // Close loading dialog
+                    Swal.close();
+                    
+                    // Initialize Razorpay payment
+                    const options = {
+                        key: '<%= process.env.RAZORPAY_KEY_ID %>', // Your Razorpay Key ID
+                        amount: parseFloat(orderData.finalAmount) * 100, // Amount in paise
+                        currency: 'INR',
+                        name: 'M Store',
+                        description: 'Purchase from M Store',
+                        order_id: razorpayOrderId,
+                        handler: async function (response) {
+                            // Show loading state
+                            Swal.fire({
+                                title: 'Verifying payment...',
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                },
+                                allowOutsideClick: false,
+                                showConfirmButton: false
+                            });
+                            
+                            try {
+                                // Verify payment with your server
+                                const verifyResponse = await fetch('/user/myprofile/verify-razorpay-payment', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature,
+                                        orderData: orderData
+                                    })
+                                });
+                                
+                                const verifyResult = await verifyResponse.json();
+                                
+                                if (verifyResponse.ok) {
+                                    // Clear the failed payment data from sessionStorage
+                                    sessionStorage.removeItem('failedPaymentData');
+                                    
+                                    // Show success message
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Payment Successful!',
+                                        text: 'Your order has been placed successfully.',
+                                        confirmButtonText: 'OK'
+                                    }).then(() => {
+                                        // Redirect to order confirmation page
+                                        window.location.href = `/user/myprofile/order-confirmed/${verifyResult.orderId}`;
+                                    });
+                                } else {
+                                    // Show error message
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Payment Verification Failed',
+                                        text: verifyResult.message || 'Failed to verify payment. Please try again.'
+                                    });
+                                }
+                            } catch (error) {
+                                console.error("Error verifying payment:", error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'An unexpected error occurred during payment verification. Please try again.'
+                                });
+                            }
+                        },
+                        prefill: {
+                            // You can add user details here if available
+                        },
+                        theme: {
+                            color: '#2874f0'
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                // User closed the Razorpay modal
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Payment Cancelled',
+                                    text: 'You can try again or return to your cart.'
+                                });
+                            }
+                        }
+                    };
+                    
+                    // Open Razorpay payment form
+                    const razorpayInstance = new Razorpay(options);
+                    razorpayInstance.open();
+                } catch (error) {
+                    console.error("Error retrying payment:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An unexpected error occurred. Please try again.'
+                    });
+                }
+            }
+        });
+    </script> -->
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Use the order data passed from the server
+    if (serverOrderData) {
+        document.getElementById('orderAmount').textContent = `₹${serverOrderData.finalAmount || serverOrderData.amount || 0}`;
+    } else {
+        // If no order data is found, hide the order details section
+        document.getElementById('orderDetailsContainer').style.display = 'none';
+    }
+    
+    
+    // Set up the retry payment button
+    document.getElementById('retryPaymentBtn').addEventListener('click', function() {
+        retryRazorpayPayment();
+    });
+    
+    // Function to retry Razorpay payment
+    async function retryRazorpayPayment() {
+        try {
+            if (!serverOrderData) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Payment information is missing. Please return to cart and try again.'
+                });
+                return;
+            }
+            
+            // Show loading state
+            Swal.fire({
+                title: 'Initializing payment...',
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                allowOutsideClick: false,
+                showConfirmButton: false
+            });
+            
+            // Create new Razorpay order
+            const response = await fetch('/user/myprofile/create-razorpay-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount: parseFloat(serverOrderData.finalAmount || serverOrderData.amount) * 100, // Razorpay expects amount in paise
+                    currency: 'INR',
+                    receipt: 'order_' + Date.now(),
+                    orderId: serverOrderData._id, // Send the database order ID
+                    // Include any other necessary order data
+                })
+            });
+
+            if (!response.ok) {
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+        const errorData = await response.json();
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorData.message || 'Failed to create payment order. Please try again.'
+        });
+    } else {
+        // Handle non-JSON response
+        const errorText = await response.text();
+        console.error("Server returned non-JSON response:", errorText);
+        Swal.fire({
+            icon: 'error',
+            title: 'Server Error',
+            text: 'An unexpected server error occurred. Please try again later.'
+        });
+    }
+    return;
+}
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message || 'Failed to create payment order. Please try again.'
+                });
+                return;
+            }
+            
+            const razorpayOrderId = result.orderId;
+            
+            // Close loading dialog
+            Swal.close();
+            
+            // Initialize Razorpay payment
+            const options = {
+                key: razorpayKeyId, // Use the key from server
+                amount: parseFloat(serverOrderData.finalAmount || serverOrderData.amount) * 100, // Amount in paise
+                currency: 'INR',
+                name: 'M Store',
+                description: 'Purchase from M Store',
+                order_id: razorpayOrderId,
+                handler: async function (response) {
+                    // Show loading state
+                    Swal.fire({
+                        title: 'Verifying payment...',
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        allowOutsideClick: false,
+                        showConfirmButton: false
+                    });
+                    
+                    try {
+                        // Verify payment with your server
+                        const verifyResponse = await fetch('/user/myprofile/verify-razorpay-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                                orderId: serverOrderData._id // Send the database order ID
+                            })
+                        });
+                        
+                        const verifyResult = await verifyResponse.json();
+                        
+                        if (verifyResponse.ok) {
+                            // Show success message
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Payment Successful!',
+                                text: 'Your order has been placed successfully.',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                // Redirect to order confirmation page
+                                window.location.href = `/user/myprofile/order-confirmed/${verifyResult.orderId || serverOrderData._id}`;
+                            });
+                        } else {
+                            // Show error message
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Payment Verification Failed',
+                                text: verifyResult.message || 'Failed to verify payment. Please try again.'
+                            });
+                        }
+                    } catch (error) {
+                        console.error("Error verifying payment:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An unexpected error occurred during payment verification. Please try again.'
+                        });
+                    }
+                },
+                prefill: {
+                    // You can add user details here if available
+                },
+                theme: {
+                    color: '#2874f0'
+                },
+                modal: {
+                    ondismiss: function() {
+                        // User closed the Razorpay modal
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Payment Cancelled',
+                            text: 'You can try again or return to your cart.'
+                        });
+                    }
+                }
+            };
+            
+            // Open Razorpay payment form
+            const razorpayInstance = new Razorpay(options);
+            razorpayInstance.open();
+        } catch (error) {
+            console.error("Error retrying payment:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An unexpected error occurred. Please try again.'
+            });
+        }
+    }
+});
+    </script>
+</body>
+</html>

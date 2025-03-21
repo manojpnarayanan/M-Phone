@@ -116,6 +116,7 @@ const wishlistcontroller = {
       const userId = decoded.id
       console.log(userId)
       const product = await Product.findById(productId)
+      console.log("product",product)
       if (!product) {
         res.status(404).json({ message: "Product not found" });
       }

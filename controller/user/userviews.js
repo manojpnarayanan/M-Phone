@@ -140,7 +140,7 @@ const userViews = {
                 .populate("products.product")
                 .populate("shippingAddress")
                 .sort({ createdAt: -1 })
-            console.log("loadprofile", orders)
+            // console.log("loadprofile", orders)
 
             let wallet = await Wallet.findOne({ userId })
             if(!wallet){

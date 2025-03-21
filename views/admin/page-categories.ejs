@@ -539,7 +539,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             document.querySelectorAll(".toggle-offer-btn").forEach(button => {
                                 // Reattach toggle offer event listeners
                             });
+                            attachEventListeners();
                         })
+
                         .catch(error => console.error(error));
                 });
             });
