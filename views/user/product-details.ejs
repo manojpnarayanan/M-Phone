@@ -276,8 +276,8 @@
                 <h2><%= product.name %></h2>
                 <p>⭐ <%= product.ratings %> / 5 ( <%= product.reviews ? product.reviews.length : 0 %> Reviews )</p>
                 <p class="price-tag">₹<%= product.price %></p>
-                <% if (product.discount) { %>
-                    <p class="text-success">Discount: <%= product.discount %>% OFF</p>
+                <% if (highestDiscount > 0) { %>
+                    <p class="text-success">Discount: <%= highestDiscount %>% OFF</p>
                 <% } %>
                 <% if (product.stock > 0) { %>
                     <form id="addToCartForm" action="/user/dashboard/addtocart/<%= product._id %>" method="POST">

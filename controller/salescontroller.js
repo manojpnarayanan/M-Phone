@@ -322,7 +322,7 @@ const generateInvoiceController = {
         try {
             const { dateRange, startDate, endDate } = req.query;
 
-            let query = {};
+            let query = {"products.status": 'Delivered'};
             if (dateRange) {
                 const now = new Date();
                 switch (dateRange) {
@@ -370,7 +370,7 @@ const generateInvoiceController = {
                 .populate("user", "name email phone")
                 .populate("products.product", "name price image");
 
-            const totalSales = orders.reduce((total, order) => total + order.totalAmount, 0);
+            const totalSales = orders.reduce((total, order) => total + order.finalAmount, 0);
             const totalOrders = orders.length;
 
             // Handle cases where user might be null
@@ -454,6 +454,7 @@ const generateInvoiceController = {
     
             const orders = await Order.find({
                 createdAt: { $gte: startDate, $lt: endDate },
+                "products.status":"Delivered"
             }).populate("user", "name email phone")
               .populate("products.product", "name price image");
               
@@ -615,7 +616,7 @@ const generateInvoiceController = {
                 const amount = `₹${order.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
                 
                 // Get status
-                const status = order.status || 'N/A';
+                const status = "Delivered";
                 
                 // Draw the row
                 xPos = tableLeft;
@@ -749,7 +750,7 @@ const generateInvoiceController = {
                 worksheet.getCell(`B${rowIndex}`).value = new Date(order.createdAt).toLocaleDateString();
                 worksheet.getCell(`C${rowIndex}`).value = order.user && order.user.name ? order.user.name : 'Guest';
                 worksheet.getCell(`D${rowIndex}`).value = `₹${order.totalAmount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
-                worksheet.getCell(`E${rowIndex}`).value = order.status || 'N/A';
+                worksheet.getCell(`E${rowIndex}`).value = 'Delivered';
                 
                 // Add alternating row colors for better readability
                 if (rowIndex % 2 === 0) {

@@ -59,15 +59,28 @@ const userController = {
                     ]
                 }
             }
-            const products = await Product.find(query);
+            const products = await Product.find(query).populate("category");
 
             const cart = await Cart.findOne({ user: decoded.id })
 
             const cartItemCount = cart ? cart.products.length : 0
-
+            const productWithDiscount=await Promise.all(products.map(async(product)=>{
+                const category=product.category
+                const categoryDiscount=category? category.discount:0
+                const highestDiscount=Math.max(product.discount,categoryDiscount)
+                return{
+                    ...product.toObject(),
+                    highestDiscount
+                }
+            }))
 
             // console.log(cartItemCount)
-            res.render("user/home", { user, products, cartItemCount, searchQuery: req.query.search || "" })
+            res.render("user/home", { user, 
+                products:productWithDiscount, 
+                cartItemCount, 
+                searchQuery: req.query.search || "" })
+
+                
         } catch (error) {
             console.log(error)
             res.status(500).send("Error fetching Data")

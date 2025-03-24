@@ -534,52 +534,51 @@
                         </div>
                     </div>
                     <!-- Delivered Orders Table -->
-<div class="table-responsive" id="deliveredproducts">
-    <h5 class="mb-3">Delivered Orders</h5>
-    <% if (typeof deliveredOrders !== 'undefined' && deliveredOrders.length > 0) { %>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ORDER ID</th>
-                    <th>CUSTOMER</th>
-                    <th>PRODUCTS</th>
-                    <th>TOTAL AMOUNT</th>
-                    <th>DATE</th>
-                    <th>STATUS</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% deliveredOrders.forEach(order => { %>
-                    <tr>
-                        <td>#<%= order.orderID || order._id %></td>
-                        <td><%= order.name || (order.user && order.user.name) || 'N/A' %></td>
-                        <td>
-                            <ul>
-                                <% if (order.items && order.items.length > 0) { %>
-                                    <% order.items.slice(0, 2).forEach(item => { %>
-                                        <li><%= item.product.name || item.productName || 'Product' %> x<%= item.quantity %></li>
+                    <div class="table-responsive" id="deliveredproducts">
+                        <h5 class="mb-3">Delivered Orders</h5>
+                        <% if (typeof orders !== 'undefined' && orders.length > 0) { %>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ORDER ID</th>
+                                        <th>CUSTOMER</th>
+                                        <th>PRODUCTS</th>
+                                        <th>TOTAL AMOUNT</th>
+                                        <th>DATE</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% orders.forEach(order => { %>
+                                        <% const deliveredProducts = order.products.filter(product => product.status === 'Delivered'); %>
+                                        <% if (deliveredProducts.length > 0) { %>
+                                            <tr>
+                                                <td>#<%= order.orderID || order._id %></td>
+                                                <td><%= order.name || (order.user && order.user.name) || 'N/A' %></td>
+                                                <td>
+                                                    <ul>
+                                                        <% deliveredProducts.slice(0, 2).forEach(item => { %>
+                                                            <li><%= item.product.name || item.productName || 'Product' %> x<%= item.quantity %></li>
+                                                        <% }) %>
+                                                        <% if (deliveredProducts.length > 2) { %>
+                                                            <li>+ <%= deliveredProducts.length - 2 %> more item(s)</li>
+                                                        <% } %>
+                                                    </ul>
+                                                </td>
+                                                <td>₹<%= order.finalAmount ? order.finalAmount.toLocaleString() : '0' %></td>
+                                                <td><%= new Date(order.orderDate || order.createdAt).toLocaleDateString() %></td>
+                                                <td><span class="badge bg-success">Delivered</span></td>
+                                            </tr>
+                                        <% } %>
                                     <% }) %>
-                                    <% if (order.items.length > 2) { %>
-                                        <li>+ <%= order.items.length - 2 %> more item(s)</li>
-                                    <% } %>
-                                <% } else { %>
-                                    <li>No items</li>
-                                <% } %>
-                            </ul>
-                        </td>
-                        <td>₹<%= order.totalAmount ? order.totalAmount.toLocaleString() : '0' %></td>
-                        <td><%= new Date(order.orderDate || order.createdAt).toLocaleDateString() %></td>
-                        <td><span class="badge bg-success">Delivered</span></td>
-                    </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    <% } else { %>
-        <div class="text-center">
-            <p>No delivered orders found for the selected period.</p>
-        </div>
-    <% } %>
-</div>
+                                </tbody>
+                            </table>
+                        <% } else { %>
+                            <div class="text-center">
+                                <p>No delivered orders found for the selected period.</p>
+                            </div>
+                        <% } %>
+                    </div>
                 </div>
             </div>
         </section>
@@ -723,6 +722,121 @@ document.getElementById('exportExcel').addEventListener('click', async () => {
         });
     }
 });
+
+// Add this script to the bottom of your page before the closing </body> tag
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Get references to form elements
+    const dateRangeSelect = document.getElementById('dateRangeSelect');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const filterForm = document.getElementById('filterForm');
+    
+    // Function to set date inputs based on selected range
+    function updateDateInputs(range) {
+        const today = new Date();
+        let start = new Date();
+        let end = new Date();
+        
+        switch(range) {
+            case 'today':
+                // Set both start and end to today
+                break;
+            case 'week':
+                // Set start to beginning of current week (Sunday)
+                start.setDate(today.getDate() - today.getDay());
+                break;
+            case 'month':
+                // Set start to first day of current month
+                start.setDate(1);
+                break;
+            case 'year':
+                // Set start to first day of current year
+                start = new Date(today.getFullYear(), 0, 1);
+                break;
+            default:
+                // If custom or no selection, don't modify dates
+                return;
+        }
+        
+        // Format dates as YYYY-MM-DD for the input fields
+        startDateInput.value = start.toISOString().split('T')[0];
+        endDateInput.value = end.toISOString().split('T')[0];
+    }
+    
+    // Update date inputs when date range selection changes
+    dateRangeSelect.addEventListener('change', function() {
+        updateDateInputs(this.value);
+    });
+    
+    // When custom dates are entered, switch date range to empty (custom)
+    startDateInput.addEventListener('change', function() {
+        if (dateRangeSelect.value !== '') {
+            dateRangeSelect.value = '';
+        }
+    });
+    
+    endDateInput.addEventListener('change', function() {
+        if (dateRangeSelect.value !== '') {
+            dateRangeSelect.value = '';
+        }
+    });
+    
+    // Initialize dates based on current selection (if any)
+    if (dateRangeSelect.value) {
+        updateDateInputs(dateRangeSelect.value);
+    }
+    
+    // Handle form submission
+    filterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate date inputs
+        if (!startDateInput.value) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Date',
+                text: 'Please select a start date for the report.'
+            });
+            return false;
+        }
+        
+        // If only start date is provided but not end date, set end date to today
+        if (startDateInput.value && !endDateInput.value) {
+            endDateInput.value = new Date().toISOString().split('T')[0];
+        }
+        
+        // Validate date range
+        if (startDateInput.value && endDateInput.value) {
+            const start = new Date(startDateInput.value);
+            const end = new Date(endDateInput.value);
+            
+            if (start > end) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Date Range',
+                    text: 'Start date cannot be after end date.'
+                });
+                return false;
+            }
+        }
+        
+        // If all validation passes, submit the form
+        this.submit();
+    });
+    
+    // Smooth scroll to results when filter is applied
+    document.getElementById('filterButton').addEventListener('click', function() {
+        setTimeout(() => {
+            const element = document.getElementById('deliveredproducts');
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    });
+});
+
+
 
 </script>
 </body>

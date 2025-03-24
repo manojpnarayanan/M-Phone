@@ -71,6 +71,46 @@ const generateInvoice = async (order, user, shippingAddress) => {
         writeStream.on('error', reject);
     });
 };
+// Function to update product quantities
+const updateProductQuantities = async (products) => {
+    try {
+        for (const item of products) {
+            // Find the product first to check its current stock
+            const product = await Product.findById(item.product);
+            
+            if (!product) {
+                console.error(`Product with ID ${item.product} not found`);
+                continue;
+            }
+            
+            // Check if there's enough stock
+            if (product.stock < item.quantity) {
+                console.error(`Insufficient stock for product ${product.name}. Required: ${item.quantity}, Available: ${product.stock}`);
+                continue;
+            }
+            
+            // Update the stock field instead of quantity
+            await Product.findByIdAndUpdate(
+                item.product,
+                { $inc: { stock: -item.quantity } },
+                { new: true }
+            );
+            
+            // Update availability if stock becomes zero
+            if (product.stock - item.quantity <= 0) {
+                await Product.findByIdAndUpdate(
+                    item.product,
+                    { availability: 'out_of_stock' },
+                    { new: true }
+                );
+            }
+        }
+        console.log("Product stock updated successfully");
+    } catch (error) {
+        console.error("Error updating product stock:", error);
+        throw error;
+    }
+};
 
 const razorpay=new Razorpay({
     key_id:process.env.KEY_ID,
@@ -101,7 +141,6 @@ const razorpayController={
               });
 
 
-
         }catch(error){
             console.log(error)
             console.error("Error creating Razorpay order:", error);
@@ -115,7 +154,7 @@ const razorpayController={
     createFailedOrder:async (req,res)=>{
         try{
             const orderData = req.body;
-            console.log("orderData",orderData)
+            // console.log("orderData",orderData)
 
             const newOrder= new Order({
                 user:orderData.userId,
@@ -134,6 +173,8 @@ const razorpayController={
                  orderStatus: 'failed'
             })
             await newOrder.save();
+        
+
             res.json({
                 success: true,
                 orderId: newOrder._id
@@ -196,11 +237,14 @@ const razorpayController={
                 
                     }
         await order.save();
+        await updateProductQuantities(order.products);
+        await Cart.deleteMany({ user: order.user });
+
 
         const user = await User.findById(order.user);
         const address = await Address.findById(order.shippingAddress);
         const invoicePath = await generateInvoice(order, user, address);
-                console.log("Invoice Path (Retry Payment):", invoicePath);
+                // console.log("Invoice Path (Retry Payment):", invoicePath);
                 order.invoice = `/invoices/invoice_${order.orderId}.pdf`;
                 await order.save();   
         return res.json({
@@ -246,12 +290,14 @@ const razorpayController={
             { new: true }
         );
     }
+                    await updateProductQuantities(orderData.products);
+
 
       const user = await User.findById(orderData.userId);
       const address = await Address.findById(orderData.shippingAddress);
 
       const invoicePath = await generateInvoice(savedOrder, user, address);
-                console.log("Invoice Path (New Order):", invoicePath);
+                // console.log("Invoice Path (New Order):", invoicePath);
                 
                 // Update the order with the invoice path
                 savedOrder.invoice = `/invoices/invoice_${savedOrder.orderId}.pdf`;
@@ -280,7 +326,7 @@ const razorpayController={
     loadFailedpaymentPage:async(req,res)=>{
         try{
             const orderId=req.params.orderId
-            console.log("order",orderId)
+            // console.log("order",orderId)
             const token=req.cookies.token
             const decoded=jwt.verify(token,process.env.JWT_SECRET)
 
@@ -306,11 +352,11 @@ const razorpayController={
     retryPayment: async (req, res) => {
         try {
             const { orderId } = req.body;
-            console.log("req.body",req.body)
+            // console.log("req.body",req.body)
             
             // Fetch the order from database
             const order = await Order.findById(orderId);
-            console.log("order",order)
+            // console.log("order",order)
             if (!order) {
                 return res.status(404).json({ success: false, message: 'Order not found' });
             }
@@ -324,7 +370,7 @@ const razorpayController={
                     orderId: orderId
                 }
             });
-            console.log("reached")
+            // console.log("reached")
             
             // Return the order ID to the client
             res.json({
@@ -332,7 +378,7 @@ const razorpayController={
                 orderId: razorpayOrder.id,
                 amount: order.finalAmount
             });
-            console.log("reached")
+            // console.log("reached")
 
         } catch (error) {
             console.error('Error creating Razorpay order for retry:', error);

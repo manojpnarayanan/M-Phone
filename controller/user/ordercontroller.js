@@ -180,21 +180,27 @@ console.log("couponApplied",couponApplied)
     
             const product = order.products[productIndex];
             // console.log("product",product)
-            const coupon=await Coupon.findOne({code:order.couponApplied.code})
-            console.log("coupon",coupon)
+            // const coupon=await Coupon.findOne({code:order.couponApplied.code})
+            // console.log("coupon",coupon)
             
 
             let refundAmount=(quantity || product.quantity)* product.price
             // console.log(refundAmount)
 
             if(order.paymentMethod==='razor-pay' && order.paymentStatus==='completed'){
-                if(order.couponApplied){
-                    const newTotalAmount=order.totalAmount-refundAmount
+                if(order.couponApplied && order.couponApplied.code){
+             const coupon=await Coupon.findOne({code:order.couponApplied.code})
+
+             if (coupon){
+                const newTotalAmount=order.totalAmount-refundAmount
                     if(newTotalAmount<coupon.minOrderAmount){
                         const adjustedRefundAmount=refundAmount-order.couponApplied.discountAmount
 
                         refundAmount=Math.max(adjustedRefundAmount,0)
                     }
+
+             }
+                    
                 }
             }
             const wallet=await Wallet.findOne({userId:order.user})

@@ -171,14 +171,16 @@ const profilecontroller = {
       console.log("changepassword:", req.body)
       const { currentPassword, newPassword, confirmPassword } = req.body
       const hashedpassword = await bcryptjs.hash(newPassword, 10)
+      console.log("hashedpassword",hashedpassword)
       const token = req.cookies.token
       const decoded = jwt.verify(token, process.env.JWT_SECRET)
       const user = await User.findByIdAndUpdate(decoded.id,
         { password: hashedpassword },
         { new: true }
       )
+      console.log("user",user)
       req.flash("success", "Password changed successfully");
-      res.redirect("/user/myprofile")
+      res.redirect(`/user/myprofile/${decoded.id}`)
     } catch (error) {
       console.log(error)
     }

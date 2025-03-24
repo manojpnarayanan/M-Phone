@@ -22,12 +22,17 @@ const userViews = {
             const cart= await Cart.findOne({user:userId})
             const cartItemCount=cart? cart.products.length:0
             const product = await Product.findById(req.params.id)
+            .populate("category")
             // console.log(product)
             if (!product) {
                 return res.status(404).send("Product not found")
             }
             const reviews = await Review.find({ product: productId })
                 .populate("user", "name")
+                const category=await Category.findById(product.category)
+                const categoryDiscount=category? category.discount:0
+
+                const highestDiscount=Math.max(product.discount,categoryDiscount)
 
             //FETCH RELEATED FIELDS
             const relatedProducts = await Product.find({
@@ -43,7 +48,8 @@ const userViews = {
                 user,
                 cartItemCount,
                 relatedProducts,
-                reviews
+                reviews,
+                highestDiscount
             })
 
         } catch (error) {
@@ -65,7 +71,7 @@ const userViews = {
             ]
         }
         if (category && category !== "all") {
-            const categoryDoc = await Category.findOne({ name: new RegExp(req.query.category, 'i') });
+            const categoryDoc = await Category.findOne({ parent: new RegExp(req.query.category, 'i') });
             // console.log("categoryDoc", categoryDoc)
             if (categoryDoc) {
                 query.category = categoryDoc._id;
