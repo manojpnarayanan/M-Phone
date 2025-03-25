@@ -460,7 +460,7 @@
 
                     <!-- Date Filter Section -->
                     <div class="filter-section mb-4">
-                        <form id="filterForm" action="/admin/sales-report" method="GET">
+                        <form id="filterForm" action="/admin/dashboard/sales-report" method="GET">
                             <div class="filter-container">
                                 <div class="date-range-select">
                                     <select class="form-select" name="dateRange" id="dateRangeSelect">
@@ -723,7 +723,7 @@ document.getElementById('exportExcel').addEventListener('click', async () => {
     }
 });
 
-// Add this script to the bottom of your page before the closing </body> tag
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // Get references to form elements
@@ -732,7 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const endDateInput = document.getElementById('endDate');
     const filterForm = document.getElementById('filterForm');
     
-    // Function to set date inputs based on selected range
+    
     function updateDateInputs(range) {
         const today = new Date();
         let start = new Date();
@@ -744,7 +744,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             case 'week':
                 // Set start to beginning of current week (Sunday)
-                start.setDate(today.getDate() - today.getDay());
+                start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
+    // Set end to today
+    end = new Date(today);
                 break;
             case 'month':
                 // Set start to first day of current month

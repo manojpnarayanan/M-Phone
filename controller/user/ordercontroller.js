@@ -293,7 +293,7 @@ console.log("couponApplied",couponApplied)
             // console.log("cancel request", orderId)
             const order = await Order.findByIdAndUpdate(orderId)
                 .populate("products.product");
-                console.log("order",order)
+                // console.log("order",order)
 
             if (!order) {
                 return res.status(404).json({ message: "Order not found" });
@@ -360,42 +360,43 @@ console.log("couponApplied",couponApplied)
             const totalRefundAmount = returnedProducts.reduce((total, item) => {
                 return total + (item.quantity * item.price);
             }, 0);
-            returnedProducts.forEach(item=>item.status="Returned")
+            returnedProducts.forEach(item=>item.status="Return Request")
             const allReturned=order.products.every(item=>item.status==="Returned")
-            console.log(allReturned)
-            if(allReturned){
-                order.orderStatus="Returned"
-            }
+            // console.log(allReturned)
+            // if(allReturned){
+            //     order.orderStatus="Returned"
+            // }
         console.log(returnedProducts)
         
         await order.save()
+        res.status(200).json({success:true, message:"Return Request Submitted Successfully. Awaiting Admin Approval."})
 
-            const wallet = await Wallet.findOne({ userId: order.user });
-            if (!wallet) {
-                return res.status(404).json({ success: false, message: "Wallet not found" });
-            }
+            // const wallet = await Wallet.findOne({ userId: order.user });
+            // if (!wallet) {
+            //     return res.status(404).json({ success: false, message: "Wallet not found" });
+            // }
 
-            wallet.transactions.push({
-                orderId: order._id,
-                transactionType: 'credit',
-                transactionAmount: totalRefundAmount,
-                transactionDescription: `Refund for returned order ${order.orderId}`,
-            });
+            // wallet.transactions.push({
+            //     orderId: order._id,
+            //     transactionType: 'credit',
+            //     transactionAmount: totalRefundAmount,
+            //     transactionDescription: `Refund for returned order ${order.orderId}`,
+            // });
 
-            await wallet.save();
+            // await wallet.save();
 
-            for (const item of order.products) {
-                const productId = item.product._id;
-                const quantity = item.quantity;
+            // for (const item of order.products) {
+            //     const productId = item.product._id;
+            //     const quantity = item.quantity;
 
-                await Product.findByIdAndUpdate(
-                    productId,
-                    { $inc: { stock: quantity } },
-                    { new: true }
-                );
-            }
+            //     await Product.findByIdAndUpdate(
+            //         productId,
+            //         { $inc: { stock: quantity } },
+            //         { new: true }
+            //     );
+            // }
 
-            res.status(200).json({ success: true, message: "Order Returned Successfully" });
+            // res.status(200).json({ success: true, message: "Order Returned Successfully" });
         } catch (error) {
             console.log(error);
             res.status(500).json({ success: false, message: "Internal Server Error" });

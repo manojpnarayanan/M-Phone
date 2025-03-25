@@ -91,6 +91,29 @@
 .status-returned {
     background-color: #ff4444;
 }
+.pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .pagination .page-item {
+        margin: 0 5px;
+    }
+    .pagination .page-link {
+        color: #007bff;
+        text-decoration: none;
+        padding: 5px 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        color: white;
+    }
+    .pagination .page-link:hover {
+        background-color: #f8f9fa;
+    }
      </style>
 
 </head>
@@ -185,7 +208,7 @@
                                                                         data-order-id="<%= order._id %>" 
                                                                         data-product-id="<%= item.product._id %>"
                                                                         data-product-index="<%= productIndex %>"
-                                                                        <%= order.orderStatus === 'Returned' ? 'disabled' : ''%>>
+                                                                        
                                                                     <option value="Pending" <%= !item.status || item.status === 'Pending' ? 'selected' : '' %>>Pending</option>
                                                                     <option value="Processing" <%= item.status === 'Processing' ? 'selected' : '' %>>Processing</option>
                                                                     <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
@@ -211,7 +234,36 @@
                                             <td colspan="2"><strong><%= orders.reduce((total, order) => total + order.totalAmount, 0).toFixed(2) %></strong></td>
                                         </tr>
                                     </tfoot>
+                                    
                                 </table>
+                                 <!-- Pagination Controls -->
+                            <div class="pagination-area mt-15 mb-50">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination justify-content-start">
+                                        <% if (currentPage > 1) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<%= currentPage - 1 %>"><i class="material-icons md-chevron_left"></i></a>
+                                            </li>
+                                        <% } %>
+                            
+                                        <% for (let i = 1; i <= totalPages; i++) { %>
+                                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                            </li>
+                                        <% } %>
+                            
+                                        <% if (currentPage < totalPages) { %>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<%= currentPage + 1 %>"><i class="material-icons md-chevron_right"></i></a>
+                                            </li>
+                                        <% } %>
+                                    </ul>
+                                </nav>
+                            </div>
+                                <!-- Add this section after the table in the existing HTML -->
+                               
+
+
                             </div>
                         </div>
                     </div>
@@ -324,11 +376,29 @@
     const productStatusDropdowns = document.querySelectorAll('.product-status-dropdown');
 
     productStatusDropdowns.forEach(dropdown => {
+        const currentStatus = dropdown.value;
+    // if (currentStatus === 'Cancelled' || currentStatus === 'Returned') {
+    //     dropdown.disabled = true;
+    // }
         dropdown.addEventListener('change', async (event) => {
             const orderId = event.target.getAttribute('data-order-id');
             const productId = event.target.getAttribute('data-product-id');
             const productIndex = event.target.getAttribute('data-product-index');
             const newStatus = event.target.value;
+
+            const disallowedStatuses = ['Cancelled', 'Returned'];
+        // if (disallowedStatuses.includes(currentStatus)) {
+        //     Swal.fire({
+        //         icon: 'warning',
+        //         title: 'Status Cannot Be Changed',
+        //         text: `Products with status ${currentStatus} cannot be modified.`,
+        //         confirmButtonText: 'OK',
+        //     });
+            
+        //     // Revert the dropdown to its original status
+        //     event.target.value = currentStatus;
+        //     return;
+        // }
             
             try {
                 const response = await fetch(`/admin/dashboard/ordermanage/${orderId}/${productId}`, {

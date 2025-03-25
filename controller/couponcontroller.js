@@ -4,8 +4,40 @@ const Coupon=require("../model/coupon")
 const couponController={
     loadCoupon:async (req,res)=>{
         try{
-            const coupons=await Coupon.find()
-            res.render("admin/coupon",{coupons})
+            const today=new Date();
+            today.setHours(0,0,0,0)
+            await Coupon.updateMany({
+                isActive:true,
+                validUntil:{$lt:today}
+            }, 
+        {$set:{isActive:false}}
+    )
+    const page=parseInt(req.query.page)||1;
+    const itemPerPage=5;
+    const searchQuery=req.query.search
+    let query={}
+    if(searchQuery){
+        query={
+            $or:[
+                {name:{$regex:searchQuery, $options:"i"}},
+                {code:{$regex:searchQuery, $options:"i"}}
+            ]
+        }
+    }
+    const totalCoupons=await Coupon.countDocuments(query)
+    const totalPages=Math.ceil(totalCoupons/itemPerPage)
+
+            const coupons=await Coupon.find(query)
+            .sort({createdAt:-1})
+            .skip((page - 1)*itemPerPage)
+            .limit(itemPerPage)
+
+            res.render("admin/coupon",{coupons,
+                currentPage:page,
+                totalPages,
+                totalCoupons,
+                search:searchQuery
+            })
 
         }catch(error){
             console.log(error)

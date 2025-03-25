@@ -1114,17 +1114,45 @@
                                             </div>
                                             <div class="product-price">$<%= item.price.toFixed(2) %></div>
                                             
-                                            <!-- Add Cancel Individual Product Button -->
-                                            <% if (order.orderStatus.toLowerCase() !== 'delivered' && 
-                                                   order.orderStatus.toLowerCase() !== 'cancelled' && 
-                                                   item.status.toLowerCase()  !== 'cancelled' &&
-                                                   order.orderStatus.toLowerCase() !== 'returned') { %>
-                                                <button 
-                                                    onclick="cancelProduct('<%= order._id %>', '<%= item.product._id %>', <%= item.quantity %>)" 
-                                                    class="btn btn-danger btn-sm mt-2">
-                                                    Cancel This Item
-                                                </button>
-                                            <% } %>
+                                           <!-- Conditional buttons based on product status -->
+                                        <div class="product-actions">
+                                          <% if (item.status.toLowerCase() === 'delivered') { %>
+                                              <div class="delivered-actions">
+                                                <a href="/user/myprofile/write-review/<%= order._id %>" >
+                                                  <button 
+                                                      onclick="writeReview('<%= item.product._id %>')" 
+                                                      class="btn btn-primary btn-sm mt-2 mr-2">
+                                                      Write Review
+                                                  </button> </a>
+                                                  
+                                                  <button 
+                                                      onclick="returnOrder('<%= order._id %>', '<%= item.product._id %>')" 
+                                                      class="btn btn-warning btn-sm mt-2 mr-2">
+                                                      Return Order
+                                                  </button>
+                                                  <button 
+                                                      onclick="downloadInvoice('<%= order._id %>')" 
+                                                      class="btn btn-success btn-sm mt-2">
+                                                      Download Invoice
+                                                  </button>
+                                              </div>
+                                          <% } %>
+
+                                          <!-- Existing Cancel Button -->
+                                          <% if (item.status.toLowerCase() !== 'delivered' && 
+                                                 order.orderStatus.toLowerCase() !== 'cancelled' &&
+                                                 order.orderStatus.toLowerCase() !== 'delivered' && 
+                                                 item.status.toLowerCase()  !== 'cancelled' &&
+                                                 item.status.toLowerCase()  !== 'returned' &&
+                                                 item.status.toLowerCase()  !== 'return request' &&
+                                                 order.orderStatus.toLowerCase() !== 'returned') { %>
+                                              <button 
+                                                  onclick="cancelProduct('<%= order._id %>', '<%= item.product._id %>', <%= item.quantity %>)" 
+                                                  class="btn btn-danger btn-sm mt-2">
+                                                  Cancel This Item
+                                              </button>
+                                          <% } %>
+                                      </div>
                                         </div>
                                     </div>
                                 <% }); %>
@@ -1181,21 +1209,7 @@
                                 </div>
                             </div>
                             
-                            <div class="order-actions">
-                                <% if (order.orderStatus.toLowerCase() !== 'delivered' && order.orderStatus.toLowerCase() !== 'cancelled') { %>
-                                    <!-- <form action="/user/myprofile/cancel-order/<%= order.orderId %>" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');"> -->
-                                        <button onclick="cancelOrder('<%= order._id %>')" class="btn btn-secondary">Cancel Order</button>
-                                    <!-- </form> -->
-                                <% } %>
-                                <!-- <a href="/user/myprofile/cancel-order/<%= order.orderId %>" class="btn btn-primary">View Details</a> -->
-                                <% if (order.orderStatus.toLowerCase() === 'delivered') { %>
-                                    <a href="/user/myprofile/write-review/<%= order._id %>" class="btn btn-secondary">Write Review</a>
-                                    <button onclick="returnOrder('<%=order._id %>')" class="btn btn-warning">Return Order</button>
-                                    <button onclick="downloadInvoice('<%= order.orderId %>')" class="btn btn-secondary">Download Invoice</button>                                <% } %>
-                                <!-- <% if (order.invoice) { %>
-                                    <a href="<%= order.invoice %>" class="btn btn-secondary" target="_blank">Download Invoice</a>
-                                <% } %> -->
-                            </div>
+                           
                         </div>
                     </div>
                 <% }); %>

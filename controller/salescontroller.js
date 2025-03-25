@@ -321,6 +321,7 @@ const generateInvoiceController = {
     loadsalesreport: async (req, res) => {
         try {
             const { dateRange, startDate, endDate } = req.query;
+            console.log("seleceted dates",req.query)
 
             let query = {"products.status": 'Delivered'};
             if (dateRange) {
@@ -333,15 +334,17 @@ const generateInvoiceController = {
                         };
                         break;
                     case 'week':
-                        const startOfWeek = new Date(now);
-                        startOfWeek.setDate(now.getDate() - now.getDay());
-                        startOfWeek.setHours(0, 0, 0, 0);
-
-                        const endOfWeek = new Date(startOfWeek);
-                        endOfWeek.setDate(startOfWeek.getDate() + 6);
+                        
+                        const endOfWeek = new Date(now);
                         endOfWeek.setHours(23, 59, 59, 999);
+                        const startOfWeek = new Date(endOfWeek);
+                        startOfWeek.setDate(endOfWeek.getDate() - 6);
+                        startOfWeek.setHours(0, 0, 0, 0);
+                        query.createdAt = { 
+                            $gte: startOfWeek, 
+                            $lt: endOfWeek 
+                        };
 
-                        query.createdAt = { $gte: startOfWeek, $lt: endOfWeek };
                         break;
                     case 'month':
                         query.createdAt = {
