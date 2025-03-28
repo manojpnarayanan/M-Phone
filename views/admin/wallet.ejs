@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Evara Dashboard - Admin Wallet</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
+    <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="screen-overlay"></div>
+    <%- include('./partials/nav') %>
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <!-- Header content from categories page -->
+        </header>
+        
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Admin Wallet</h2>
+                    <p>View wallet transactions and balance</p>
+                </div>
+                <div>
+                    <input id="transactionSearch" type="text" placeholder="Search Transactions" class="form-control bg-white">
+                </div>
+            </div>
+
+            <% if (messages.success) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= messages.success %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+            
+            <% if (messages.error) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <%= messages.error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+
+            <!-- Admin Wallet Summary Card at the top -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="wallet-summary">
+                        <h4>Wallet Summary</h4>
+                        <div class="balance-card">
+                            <p>Total Balance</p>
+                            <h2>₹<%=(transactionSummary.totalCredits - transactionSummary.totalDebits).toFixed(2) %></h2>
+                            <div class="d-flex justify-content-between mt-3">
+                                <div>
+                                    <small>Total Credits</small>
+                                    <p class="text-success">₹<%=transactionSummary.totalCredits.toFixed(2) %></p>
+                                </div>
+                                <div>
+                                    <small>Total Debits</small>
+                                    <p class="text-danger">₹<%= transactionSummary.totalDebits.toFixed(2) %></p>
+                                </div>
+                            </div>
+                            <!-- <button class="btn btn-primary w-100 mt-3" id="addFundsBtn">Add Funds</button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wallet Summary Details as Cards in Rows -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Credits</h5>
+                            <h3 class="text-success">₹<%=transactionSummary.totalCredits.toFixed(2) %></h3>
+                            <p class="card-text">All incoming transactions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Debits</h5>
+                            <h3 class="text-danger">₹<%= transactionSummary.totalDebits.toFixed(2) %></h3>
+                            <p class="card-text">All outgoing transactions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Net Balance</h5>
+                            <h3>₹<%=(transactionSummary.totalCredits - transactionSummary.totalDebits).toFixed(2) %></h3>
+                            <p class="card-text">Current wallet balance</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full-width Transaction Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Transaction ID</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (wallet.transactions && wallet.transactions.length > 0) { %>
+                                    <% wallet.transactions.forEach(transaction => { %>
+                                        <tr>
+                                            
+                                            <td><%= transaction.orderId.user.name %></td>
+                                            <td><%= transaction.transactionId %></td>
+                                            <td><%= transaction.transactionDescription %></td>
+                                            <td>₹<%= transaction.transactionAmount.toFixed(2) %></td>
+                                            <td>
+                                                <span class="badge <%= 
+                                                transaction.transactionType && transaction.transactionType.toLowerCase() === 'credit' ? 'bg-success' : 
+                                                transaction.transactionType && transaction.transactionType.toLowerCase() === 'debit' ? 'bg-danger' : 
+                                                'bg-secondary' 
+                                                %>">
+                                                    <%= transaction.transactionType %>
+                                                </span>
+                                            </td>
+                                            <td><%= transaction.transactionDate.toLocaleDateString() %></td>
+                                            <td>
+                                                <span class="badge <%= 
+                                                    transaction.transactionStatus === 'Completed' ?'bg-success text-white' : 
+                                                    transaction.transactionStatus === 'Pending' ? 'bg-warning' : 
+                                                    'bg-danger' 
+                                                %>">
+                                                    <%= transaction.transactionStatus %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <% if (transaction.transactionType && transaction.transactionType.toLowerCase() === 'debit') { %>
+                                                    <button class="btn btn-sm btn-primary view-order" data-order-id="<%= transaction.orderId._id %>">
+                                                        ViewOrder
+                                                    </button>
+                                                <% } else { %>
+                                            
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center">No transactions found</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="pagination-container mt-4">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                        <a class="page-link" href="#" data-page="<%= i %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>document.write(new Date().getFullYear())</script> ©, Evara - HTML Ecommerce Template.
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">All rights reserved</div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="/assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js" type="text/javascript"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add Funds Button
+        document.getElementById('addFundsBtn')?.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Add Funds to Admin Wallet',
+                input: 'number',
+                inputLabel: 'Enter Amount',
+                inputPlaceholder: 'Enter amount to add',
+                showCancelButton: true,
+                confirmButtonText: 'Add Funds',
+                inputValidator: (value) => {
+                    if (!value || value <= 0) {
+                        return 'Please enter a valid amount';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/admin/wallet/add-funds', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ amount: result.value })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Success', 'Funds added successfully', 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Error', data.message || 'Failed to add funds', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'An error occurred', 'error');
+                    });
+                }
+            });
+        });
+
+        // Transaction Search
+        const searchInput = document.getElementById('transactionSearch');
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = searchInput.value.trim();
+
+            fetch(`/admin/wallet/transactions?search=${searchTerm}`)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    document.querySelector('tbody').innerHTML = doc.querySelector('tbody').innerHTML;
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'Failed to load search results', 'error');
+                });
+        });
+
+        // Pagination
+        document.querySelectorAll('.pagination a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.getAttribute('data-page');
+                const searchTerm = document.getElementById('transactionSearch').value.trim();
+
+                fetch(`/admin/wallet/transactions?page=${page}&search=${searchTerm}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        document.querySelector('tbody').innerHTML = doc.querySelector('tbody').innerHTML;
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Failed to load page', 'error');
+                    });
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener for View Order buttons
+    document.querySelectorAll('.view-order').forEach(button => {
+        button.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-order-id');
+            
+            // Add more robust error checking
+            if (!orderId) {
+                console.error('No order ID found');
+                Swal.fire('Error', 'Order ID is missing', 'error');
+                return;
+            }
+
+            // Log the orderId to debug
+            console.log('Attempting to view order:', orderId);
+
+            // Use window.location with error handling
+            window.location.href = `/admin/dashboard/wallet/view-detail/${orderId}`;
+        });
+    });
+});
+
+
+   
+    
+    </script>
+
+    
+</body>
+</html>

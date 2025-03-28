@@ -8,6 +8,7 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 const Coupon=require("../../model/coupon")
+const Admin=require("../../model/admin")
 
 // Helper function to generate invoice
 
@@ -77,7 +78,14 @@ const orderController = {
     placeOrder: async (req, res) => {
         try {
             const { userId, products, shippingAddress, paymentMethod, totalAmount, discount, finalAmount, couponApplied } = req.body;
-console.log("couponApplied",couponApplied)
+// console.log("couponApplied",req.body)
+
+             if(paymentMethod==="cash_on_delivery"){
+                if(totalAmount<=1000){
+                    return res.status(400).json({success:false, message:"orders above RS:1000 is eligible for COD"})
+                }
+             }
+
             if(!products || products.length===0){
                 return res.status(400).json({success:false, message:"Cart is empty"})
             }
@@ -140,6 +148,35 @@ console.log("couponApplied",couponApplied)
             // Add the order to the user's order history
             await User.findByIdAndUpdate(userId, { $push: { orders: newOrder._id } });
 
+            const admin=await Admin.find()
+            console.log("admin",admin)
+            if (!admin) {
+                console.log("No admin found");
+                return res.status(500).json({ success: false, message: 'Admin not found' });
+            }
+            const adminId=admin[0]._id
+            console.log(adminId)
+
+            if(paymentMethod !=="cash_on_delivery"){
+                let adminWallet=await Wallet.findOne({userId:adminId})
+                console.log("adminWallet",adminWallet)
+               
+                adminWallet.transactions.push({
+                    orderId:newOrder._id,
+                    transactionType:"credit",
+                    transactionAmount:newOrder.finalAmount,
+                    transactionDescription:`Payment for order ${newOrder.orderId}`,
+                })
+                await adminWallet.save()
+
+            }
+
+
+           
+
+
+
+
             // Generate and save the invoice
             const user = await User.findById(userId);
             const address = await Address.findById(shippingAddress);
@@ -187,6 +224,37 @@ console.log("couponApplied",couponApplied)
             let refundAmount=(quantity || product.quantity)* product.price
             // console.log(refundAmount)
 
+            if (order.paymentMethod === 'cash_on_delivery' && order.paymentStatus === 'pending') {
+                // Simply update product status and stock without wallet transactions
+                order.cancelledProducts.push({
+                    product: product.product,
+                    quantity: quantity || product.quantity, 
+                    price: product.price
+                });
+    
+                await Product.findByIdAndUpdate(
+                    product.product,
+                    { $inc: { stock: quantity || product.quantity } },
+                    { new: true }
+                );
+    
+                if (quantity && quantity < product.quantity) {
+                    order.products[productIndex].quantity -= quantity;
+                } else {
+                    order.products[productIndex].status = "Cancelled";
+                }
+    
+                const allCancelled = order.products.every(item => item.status === "Cancelled" || (item.quantity === 0));
+    
+                if (allCancelled) {
+                    order.orderStatus = "Cancelled";
+                }
+    
+                await order.save();
+    
+                return res.status(200).json({ message: "Product cancelled successfully" });
+            }
+
             if(order.paymentMethod==='razor-pay' && order.paymentStatus==='completed'){
                 if(order.couponApplied && order.couponApplied.code){
              const coupon=await Coupon.findOne({code:order.couponApplied.code})
@@ -217,23 +285,37 @@ console.log("couponApplied",couponApplied)
                 in order${order.orderId}`
             })
             await wallet.save()
+
+            const admin= await Admin.find()
+            const adminId=admin[0]._id;
+            let adminWallet=await Wallet.findOne({userId:adminId})
+            if(!adminWallet){
+                return res.status(400).json({success:false, message:"Wallet not found"})
+            }
+            adminWallet.transactions.push({
+                orderId:order._id,
+                transactionType:"debit",
+                transactionAmount:refundAmount,
+                transactionDescription:`Refund for cancelled product in order ${order.orderId}`
+            })
+            await adminWallet.save()
     
-            // Add the product to cancelledProducts
+            
             order.cancelledProducts.push({
                 product: product.product,
-                quantity: quantity || product.quantity, // Allow partial cancellation
+                quantity: quantity || product.quantity, 
                 price: product.price
             });
             
     
-            // Update the product stock
+            
             await Product.findByIdAndUpdate(
                 product.product,
                 { $inc: { stock: quantity || product.quantity } },
                 { new: true }
             );
     
-            // Remove the product from the order or reduce its quantity
+        
             if (quantity && quantity < product.quantity) {
                 order.products[productIndex].quantity -= quantity;
                 // order.products[productIndex].partiallyCancelled = true;
@@ -245,7 +327,7 @@ console.log("couponApplied",couponApplied)
 
             }
     
-            // If all products are cancelled, mark the order as cancelled
+            
             if (order.products.length === 0) {
                 order.orderStatus = "Cancelled";
             }
@@ -298,7 +380,8 @@ console.log("couponApplied",couponApplied)
             if (!order) {
                 return res.status(404).json({ message: "Order not found" });
             }
-            if (order.paymentMethod === 'razor-pay' && order.paymentStatus === 'completed') {
+            
+            if (order.paymentMethod === 'razor-pay' && order.paymentStatus === 'completed' || order.paymentMethod === 'cash_on_delivery' && order.paymentStatus==="completed") {
                 // Calculate the total refund amount
                 const totalRefundAmount = order.products.reduce((total, item) => {
                     return total + (item.quantity * item.price);

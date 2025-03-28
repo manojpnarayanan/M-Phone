@@ -12,7 +12,9 @@ const jwt=require("jsonwebtoken")
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
-const Coupon=require("../../model/coupon")
+const Coupon=require("../../model/coupon");
+const Wallet = require('../../model/wallet');
+const Admin=require("../../model/admin")
 
 env.config()
 
@@ -210,6 +212,30 @@ const razorpayController={
           message: 'Invalid payment signature. Possible payment tampering detected.'
         });
       }
+
+      const creditAdminWallet=async (order)=>{
+        const admin=await Admin.find();
+        if(!admin || admin.length===0){
+            console.log("no admin fou nd")
+            return
+        }
+        const adminId=admin[0]._id;
+        let adminWallet=await Wallet.findOne({userId:adminId})
+        console.log("adminWallet",adminWallet)
+
+        if(!adminWallet){
+          return  res.status(400).json({success:false, message:"Wallet not found"})
+        }
+        adminWallet.transactions.push({
+            orderId:order._id,
+            transactionType:"credit",
+            transactionAmount:order.finalAmount,
+            transactionDescription: `Payment for order ${order.orderId}`,
+        })
+        await adminWallet.save()
+
+      }
+
       if(orderId){
         const order = await Order.findById(orderId);
         if(!order){
@@ -239,6 +265,8 @@ const razorpayController={
         await order.save();
         await updateProductQuantities(order.products);
         await Cart.deleteMany({ user: order.user });
+
+        await creditAdminWallet(order)   //credit to admin wallet
 
 
         const user = await User.findById(order.user);
@@ -291,6 +319,8 @@ const razorpayController={
         );
     }
                     await updateProductQuantities(orderData.products);
+                    await User.findByIdAndUpdate(orderData.userId, { $push: { orders: savedOrder._id } });
+                    await creditAdminWallet(savedOrder);
 
 
       const user = await User.findById(orderData.userId);

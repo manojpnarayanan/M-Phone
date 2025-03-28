@@ -14,6 +14,8 @@ const ordermanage=require("../router/ordermanage")
 const salesController=require("../controller/salescontroller")
 const couponController=require("../controller/couponcontroller")
 const copounrouter=require("../router/coupon")
+const WalletController=require("../controller/walletcontroller")
+const walletController = require("../controller/walletcontroller")
 
 router.get("/productlist",addproductController.getProduct)
 router.patch("/productlist/:id",addproductController.blockProduct)
@@ -39,6 +41,9 @@ router.get("/sales-report/download-invoice", salesController.downloadInvoice);
 
 router.get("/coupons",couponController.loadCoupon)
 router.post("/coupons",couponController.createCoupon)
+
+router.get("/wallet",walletController.loadWallet)
+router.get("/wallet/view-detail/:id",walletController.viewOrderdetailPage)
 
 router.use("/coupons",copounrouter)
 router.use("/products",productRoute)

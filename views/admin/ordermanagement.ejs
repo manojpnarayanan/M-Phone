@@ -123,20 +123,7 @@
     <%- include('./partials/nav') %>
     <main class="main-wrap">
         <header class="main-header navbar">
-            <div class="col-search">
-                <form class="searchform">
-                    <div class="input-group">
-                        <input list="search_terms" type="text" class="form-control" placeholder="Search term">
-                        <button class="btn btn-light bg" type="button"> <i class="material-icons md-search"></i></button>
-                    </div>
-                    <datalist id="search_terms">
-                        <option value="Products">
-                        <option value="New orders">
-                        <option value="Apple iphone">
-                        <option value="Ahmed Hassan">
-                    </datalist>
-                </form>
-            </div>
+           
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
                 </ul>
@@ -146,6 +133,22 @@
             <div class="content-header">
                 <div>
                     <h2 class="content-title card-title">Order detail</h2>
+                </div>
+                <div class="col-search">
+                    <form class="searchform" action="/admin/dashboard/ordermanage" method="GET">
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                name="search" 
+                                class="form-control" 
+                                placeholder="Search orders (name, email, product, city...)" 
+                                value="<%= searchTerm || '' %>"
+                            >
+                            <button class="btn btn-light bg" type="submit">
+                                <i class="material-icons md-search"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <div class="card">
@@ -237,30 +240,47 @@
                                     
                                 </table>
                                  <!-- Pagination Controls -->
-                            <div class="pagination-area mt-15 mb-50">
-                                <nav aria-label="Page navigation example">
-                                    <ul class="pagination justify-content-start">
-                                        <% if (currentPage > 1) { %>
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page=<%= currentPage - 1 %>"><i class="material-icons md-chevron_left"></i></a>
-                                            </li>
+                                 <div class="pagination-area mt-15 mb-50">
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination justify-content-start">
+                                            <% if (currentPage > 1) { %>
+                                                <li class="page-item">
+                                                    <a class="page-link" href="?page=<%= currentPage - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>">
+                                                        <i class="material-icons md-chevron_left"></i>
+                                                    </a>
+                                                </li>
+                                            <% } %>
+                                
+                                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                                    <a class="page-link" href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>">
+                                                        <%= i %>
+                                                    </a>
+                                                </li>
+                                            <% } %>
+                                
+                                            <% if (currentPage < totalPages) { %>
+                                                <li class="page-item">
+                                                    <a class="page-link" href="?page=<%= currentPage + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>">
+                                                        <i class="material-icons md-chevron_right"></i>
+                                                    </a>
+                                                </li>
+                                            <% } %>
+                                        </ul>
+                                    </nav>
+                                </div>
+                                
+                                <!-- Add a message when no results are found -->
+                                <% if (orders.length === 0) { %>
+                                    <div class="alert alert-info text-center" role="alert">
+                                        <% if (searchTerm) { %>
+                                            No orders found matching the search term "<%= searchTerm %>".
+                                        <% } else { %>
+                                            No orders found.
                                         <% } %>
-                            
-                                        <% for (let i = 1; i <= totalPages; i++) { %>
-                                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                                            </li>
-                                        <% } %>
-                            
-                                        <% if (currentPage < totalPages) { %>
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page=<%= currentPage + 1 %>"><i class="material-icons md-chevron_right"></i></a>
-                                            </li>
-                                        <% } %>
-                                    </ul>
-                                </nav>
-                            </div>
-                                <!-- Add this section after the table in the existing HTML -->
+                                    </div>
+                                <% } %>
+                                
                                
 
 
@@ -295,7 +315,17 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
         <script>
-  
+  document.addEventListener("DOMContentLoaded",function(){
+    const searchForm=document.querySelectorAll("searchform");
+    const searchInput=document.getElementById("searchInput")
+    searchForm.addEventListener("submit",function(e){
+        e.preventDefault();
+        const searchTerm=searchInput.value.trim();
+        const baseUrl=window.location.pathname;
+        const searchUrl=searchTerm? `${baseUrl}?search=${encodeURIComponent(searchTerm)}`:baseUrl
+        window.location.href=searchUrl;
+    })
+  })
     
     
     async function fetchOrderDetails(orderId) {
@@ -377,9 +407,9 @@
 
     productStatusDropdowns.forEach(dropdown => {
         const currentStatus = dropdown.value;
-    // if (currentStatus === 'Cancelled' || currentStatus === 'Returned') {
-    //     dropdown.disabled = true;
-    // }
+    if (currentStatus === 'Cancelled' || currentStatus === 'Returned') {
+        dropdown.disabled = true;
+    }
         dropdown.addEventListener('change', async (event) => {
             const orderId = event.target.getAttribute('data-order-id');
             const productId = event.target.getAttribute('data-product-id');
@@ -387,18 +417,18 @@
             const newStatus = event.target.value;
 
             const disallowedStatuses = ['Cancelled', 'Returned'];
-        // if (disallowedStatuses.includes(currentStatus)) {
-        //     Swal.fire({
-        //         icon: 'warning',
-        //         title: 'Status Cannot Be Changed',
-        //         text: `Products with status ${currentStatus} cannot be modified.`,
-        //         confirmButtonText: 'OK',
-        //     });
+        if (disallowedStatuses.includes(currentStatus)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Status Cannot Be Changed',
+                text: `Products with status ${currentStatus} cannot be modified.`,
+                confirmButtonText: 'OK',
+            });
             
-        //     // Revert the dropdown to its original status
-        //     event.target.value = currentStatus;
-        //     return;
-        // }
+            // Revert the dropdown to its original status
+            event.target.value = currentStatus;
+            return;
+        }
             
             try {
                 const response = await fetch(`/admin/dashboard/ordermanage/${orderId}/${productId}`, {

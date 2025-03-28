@@ -6,6 +6,7 @@ const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const path = require('path');
 const Wallet = require("../model/wallet");
+const Admin=require("../model/admin")
 
 
 
@@ -15,6 +16,18 @@ const ordermanagement = {
         try {
             const page = parseInt(req.query.page) || 1;
             const itemsPerPage = 6;
+            const searchTerm=req.query.search|| "";
+            console.log("searchTerm",searchTerm)
+
+            const searchQuery=searchTerm?{
+                $or:[
+                    { 'user': { $elemMatch: { name: { $regex: searchTerm, $options: 'i' } } } },
+                    {"shippingAddress.city":{$regex:searchTerm,$options:"i"}},
+                    { 'user': { $elemMatch: { email: { $regex: searchTerm, $options: 'i' } } } },
+                ]
+
+            }:{};
+            console.log(searchQuery)
 
             if (isNaN(page) || page < 1) {
                 return res.status(400).render("admin/ordermanagement", { 
@@ -22,16 +35,17 @@ const ordermanagement = {
                     currentPage: 1,
                     totalPages: 0,
                     totalOrders: 0,
+                    searchTerm: searchTerm,
                     error: "Invalid page number"
                 });
             }
-            const totalOrders=await Order.countDocuments();
+            const totalOrders=await Order.countDocuments(searchQuery);
             const totalPages=Math.ceil(totalOrders/itemsPerPage)
             if (page > totalPages && totalPages > 0) {
                 return res.redirect(`?page=${totalPages}`);
             }
 
-            const orders = await Order.find()
+            const orders = await Order.find(searchQuery)
                  .sort({createdAt:-1})
                  .skip((page -1)*itemsPerPage )
                  .limit(itemsPerPage)
@@ -48,12 +62,14 @@ const ordermanagement = {
             //         totalOrders: 0 
             //     });
             // }
+            console.log("reached",orders.length)
             const order = await Order.find();
             res.render("admin/ordermanagement", { orders,
                 order,
                 currentPage:page,
                 totalPages,
-                totalOrders
+                totalOrders,
+                searchTerm: searchTerm,
             })
 
         } catch (error) {
@@ -215,7 +231,23 @@ const ordermanagement = {
                     transactionDescription: `Refund for ${productStatus} product in order ${order.orderId}`
                 });
 
-                await wallet.save(); 
+                await wallet.save();
+
+                const admin=await Admin.find()
+                const adminId=admin[0]._id
+                let adminWallet=await Wallet.findOne({userId:adminId})
+                if(!adminWallet){
+                    return res.status(400).json({success:false, message:"Wallet not found"})
+                }
+                adminWallet.transactions.push({
+                    orderId:order._id,
+                    transactionType:"debit",
+                    transactionAmount:refundAmount,
+                    transactionDescription:`Refund for ${productStatus} in order ${order.orderId}`
+                })
+                await adminWallet.save()
+                
+                
 
                 await product.findByIdAndUpdate(
                     currentProduct.product._id,
