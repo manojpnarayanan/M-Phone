@@ -137,22 +137,41 @@ const generator = {
             await User.updateOne({ email }, {
                 $set: { otp: null, otpExpiry: null, isVerified: true }
             })
+            if (user.referredBy) {
+            
+                const referrer = await User.findById(user.referredBy)
+            if (referrer) {
+                
+                if (!referrer.referrals) {
+                  referrer.referrals = [];
+                }
+                referrer.referrals.push(user._id);
+                
+                
+                if (!referrer.referralDetails) {
+                  referrer.referralDetails = [];
+                }
+                
+                referrer.referralDetails.push({
+                  userId: user._id,
+                  name: user.name,
+                  email: user.email,
+                  joinedAt: new Date(),
+                  status: 'active'
+                });
+                
+            
+                referrer.referralRewards = (referrer.referralRewards || 0) + 1;
+                
+                await referrer.save();
+                
+              }
+            }
             return res.json({ message: "OTP Verified! Redirecting to login...", redirect: "/user/login" });
         } catch (error) {
             console.log("err", error);
             res.status(500).send("Error signing up")
         }
-
-        // await newUser.save();
-
-        // req.login(user,(err)=>{
-        //     if(err) return next(err)
-        //         res.redirect("/dashboard")
-        // })
-
-
-
-
     },
     resendOtp: async (req, res) => {
         try {

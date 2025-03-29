@@ -42,13 +42,23 @@ const checkoutcontroller = {
                 appliedCouponCode = cart.appliedCoupon.code;
 
             }
+            const regularCouponQuery = {
+                isActive: true,
+                validUntil:{$gte: new Date()},
+                // name:{$ne:"Reward Coupon"},
+                // code:{$ne:"reward"} 
+            };
+
+            const referrablecoupon=user.referredBy ||  (user.referralDetails && user.referralDetails.length > 0)
+            if(!referrablecoupon){
+                regularCouponQuery.name = { $ne: "Reward Coupon" };
+                regularCouponQuery.code = { $ne: "reward" };
+
+            }
+            // console.log("referrablecoupon",referrablecoupon,regularCouponQuery.name)
 
             //  console.log("couponDiscount",couponDiscount)
-            const activeCoupon=await Coupon.find({
-                isActive:true,
-                // validFrom:{$lte:new Date()},
-                validUntil:{$gte: new Date()},
-            }).sort({createdAt:-1})
+            const activeCoupon=await Coupon.find(regularCouponQuery).sort({createdAt:-1})
             // console.log("activeCoupon",activeCoupon)
 
             if(cart.products.length===0){

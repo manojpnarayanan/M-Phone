@@ -47,6 +47,8 @@ router.get("/wallet",walletController.getWallet)
 router.post("/wallet/add-funds",walletController.addFunds)
 router.get("/:id/download-invoice",orderController.downloadInvoice)
 
+router.post("/send-invite",userViews.sendInvite)
+
 router.post("/:id",wishlistController.addToCartFromWishlist)
 router.get("/:id",userViews.loadMyProfile)
 module.exports=router

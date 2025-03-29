@@ -94,7 +94,7 @@ const signupController = {
   signup: async (req, res) => {
     try {
       console.log("Request Body:", req.body);
-      const { name, email, password, confirmPassword, phonenumber } = req.body;
+      const { name, email, password, confirmPassword, phonenumber, referralCode } = req.body;
 
       // Validate all fields are present
       if (!name || !email || !password || !confirmPassword || !phonenumber) {
@@ -116,7 +116,7 @@ const signupController = {
       console.log(userVerified)
       if(userVerified && userVerified.isVerified===false){
         await User.deleteOne({email})
-console.log("deleted email:",email)
+// console.log("deleted email:",email)
 
       }
 
@@ -125,6 +125,8 @@ console.log("deleted email:",email)
       if (existingUser) {
         return res.status(400).json({ message: "User already exists" });
       }
+
+     
 
       // Validate phone number (Indian format)
       if (!/^[6-9]\d{9}$/.test(phonenumber)) {
@@ -147,6 +149,18 @@ console.log("deleted email:",email)
         otp,
         otpExpiry,
       });
+
+      let referrer=null
+      if(referralCode){
+         referrer=await User.findOne({referralCode:referralCode})
+         if(referrer){
+          newUser.referredBy=referrer._id
+         }
+
+      }
+
+      console.log("referred ",referrer)
+
       await newUser.save();
 
       // Set up the Nodemailer transporter to send OTP via email

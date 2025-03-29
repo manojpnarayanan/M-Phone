@@ -81,8 +81,8 @@ const orderController = {
 // console.log("couponApplied",req.body)
 
              if(paymentMethod==="cash_on_delivery"){
-                if(totalAmount<=1000){
-                    return res.status(400).json({success:false, message:"orders above RS:1000 is eligible for COD"})
+                if(totalAmount>=1000){
+                    return res.status(400).json({success:false, message:"orders below RS:1000 is eligible for COD"})
                 }
              }
 
