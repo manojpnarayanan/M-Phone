@@ -386,12 +386,15 @@ document.querySelectorAll(".toggle-offer-btn").forEach(button => {
 
                                 
                                 Swal.fire(
-                                    'Success!',
-                                    'Offer has been added successfully.',
-                                    'success'
-                                );
-                                // window.location.reload();
+                                    {title: 'Success!',
+                                    text: 'Offer has been added successfully.',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'}
+                                ).then(()=>{
+                                    window.location.reload();
+                                })
                             })
+                                
                             .catch(error => {
                                 console.error('Error:', error);
                                 Swal.fire(

@@ -84,6 +84,9 @@ const walletController={
             console.log(error)
         }
     },
+    
+   
+    
     viewOrderdetailPage:async(req,res)=>{
         try{
             const orderId=req.params.id

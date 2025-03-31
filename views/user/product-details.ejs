@@ -329,7 +329,7 @@
             <% if (relatedProducts && relatedProducts.length > 0) { %>
                 <% relatedProducts.forEach(related => { %>
                     <div class="related-product-card">
-                        <a href="/user/dashboard/product/<%= related._id %>" class="text-decoration-none">
+                        <a href="/user/dashboard/products/<%= related._id %>" class="text-decoration-none">
                             <% if (related.image && related.image.length > 0) { %>
                                 <img src="/<%= related.image[0] %>" alt="<%= related.name %>" class="related-product-image">
                             <% } else { %>

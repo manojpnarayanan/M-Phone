@@ -196,71 +196,52 @@
     <script src="/assets/js/main.js" type="text/javascript"></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add Funds Button
-        document.getElementById('addFundsBtn')?.addEventListener('click', function() {
-            Swal.fire({
-                title: 'Add Funds to Admin Wallet',
-                input: 'number',
-                inputLabel: 'Enter Amount',
-                inputPlaceholder: 'Enter amount to add',
-                showCancelButton: true,
-                confirmButtonText: 'Add Funds',
-                inputValidator: (value) => {
-                    if (!value || value <= 0) {
-                        return 'Please enter a valid amount';
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('/admin/wallet/add-funds', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ amount: result.value })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire('Success', 'Funds added successfully', 'success')
-                                .then(() => location.reload());
-                        } else {
-                            Swal.fire('Error', data.message || 'Failed to add funds', 'error');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add Funds Button
+            document.getElementById('addFundsBtn')?.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Add Funds to Admin Wallet',
+                    input: 'number',
+                    inputLabel: 'Enter Amount',
+                    inputPlaceholder: 'Enter amount to add',
+                    showCancelButton: true,
+                    confirmButtonText: 'Add Funds',
+                    inputValidator: (value) => {
+                        if (!value || value <= 0) {
+                            return 'Please enter a valid amount';
                         }
-                    })
-                    .catch(error => {
-                        Swal.fire('Error', 'An error occurred', 'error');
-                    });
-                }
-            });
-        });
-
-        // Transaction Search
-        const searchInput = document.getElementById('transactionSearch');
-        searchInput.addEventListener('keyup', function() {
-            const searchTerm = searchInput.value.trim();
-
-            fetch(`/admin/wallet/transactions?search=${searchTerm}`)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    document.querySelector('tbody').innerHTML = doc.querySelector('tbody').innerHTML;
-                })
-                .catch(error => {
-                    Swal.fire('Error', 'Failed to load search results', 'error');
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/admin/wallet/add-funds', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ amount: result.value })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Success', 'Funds added successfully', 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Error', data.message || 'Failed to add funds', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Error', 'An error occurred', 'error');
+                        });
+                    }
                 });
-        });
-
-        // Pagination
-        document.querySelectorAll('.pagination a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const page = this.getAttribute('data-page');
-                const searchTerm = document.getElementById('transactionSearch').value.trim();
-
-                fetch(`/admin/wallet/transactions?page=${page}&search=${searchTerm}`)
+            });
+    
+            // Transaction Search
+            const searchInput = document.getElementById('transactionSearch');
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = searchInput.value.trim();
+    
+                fetch(`/admin/wallet/transactions?search=${searchTerm}`)
                     .then(response => response.text())
                     .then(html => {
                         const parser = new DOMParser();
@@ -268,39 +249,60 @@
                         document.querySelector('tbody').innerHTML = doc.querySelector('tbody').innerHTML;
                     })
                     .catch(error => {
-                        Swal.fire('Error', 'Failed to load page', 'error');
+                        Swal.fire('Error', 'Failed to load search results', 'error');
                     });
+            });
+    
+            // Pagination
+            document.querySelectorAll('.pagination a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    const searchTerm = document.getElementById('transactionSearch').value.trim();
+    
+                    fetch(`/admin/wallet/transactions?page=${page}&search=${searchTerm}`)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            document.querySelector('tbody').innerHTML = doc.querySelector('tbody').innerHTML;
+                        })
+                        .catch(error => {
+                            Swal.fire('Error', 'Failed to load page', 'error');
+                        });
+                });
+            });
+        });
+    
+        document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener for View Order buttons
+        document.querySelectorAll('.view-order').forEach(button => {
+            button.addEventListener('click', function() {
+                const orderId = this.getAttribute('data-order-id');
+                
+                // Add more robust error checking
+                if (!orderId) {
+                    console.error('No order ID found');
+                    Swal.fire('Error', 'Order ID is missing', 'error');
+                    return;
+                }
+    
+                // Log the orderId to debug
+                console.log('Attempting to view order:', orderId);
+    
+                // Use window.location with error handling
+                window.location.href = `/admin/dashboard/wallet/view-detail/${orderId}`;
             });
         });
     });
-
-    document.addEventListener('DOMContentLoaded', function() {
-    // Add event listener for View Order buttons
-    document.querySelectorAll('.view-order').forEach(button => {
-        button.addEventListener('click', function() {
-            const orderId = this.getAttribute('data-order-id');
-            
-            // Add more robust error checking
-            if (!orderId) {
-                console.error('No order ID found');
-                Swal.fire('Error', 'Order ID is missing', 'error');
-                return;
-            }
-
-            // Log the orderId to debug
-            console.log('Attempting to view order:', orderId);
-
-            // Use window.location with error handling
-            window.location.href = `/admin/dashboard/wallet/view-detail/${orderId}`;
-        });
-    });
-});
-
-
-   
     
-    </script>
+    
+       
+        
+        </script>
 
     
+
+
 </body>
 </html>

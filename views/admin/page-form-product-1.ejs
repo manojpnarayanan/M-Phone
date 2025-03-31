@@ -124,7 +124,9 @@
         </section>
     </main>
 
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- <script>
         let cropper;
         let croppedImagesData = [];
 
@@ -194,10 +196,171 @@
                 alert("Please crop at least 3 images before submitting.");
             }
         });
-    </script>
+    </script> -->
 
+<!-- //corrected one  -->
+ <script>
+  // Initialize variables
+let cropper;
+let croppedImagesData = [];
+let processingImages = false;
+
+// Listen for image upload
+document.getElementById("imageUpload").addEventListener("change", function(event) {
+    let preview = document.getElementById("imagePreview");
+    preview.innerHTML = "";
+    const files = event.target.files;
     
+    // Validate minimum image count
+    if (files.length < 3) {
+        Swal.fire({
+            title: 'Not Enough Images',
+            text: 'Please upload at least 3 images.',
+            icon: 'warning',
+            confirmButtonColor: '#3085d6'
+        });        return;
+    }
+    
+    // Set flag that we're processing images
+    processingImages = true;
+    croppedImagesData = [];
 
+    Swal.fire({
+        title: 'Processing Images',
+        text: 'Please crop each image as prompted.',
+        icon: 'info',
+        confirmButtonColor: '#3085d6'
+    });
+    
+    let imageIndex = 0;
+    
+    // Process images one by one
+    function processImage() {
+        // If all images are processed, update hidden field and reset flag
+        if (imageIndex >= files.length) {
+            document.getElementById("croppedImages").value = JSON.stringify(croppedImagesData);
+            processingImages = false;
+
+            Swal.fire({
+                title: 'Images Ready',
+                text: `Successfully processed ${croppedImagesData.length} images. You can now complete the form and submit the product.`,
+                icon: 'success',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        let file = files[imageIndex];
+        let reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Create and configure crop modal
+            let cropModal = document.getElementById("cropModal");
+            cropModal.style.display = "block";
+            cropModal.innerHTML = "";
+            
+            // Create image element for cropping
+            let img = document.createElement("img");
+            img.src = e.target.result;
+            img.id = "cropImage";
+            img.style.maxWidth = "100%";
+            cropModal.appendChild(img);
+            
+            // Initialize cropper
+            cropper = new Cropper(img, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 0.8,
+            });
+
+            // Create crop button
+            let cropBtn = document.createElement("button");
+            cropBtn.innerText = "Crop";
+            cropBtn.classList.add("btn", "btn-primary", "mt-2");
+            cropBtn.type = "button"; // Explicitly set type to button to prevent form submission
+            cropModal.appendChild(cropBtn);
+            
+            // Add crop button functionality
+            cropBtn.addEventListener("click", function(e) {
+                // Prevent any default actions
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Get cropped canvas and add to our data
+                let canvas = cropper.getCroppedCanvas();
+                croppedImagesData.push(canvas.toDataURL("image/jpeg"));
+                
+                // Add preview image
+                let croppedImg = document.createElement("img");
+                croppedImg.src = canvas.toDataURL("image/jpeg");
+                croppedImg.style.width = "100px";
+                croppedImg.style.height = "100px";
+                croppedImg.classList.add("rounded", "border");
+                preview.appendChild(croppedImg);
+                
+                // Close and clean up
+                cropModal.style.display = "none";
+                cropper.destroy();
+                
+                // Process next image
+                imageIndex++;
+                processImage();
+                
+                return false; // Extra safety to prevent form submission
+            });
+        };
+        
+        reader.readAsDataURL(file);
+    }
+
+    // Start processing the first image
+    processImage();
+});
+
+// Form submission handler
+document.getElementById("productForm").addEventListener("submit", function(event) {
+    // If we're still processing images, prevent submission
+    if (processingImages) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Please Wait',
+            text: 'Please wait until all images are processed.',
+            icon: 'warning',
+            confirmButtonColor: '#3085d6'
+        });
+            return false;
+    }
+    
+    // Check if we have enough images
+    if (croppedImagesData.length < 3) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Not Enough Images',
+            text: 'Please crop at least 3 images before submitting.',
+            icon: 'error',
+            confirmButtonColor: '#3085d6'
+        });
+            return false;
+    } else {
+        // Make sure the cropped images are set in the hidden field before submission
+        document.getElementById("croppedImages").value = JSON.stringify(croppedImagesData);
+        Swal.fire({
+            title: 'Creating Product',
+            text: 'Processing your request...',
+            icon: 'info',
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    }
+});
+</script> 
+    
+<script>
+    
+</script>
 
 
 

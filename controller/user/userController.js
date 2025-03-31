@@ -59,7 +59,9 @@ const userController = {
                     ]
                 }
             }
-            const products = await Product.find(query).populate("category");
+            const products = await Product.find(query).populate("category")
+            .limit(8)
+            .sort({createdAt:-1})
 
             const cart = await Cart.findOne({ user: decoded.id })
 
@@ -80,7 +82,7 @@ const userController = {
                 cartItemCount, 
                 searchQuery: req.query.search || "" })
 
-                
+
         } catch (error) {
             console.log(error)
             res.status(500).send("Error fetching Data")

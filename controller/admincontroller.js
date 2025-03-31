@@ -381,13 +381,33 @@ async function getTopBrands(startDate, endDate) {
 }
 
 // Get orders data for chart
+// async function getOrdersData(timeFilter, startDate, endDate) {
+//     const groupBy = timeFilter === 'daily' ? { $dayOfMonth: '$createdAt' } 
+//         : timeFilter === 'weekly' ? { $week: '$createdAt' }
+//         : timeFilter === 'yearly' ? { $month: '$createdAt' }
+//         : { $month: '$createdAt' };
+
+//     return await Order.aggregate([
+//         { $match: { 
+//             createdAt: { $gte: startDate, $lte: endDate },
+//             orderStatus: { $nin: ['Cancelled', 'Returned'] }
+//         }},
+//         { $group: {
+//             _id: groupBy,
+//             totalOrders: { $sum: 1 },
+//             totalRevenue: { $sum: '$finalAmount' }
+//         }},
+//         { $sort: { '_id': 1 } }
+//     ]);
+// }
+
 async function getOrdersData(timeFilter, startDate, endDate) {
     const groupBy = timeFilter === 'daily' ? { $dayOfMonth: '$createdAt' } 
         : timeFilter === 'weekly' ? { $week: '$createdAt' }
         : timeFilter === 'yearly' ? { $month: '$createdAt' }
         : { $month: '$createdAt' };
 
-    return await Order.aggregate([
+    const result = await Order.aggregate([
         { $match: { 
             createdAt: { $gte: startDate, $lte: endDate },
             orderStatus: { $nin: ['Cancelled', 'Returned'] }
@@ -397,7 +417,17 @@ async function getOrdersData(timeFilter, startDate, endDate) {
             totalOrders: { $sum: 1 },
             totalRevenue: { $sum: '$finalAmount' }
         }},
-        { $sort: { '_id': 1 } }
+        { $sort: { '_id': 1 } },
+        
+        { $project: {
+            _id: { $toString: "$_id" },
+            totalOrders: 1,
+            totalRevenue: 1
+        }}
     ]);
+    
+    console.log('Orders data:', result);
+    return result;
 }
+
 module.exports = admincontroller

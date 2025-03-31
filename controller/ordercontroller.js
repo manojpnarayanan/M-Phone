@@ -7,6 +7,7 @@ const PDFDocument = require('pdfkit');
 const path = require('path');
 const Wallet = require("../model/wallet");
 const Admin=require("../model/admin")
+const Address=require("../model/address")
 
 
 
@@ -18,16 +19,54 @@ const ordermanagement = {
             const itemsPerPage = 6;
             const searchTerm=req.query.search|| "";
             console.log("searchTerm",searchTerm)
+            let searchQuery = {};
 
-            const searchQuery=searchTerm?{
-                $or:[
-                    { 'user': { $elemMatch: { name: { $regex: searchTerm, $options: 'i' } } } },
-                    {"shippingAddress.city":{$regex:searchTerm,$options:"i"}},
-                    { 'user': { $elemMatch: { email: { $regex: searchTerm, $options: 'i' } } } },
-                ]
+            if(searchTerm){
+                const matchingUsers=await User.find({
+                    $or:[
+                        {name:{$regex:searchTerm,$options:"i"}},
+                        { email: { $regex: searchTerm, $options: 'i' } },
+                        { phone: { $regex: searchTerm, $options: 'i' } }
+                        
+                    ]
+                }).select('_id');
+                const userIds = matchingUsers.map(user => user._id);
 
-            }:{};
-            console.log(searchQuery)
+                const matchingAddresses = await Address.find({
+                    $or: [
+                        { city: { $regex: searchTerm, $options: 'i' } },
+                        { state: { $regex: searchTerm, $options: 'i' } },
+                        { housename: { $regex: searchTerm, $options: 'i' } },
+                        { pincode: { $regex: searchTerm, $options: 'i' } }
+                    ]
+                }).select('_id');
+
+                const addressIds = matchingAddresses.map(address => address._id);
+                const matchingProducts = await product.find({
+                    name: { $regex: searchTerm, $options: 'i' }
+                }).select('_id');
+                const productIds = matchingProducts.map(product => product._id);
+
+
+                searchQuery = {
+                    $or: [
+                        { user: { $in: userIds } },
+                        { shippingAddress: { $in: addressIds } },
+                        { 'products.product': { $in: productIds } }
+                    ]
+                };
+
+            }
+
+            // const searchQuery=searchTerm?{
+            //     $or:[
+            //         { 'user.name': { $regex: searchTerm, $options: 'i' } },
+            //         {"shippingAddress.city":{$regex:searchTerm,$options:"i"}},
+            //         { 'user.email': { $regex: searchTerm, $options: 'i' } },
+            //         ]
+
+            // }:{};
+            console.log("searchQuery",searchQuery)
 
             if (isNaN(page) || page < 1) {
                 return res.status(400).render("admin/ordermanagement", { 
@@ -49,7 +88,7 @@ const ordermanagement = {
                  .sort({createdAt:-1})
                  .skip((page -1)*itemsPerPage )
                  .limit(itemsPerPage)
-                .populate("user", "name price phone")
+                .populate("user", "name price phone email")
                 .populate("products.product", "name price image")
                 .populate('shippingAddress')
                 

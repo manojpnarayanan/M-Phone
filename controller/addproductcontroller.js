@@ -12,12 +12,12 @@ const addproducts = {
       const { name, description, price, stock, isActive, brand, croppedImages, category, discount, availability, deliveryTime, tags } = req.body
       // console.log(req.body)
       if (!croppedImages) {
-        return res.status(400).send("Product adding Failed, Add At Least 3 images");
+        return res.status(400).json({success:false, message:"Product adding Failed, Add At Least 3 images"});
       }
 
       const croppedImagesArray = JSON.parse(croppedImages);
       if (croppedImagesArray.length < 3) {
-        return res.status(400).send("Product adding Failed, Add At Least 3 images");
+        return res.status(400).json({success:false, message:"Product adding Failed, Add At Least 3 images"});
       }
       let imagePaths = [];
       const uploadDir = "public/uploads/product-images/";
@@ -25,7 +25,7 @@ const addproducts = {
       for (let i = 0; i < croppedImagesArray.length; i++) {
         const base64Data = croppedImagesArray[i].replace(/^data:image\/\w+;base64,/, "");
         if (!base64Data || base64Data.trim() === "") {
-          return res.status(400).send("Invalid image data detected");
+          return res.status(400).json({success:false, message:"Invalid image files Add only jpg/png"});
         }
        
         const imageName = `image-${Date.now()}-${i}.jpg`;
@@ -56,7 +56,7 @@ const addproducts = {
 
     } catch (error) {
       console.log(error)
-      res.status(400).send("Failed to add products")
+      res.status(400).json({success:false, message:"Product adding Failed"});
     }
   },
   

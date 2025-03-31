@@ -64,7 +64,7 @@ const userViews = {
         const { category, brand, price } = req.query
         // console.log("loadshopping page",req.query)
         page = parseInt(page) || 1
-        const limit = 4
+        const limit = 8
         const skip = (page - 1) * limit;
         let query = {}
         if (search) {
@@ -325,7 +325,7 @@ const userViews = {
             const user = await User.findById(decoded.id)
             // console.log("addtocart user:",user)
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                return res.status(400).json({ message: "User not found" });
             }
 
             if (user.isActive == false) {
@@ -358,6 +358,7 @@ const userViews = {
                 })
                 cartItems = cart.products;
             }
+            
 
 
             res.render("user/addtocart", { user, cartItems, totalItems, totalPrice });
@@ -465,20 +466,30 @@ const userViews = {
             }
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const userId = decoded.id;
-            const cart = await Cart.findOne({ user: userId });
+            const cart = await Cart.findOneAndUpdate({ user: userId },
+                { $pull: { products: { product: productId } } },
+                { new: true }
+            );
             if (!cart) {
                 return res.status(404).json({ message: "Cart not found" });
             }
 
-            cart.products = cart.products.filter(item => item.product.toString() !== productId);
-            await cart.save();
-            res.json({ success: true , message:"Item removed "});
+            // cart.products = cart.products.filter(item => item.product.toString() !== productId);
+            // await cart.save();
+            // req.flash("success","item removed succssfully")
+            // res.redirect("/user/dashboard/addtocart")
+            return res.json({ success: true, message: "Item removed successfully" });
+
+            // res.json({ success: true , message:"Item removed "});
             
 
         } catch (error) {
             console.log(error)
             console.error(error);
-            res.status(500).json({ message: "Internal Server Error" })
+            // req.flash("false","Internal server error")
+            // res.redirect("/user/dashboard/addtocart")
+            return res.status(500).json({ success: false, message: "Internal server error" });
+            // res.status(500).json({ message: "Internal Server Error" })
         }
     },
     sendInvite:async(req,res)=>{

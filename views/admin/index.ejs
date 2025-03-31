@@ -180,7 +180,7 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
+<!-- <script>
      const salesData = <%- JSON.stringify(ordersData) %>;
     const timeFilter = '<%= timeFilter %>';
     const ctx = document.getElementById('salesChart').getContext('2d');
@@ -285,5 +285,303 @@
         chartDetailsEl.textContent = getDateRangeDetails(salesData, selectedFilter);
         chart.update();
     });
-</script>
+</script> -->
 
+<script>
+   // Enhanced chart script for the dashboard
+const salesData = <%- JSON.stringify(ordersData) %>;
+const timeFilter = '<%= timeFilter %>';
+const ctx = document.getElementById('salesChart').getContext('2d');
+const chartDetailsEl = document.getElementById('chartDetails');
+
+// Function to generate all possible labels based on time filter
+function generateAllLabels(filter) {
+    const now = new Date();
+    const labels = [];
+    
+    switch(filter) {
+        case 'yearly':
+            // Generate last 12 months from now
+            for (let i = 11; i >= 0; i--) {
+                const d = new Date(now);
+                d.setMonth(d.getMonth() - i);
+                labels.push(d.toLocaleString('default', { month: 'short', year: 'numeric' }));
+            }
+            return labels;
+            
+        case 'monthly':
+            // Generate all 12 months of the current year
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return monthNames;
+            
+        case 'weekly':
+            // Generate last 4 weeks from now
+            for (let i = 3; i >= 0; i--) {
+                const weekStartDate = new Date(now);
+                weekStartDate.setDate(now.getDate() - (i * 7));
+                const weekEndDate = new Date(weekStartDate);
+                weekEndDate.setDate(weekStartDate.getDate() + 6);
+                
+                const startFormatted = weekStartDate.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+                const endFormatted = weekEndDate.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+                labels.push(`${startFormatted} - ${endFormatted}`);
+            }
+            return labels;
+            
+        case 'daily':
+            // For daily view, we'll use hourly breakdown of today
+            const hours = [];
+            for (let i = 0; i < 24; i++) {
+                hours.push(`${i}:00`);
+            }
+            return hours;
+            
+        default:
+            return [];
+    }
+}
+
+// Function to map actual data to all possible labels
+function mapDataToLabels(allLabels, data, filter) {
+    const now = new Date();
+    
+    // Initialize arrays with zeros
+    const mappedData = {
+        orders: Array(allLabels.length).fill(0),
+        revenue: Array(allLabels.length).fill(0)
+    };
+    
+    // Handle empty or invalid data
+    if (!data || !Array.isArray(data) || data.length === 0) {
+        console.log("No sales data available or invalid format");
+        return mappedData;
+    }
+    
+    data.forEach(item => {
+        // Make sure item._id is a valid date string
+        if (!item._id) {
+            console.log("Invalid item, missing _id:", item);
+            return;
+        }
+        
+        const date = new Date(item._id);
+        if (isNaN(date.getTime())) {
+            console.log("Invalid date from _id:", item._id);
+            return;
+        }
+        
+        let index = -1;
+        
+        switch(filter) {
+            case 'yearly':
+                // Check if date falls within last 12 months
+                for (let i = 0; i < 12; i++) {
+                    const monthStart = new Date(now);
+                    monthStart.setMonth(now.getMonth() - i);
+                    monthStart.setDate(1);
+                    monthStart.setHours(0, 0, 0, 0);
+                    
+                    const monthEnd = new Date(monthStart);
+                    monthEnd.setMonth(monthStart.getMonth() + 1);
+                    monthEnd.setDate(0);
+                    monthEnd.setHours(23, 59, 59, 999);
+                    
+                    if (date >= monthStart && date <= monthEnd) {
+                        index = 11 - i;  // Reverse order (most recent month first)
+                        break;
+                    }
+                }
+                break;
+                
+            case 'monthly':
+                // Check month in current year
+                if (date.getFullYear() === now.getFullYear()) {
+                    index = date.getMonth();
+                }
+                break;
+                
+            case 'weekly':
+                // Check if date falls within last 4 weeks
+                for (let i = 0; i < 4; i++) {
+                    const weekStart = new Date(now);
+                    weekStart.setDate(now.getDate() - (i * 7) - now.getDay());
+                    weekStart.setHours(0, 0, 0, 0);
+                    
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekStart.getDate() + 6);
+                    weekEnd.setHours(23, 59, 59, 999);
+                    
+                    if (date >= weekStart && date <= weekEnd) {
+                        index = 3 - i;  // Reverse order (most recent week first)
+                        break;
+                    }
+                }
+                break;
+                
+            case 'daily':
+                // Check if date is today
+                const today = new Date(now);
+                today.setHours(0, 0, 0, 0);
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                
+                if (date >= today && date < tomorrow) {
+                    index = date.getHours();
+                }
+                break;
+        }
+        
+        if (index !== -1 && index < allLabels.length) {
+            // Ensure the values are numbers before adding
+            const orderCount = Number(item.totalOrders) || 0;
+            const revenueAmount = Number(item.totalRevenue) || 0;
+            
+            // Aggregate values if there are multiple entries for the same period
+            mappedData.orders[index] += orderCount;
+            mappedData.revenue[index] += revenueAmount;
+        }
+    });
+    
+    return mappedData;
+}
+
+// Function to get date range details
+function getDateRangeDetails(filter) {
+    const now = new Date();
+    
+    switch(filter) {
+        case 'yearly': {
+            const oneYearAgo = new Date(now);
+            oneYearAgo.setFullYear(now.getFullYear() - 1);
+            oneYearAgo.setMonth(now.getMonth());
+            oneYearAgo.setDate(now.getDate());
+            return `Yearly View: ${oneYearAgo.toLocaleDateString()} to ${now.toLocaleDateString()}`;
+        }
+            
+        case 'monthly': {
+            return `Monthly View: ${now.getFullYear()} Monthly Breakdown`;
+        }
+            
+        case 'weekly': {
+            const fourWeeksAgo = new Date(now);
+            fourWeeksAgo.setDate(now.getDate() - 28);
+            return `Weekly View: Last 4 Weeks (${fourWeeksAgo.toLocaleDateString()} to ${now.toLocaleDateString()})`;
+        }
+            
+        case 'daily':
+            return `Daily View: ${now.toLocaleDateString()} Hourly Breakdown`;
+            
+        default:
+            return 'Performance Overview';
+    }
+}
+
+// Generate all possible labels based on the time filter
+const allLabels = generateAllLabels(timeFilter);
+
+// Map the actual data to all possible labels
+const mappedData = mapDataToLabels(allLabels, salesData, timeFilter);
+
+// Create the chart - making sure this code executes
+try {
+    // Check if Chart is properly loaded
+    if (typeof Chart !== 'undefined') {
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: salesData.map(item => item._id.toString()),
+                datasets: [
+                {
+        label: 'Total Orders',
+        data: salesData.map(item => item.totalOrders),
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      },
+      {
+        label: 'Total Revenue (₹)',
+        data: salesData.map(item => item.totalRevenue),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1
+      }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    'y-orders': {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Orders'
+                        }
+                    },
+                    'y-revenue': {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Revenue (₹)'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: getDateRangeDetails(timeFilter)
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                return tooltipItems[0].label;
+                            },
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    if (context.datasetIndex === 1) { // Revenue dataset
+                                        label += '₹' + context.parsed.y.toLocaleString();
+                                    } else {
+                                        label += context.parsed.y.toLocaleString();
+                                    }
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Update chart details
+        if (chartDetailsEl) {
+            chartDetailsEl.textContent = getDateRangeDetails(timeFilter);
+        }
+    } else {
+        console.error("Chart.js is not loaded properly");
+        document.getElementById('chartDetails').textContent = "Chart library not loaded properly. Please refresh the page.";
+    }
+} catch (error) {
+    console.error("Error creating chart:", error);
+    document.getElementById('chartDetails').textContent = "Error creating chart. Please check console for details.";
+}
+
+// Add interactivity to update chart details when filter changes
+document.getElementById('timeFilterSelect').addEventListener('change', function() {
+    // Form will submit and page will reload with new filter
+});
+</script>

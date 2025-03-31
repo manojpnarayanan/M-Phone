@@ -8,6 +8,19 @@ const productupdates = {
         try {
             let { name, slug, parent, description, isActive } = req.body
              console.log("Categories from :",req.body)
+
+             if (!name || name.trim().length < 3) {
+                req.flash("error", "Category name must be at least 3 characters long.");
+                return res.redirect("/admin/dashboard/products/categories");
+            }
+            name = name.trim();
+
+            const existingCategoryByName = await Category.findOne({ name: { $regex: new RegExp("^" + name + "$", "i") } });
+            if (existingCategoryByName) {
+                req.flash("error", "Category name already exists.");
+                return res.redirect("/admin/dashboard/products/categories");
+            }
+
             const existingCategory = await Category.findOne({ slug })
             if (existingCategory) {
                 // return res.status(400).send("Already Exists...")
@@ -71,7 +84,7 @@ const productupdates = {
     updateCategory: async (req, res) => {
         try {
             const { name, slug, parent, description } = req.body;
-            // console.log(req.body)
+            console.log(req.body)
             const updatedCategory = await Category.findByIdAndUpdate(req.params.id, {
                 name,
                 slug,
@@ -82,13 +95,13 @@ const productupdates = {
             )
 
             if (!updatedCategory) {
-                return res.status(404).send({ error: "Category not found" })
+                return res.status(404).json({success:false, message: "Category not found" })
             }
 
-            res.json(updatedCategory)
+             res.status(200).json({success:true, message: "Category updated successfully" })
         } catch (error) {
             console.log(error)
-            res.status(500).send("Failed to update Category")
+            res.status(500).json({success:false, message:"Failed to update Category"})
         }
     },
     blockCategory: async (req, res) => {

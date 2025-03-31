@@ -423,11 +423,26 @@ async function updateCart(productId, quantity) {
        // Remove from Cart Function
 async function removeFromCart(productId) {
     try {
-        const response = await fetch(`/user/dashboard/addtocart/remove/${productId}`, { method: 'POST' });
+        const response = await fetch(`/user/dashboard/addtocart/remove/${productId}`, 
+        { method: 'POST' });
         const data = await response.json();
         if (data.success) {
-            location.reload(); // Refresh the page to reflect changes
+            Swal.fire({
+                icon: 'success',
+                title: 'Removed',
+                text: data.message,
+                timer: 1500,
+                showConfirmButton: false,
+            });
+            setTimeout(() => location.reload(), 1500);
+        }else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message,
+            });
         }
+        
     } catch (error) {
         console.error('Error removing from cart:', error);
     }
