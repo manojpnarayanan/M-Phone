@@ -3,7 +3,7 @@ const User = require("../../model/user")
 const Address = require("../../model/address")
 const Product = require("../../model/addproduct")
 const Cart = require("../../model/cart")
-const Coupon=require("../../model/coupon")
+const Coupon = require("../../model/coupon")
 
 
 const checkoutcontroller = {
@@ -44,31 +44,27 @@ const checkoutcontroller = {
             }
             const regularCouponQuery = {
                 isActive: true,
-                validUntil:{$gte: new Date()},
-                // name:{$ne:"Reward Coupon"},
-                // code:{$ne:"reward"} 
+                validUntil: { $gte: new Date() },
+
             };
 
-            const referrablecoupon=user.referredBy ||  (user.referralDetails && user.referralDetails.length > 0)
-            if(!referrablecoupon){
+            const referrablecoupon = user.referredBy || (user.referralDetails && user.referralDetails.length > 0)
+            if (!referrablecoupon) {
                 regularCouponQuery.name = { $ne: "Reward Coupon" };
                 regularCouponQuery.code = { $ne: "reward" };
 
             }
-            // console.log("referrablecoupon",referrablecoupon,regularCouponQuery.name)
 
-            //  console.log("couponDiscount",couponDiscount)
-            const activeCoupon=await Coupon.find(regularCouponQuery).sort({createdAt:-1})
+            const activeCoupon = await Coupon.find(regularCouponQuery).sort({ createdAt: -1 })
             // console.log("activeCoupon",activeCoupon)
 
-            if(cart.products.length===0){
-                // return res.status(400).json({success:false, message:"cart is empty"})
-                req.flash("error",'Cart is empty')
+            if (cart.products.length === 0) {
+                req.flash("error", 'Cart is empty')
                 res.redirect("/user/dashboard/addtocart")
             }
 
             res.render("user/checkout", {
-                coupons:activeCoupon,
+                coupons: activeCoupon,
                 user,
                 product: cart.products,
                 addresses,
@@ -89,38 +85,38 @@ const checkoutcontroller = {
 
 
     },
-    applyCoupon:async(req,res)=>{
-        try{
-            const {couponId,userId}=req.body
+    applyCoupon: async (req, res) => {
+        try {
+            const { couponId, userId } = req.body
             // console.log(couponId,userId)
 
-            if(!couponId || !userId){
-                return res.status(500).json({success:false, message:"Missing required Parameters"})
+            if (!couponId || !userId) {
+                return res.status(500).json({ success: false, message: "Missing required Parameters" })
             }
             // console.log("1")
 
-            const coupon=await Coupon.findById(couponId)
+            const coupon = await Coupon.findById(couponId)
 
-            if(!coupon){
-                return res.status(500).json({success:false, message:"Coupon not found"})
+            if (!coupon) {
+                return res.status(500).json({ success: false, message: "Coupon not found" })
             }
-            if(!coupon.isActive){
-                return res.status(400).json({success:false, message:"This coupon is no longer active"})
+            if (!coupon.isActive) {
+                return res.status(400).json({ success: false, message: "This coupon is no longer active" })
             }
-            const now=new Date()
-            if(now<coupon.validFrom || now>coupon.validUntil){
-                return res.status(400).json({success:false, message:"coupon is expired"})
+            const now = new Date()
+            if (now < coupon.validFrom || now > coupon.validUntil) {
+                return res.status(400).json({ success: false, message: "coupon is expired" })
             }
             // console.log("2")
-            if(coupon.usersUsed && coupon.usersUsed.includes(userId)){
-                return res.status(400).json({success:false, message:"coupon usage limited to one per User"})
+            if (coupon.usersUsed && coupon.usersUsed.includes(userId)) {
+                return res.status(400).json({ success: false, message: "coupon usage limited to one per User" })
             }
-            const cart=await Cart.findOne({user:userId})
-            .populate("products.product")
+            const cart = await Cart.findOne({ user: userId })
+                .populate("products.product")
             // console.log("reached")
 
-            if(!cart){
-                return res.status(400).json({success:false, message:"Cart not found"})
+            if (!cart) {
+                return res.status(400).json({ success: false, message: "Cart not found" })
             }
             // console.log("reached")
             let cartTotal = 0;
@@ -132,47 +128,47 @@ const checkoutcontroller = {
             });
             // console.log("reached",cartTotal)
 
-            if ( cartTotal < coupon.minOrderAmount) {
+            if (cartTotal < coupon.minOrderAmount) {
                 // console.log("Cart total:", cartTotal);
-    // console.log("Minimum order amount:", coupon.minOrderAmount);
-                return res.status(400).json({ 
-                    success: false, 
-                    message: `Minimum order amount of ₹${coupon.minOrderAmount} required for this coupon` 
+                // console.log("Minimum order amount:", coupon.minOrderAmount);
+                return res.status(400).json({
+                    success: false,
+                    message: `Minimum order amount of ₹${coupon.minOrderAmount} required for this coupon`
                 });
             }
             // console.log("reached herere")
             // console.log("3")
             let discountAmount = 0;
-        if (coupon.discountType === 'percentage') {
-            discountAmount = (cartTotal * coupon.discountValue) / 100;
-            // Apply max discount cap if present
-            if (coupon.maxDiscountAmount && discountAmount > coupon.maxDiscountAmount) {
-                discountAmount = coupon.maxDiscountAmount;
+            if (coupon.discountType === 'percentage') {
+                discountAmount = (cartTotal * coupon.discountValue) / 100;
+
+                if (coupon.maxDiscountAmount && discountAmount > coupon.maxDiscountAmount) {
+                    discountAmount = coupon.maxDiscountAmount;
+                }
+            } else {
+
+                discountAmount = coupon.discountValue;
             }
-        } else {
-            // Fixed amount discount
-            discountAmount = coupon.discountValue;
-        }
-        // console.log("4")
-        discountAmount = Math.round(discountAmount * 100) / 100;
+            // console.log("4")
+            discountAmount = Math.round(discountAmount * 100) / 100;
 
-        cart.appliedCoupon = {
-            coupon: coupon._id,
-            code: coupon.code,
-            discountAmount: discountAmount
-        };
+            cart.appliedCoupon = {
+                coupon: coupon._id,
+                code: coupon.code,
+                discountAmount: discountAmount
+            };
 
-        await cart.save();
-        // console.log("5")
+            await cart.save();
+            // console.log("5")
 
-        return res.status(200).json({ 
-            success: true, 
-            message: `Coupon applied successfully! You saved ₹${discountAmount}`,
-            discountAmount
-        });
+            return res.status(200).json({
+                success: true,
+                message: `Coupon applied successfully! You saved ₹${discountAmount}`,
+                discountAmount
+            });
 
 
-        }catch(error){
+        } catch (error) {
             console.log(error)
             return res.status(500).json({ success: false, message: 'Internal server error' });
 

@@ -180,128 +180,23 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- <script>
-     const salesData = <%- JSON.stringify(ordersData) %>;
-    const timeFilter = '<%= timeFilter %>';
-    const ctx = document.getElementById('salesChart').getContext('2d');
-    const chartDetailsEl = document.getElementById('chartDetails');
 
-    // Function to format labels based on time filter
-    function formatLabels(data, filter) {
-        return data.map(item => {
-            const date = new Date(item._id);
-            switch(filter) {
-                case 'yearly':
-                    return date.toLocaleString('default', { month: 'short' });
-                case 'monthly':
-                    return `Week ${date.getWeek()}`;
-                case 'weekly':
-                    return date.toLocaleDateString();
-                case 'daily':
-                    return date.toLocaleDateString();
-                default:
-                    return item._id.toString();
-            }
-        });
-    }
-     // Extend Date prototype to get week number
-     Date.prototype.getWeek = function() {
-        var date = new Date(this.getTime());
-        date.setHours(0, 0, 0, 0);
-        date.setDate(date.getDate() + 4 - (date.getDay() || 7));
-        var yearStart = new Date(date.getFullYear(), 0, 1);
-        var weekNo = Math.ceil(((date - yearStart) / 86400000 + 1) / 7);
-        return weekNo;
-    };
-
-    // Function to get date range details
-    function getDateRangeDetails(data, filter) {
-        if (data.length === 0) return 'No data available';
-
-        switch(filter) {
-            case 'yearly':
-                return `Yearly View: All Months Breakdown`;
-            case 'monthly':
-                return `Monthly View: All Weeks Breakdown`;
-            case 'weekly':
-                return `Weekly View: Daily Performance`;
-            case 'daily':
-                return `Daily View: Detailed Performance`;
-            default:
-                return 'Performance Overview';
-        }
-    }
-
-    const chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: formatLabels(salesData, timeFilter),
-            datasets: [
-                {
-                    label: 'Total Orders',
-                    data: salesData.map(item => item.totalOrders),
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Total Revenue (₹)',
-                    data: salesData.map(item => item.totalRevenue),
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '₹' + value.toLocaleString();
-                        }
-                    }
-                }
-            },
-            plugins: {
-                title: {
-                    display: true,
-                    text: getDateRangeDetails(salesData, timeFilter)
-                }
-            }
-        }
-    });
-
-    // Update chart details
-    chartDetailsEl.textContent = getDateRangeDetails(salesData, timeFilter);
-
-    // Optional: Add interactivity to update chart details when filter changes
-    document.getElementById('timeFilterSelect').addEventListener('change', function() {
-        const selectedFilter = this.value;
-        chart.data.labels = formatLabels(salesData, selectedFilter);
-        chart.options.plugins.title.text = getDateRangeDetails(salesData, selectedFilter);
-        chartDetailsEl.textContent = getDateRangeDetails(salesData, selectedFilter);
-        chart.update();
-    });
-</script> -->
 
 <script>
-   // Enhanced chart script for the dashboard
+   
 const salesData = <%- JSON.stringify(ordersData) %>;
 const timeFilter = '<%= timeFilter %>';
 const ctx = document.getElementById('salesChart').getContext('2d');
 const chartDetailsEl = document.getElementById('chartDetails');
 
-// Function to generate all possible labels based on time filter
+
 function generateAllLabels(filter) {
     const now = new Date();
     const labels = [];
     
     switch(filter) {
         case 'yearly':
-            // Generate last 12 months from now
+            
             for (let i = 11; i >= 0; i--) {
                 const d = new Date(now);
                 d.setMonth(d.getMonth() - i);
@@ -310,12 +205,12 @@ function generateAllLabels(filter) {
             return labels;
             
         case 'monthly':
-            // Generate all 12 months of the current year
+            
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             return monthNames;
             
         case 'weekly':
-            // Generate last 4 weeks from now
+            
             for (let i = 3; i >= 0; i--) {
                 const weekStartDate = new Date(now);
                 weekStartDate.setDate(now.getDate() - (i * 7));
@@ -329,7 +224,7 @@ function generateAllLabels(filter) {
             return labels;
             
         case 'daily':
-            // For daily view, we'll use hourly breakdown of today
+            
             const hours = [];
             for (let i = 0; i < 24; i++) {
                 hours.push(`${i}:00`);
@@ -341,24 +236,24 @@ function generateAllLabels(filter) {
     }
 }
 
-// Function to map actual data to all possible labels
+
 function mapDataToLabels(allLabels, data, filter) {
     const now = new Date();
     
-    // Initialize arrays with zeros
+
     const mappedData = {
         orders: Array(allLabels.length).fill(0),
         revenue: Array(allLabels.length).fill(0)
     };
     
-    // Handle empty or invalid data
+    
     if (!data || !Array.isArray(data) || data.length === 0) {
         console.log("No sales data available or invalid format");
         return mappedData;
     }
     
     data.forEach(item => {
-        // Make sure item._id is a valid date string
+        
         if (!item._id) {
             console.log("Invalid item, missing _id:", item);
             return;
@@ -374,7 +269,7 @@ function mapDataToLabels(allLabels, data, filter) {
         
         switch(filter) {
             case 'yearly':
-                // Check if date falls within last 12 months
+                
                 for (let i = 0; i < 12; i++) {
                     const monthStart = new Date(now);
                     monthStart.setMonth(now.getMonth() - i);
@@ -387,21 +282,21 @@ function mapDataToLabels(allLabels, data, filter) {
                     monthEnd.setHours(23, 59, 59, 999);
                     
                     if (date >= monthStart && date <= monthEnd) {
-                        index = 11 - i;  // Reverse order (most recent month first)
+                        index = 11 - i;  
                         break;
                     }
                 }
                 break;
                 
             case 'monthly':
-                // Check month in current year
+                
                 if (date.getFullYear() === now.getFullYear()) {
                     index = date.getMonth();
                 }
                 break;
                 
             case 'weekly':
-                // Check if date falls within last 4 weeks
+                
                 for (let i = 0; i < 4; i++) {
                     const weekStart = new Date(now);
                     weekStart.setDate(now.getDate() - (i * 7) - now.getDay());
@@ -412,14 +307,14 @@ function mapDataToLabels(allLabels, data, filter) {
                     weekEnd.setHours(23, 59, 59, 999);
                     
                     if (date >= weekStart && date <= weekEnd) {
-                        index = 3 - i;  // Reverse order (most recent week first)
+                        index = 3 - i;  
                         break;
                     }
                 }
                 break;
                 
             case 'daily':
-                // Check if date is today
+                
                 const today = new Date(now);
                 today.setHours(0, 0, 0, 0);
                 const tomorrow = new Date(today);
@@ -432,11 +327,11 @@ function mapDataToLabels(allLabels, data, filter) {
         }
         
         if (index !== -1 && index < allLabels.length) {
-            // Ensure the values are numbers before adding
+        
             const orderCount = Number(item.totalOrders) || 0;
             const revenueAmount = Number(item.totalRevenue) || 0;
             
-            // Aggregate values if there are multiple entries for the same period
+            
             mappedData.orders[index] += orderCount;
             mappedData.revenue[index] += revenueAmount;
         }
@@ -445,7 +340,7 @@ function mapDataToLabels(allLabels, data, filter) {
     return mappedData;
 }
 
-// Function to get date range details
+
 function getDateRangeDetails(filter) {
     const now = new Date();
     
@@ -476,15 +371,15 @@ function getDateRangeDetails(filter) {
     }
 }
 
-// Generate all possible labels based on the time filter
+
 const allLabels = generateAllLabels(timeFilter);
 
-// Map the actual data to all possible labels
+
 const mappedData = mapDataToLabels(allLabels, salesData, timeFilter);
 
-// Create the chart - making sure this code executes
+
 try {
-    // Check if Chart is properly loaded
+    
     if (typeof Chart !== 'undefined') {
         const chart = new Chart(ctx, {
             type: 'bar',
@@ -567,7 +462,7 @@ try {
             }
         });
 
-        // Update chart details
+    
         if (chartDetailsEl) {
             chartDetailsEl.textContent = getDateRangeDetails(timeFilter);
         }
@@ -580,8 +475,8 @@ try {
     document.getElementById('chartDetails').textContent = "Error creating chart. Please check console for details.";
 }
 
-// Add interactivity to update chart details when filter changes
+
 document.getElementById('timeFilterSelect').addEventListener('change', function() {
-    // Form will submit and page will reload with new filter
+    
 });
 </script>

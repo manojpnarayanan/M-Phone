@@ -7,9 +7,9 @@ const productupdates = {
     addCategory: async (req, res) => {
         try {
             let { name, slug, parent, description, isActive } = req.body
-             console.log("Categories from :",req.body)
+            //  console.log("Categories from :",req.body)
 
-             if (!name || name.trim().length < 3) {
+            if (!name || name.trim().length < 3) {
                 req.flash("error", "Category name must be at least 3 characters long.");
                 return res.redirect("/admin/dashboard/products/categories");
             }
@@ -23,13 +23,12 @@ const productupdates = {
 
             const existingCategory = await Category.findOne({ slug })
             if (existingCategory) {
-                // return res.status(400).send("Already Exists...")
+
                 req.flash('error', 'Category already exists');
                 return res.redirect("/admin/dashboard/products/categories");
 
             }
-            //  parent=parent&&mongoose.Types.ObjectId.isValid(parent)? new mongoose.Types.ObjectId(parent):null;
-            //  console.log(parent)
+
             const category = new Category({
                 name,
                 slug,
@@ -46,26 +45,7 @@ const productupdates = {
             req.flash('error', 'An error occurred while creating the category');
         }
     },
-    //  getCategory: async (req,res)=>{
-    //     try{
-    //         const searchQuery=req.query.search || "";
-    //         const categories=await Category.find({
-    //             $or:[
-    //                 {name:{$regex:searchQuery, $options:"i"}},
-    //                 {slug:{$regex:searchQuery, $options:"i"}},
-    //                 // {"parent.name":{$regex:searchQuery, $options:"i"}}
-    //             ]
-    //         })
-    //         .populate("parent","name")
-    //         .sort({createdAt:-1})
-    //         .lean();
-    //         // console.log(categories)
-    //         res.render("admin/page-categories",{categories,searchQuery})
-    //     }catch(error){
-    //         console.log(error)
-    //         res.status(500).send("error fetching categories")
-    //     }
-    //  },
+
     editCategory: async (req, res) => {
         try {
             const category = await Category.findById(req.params.id);
@@ -91,25 +71,24 @@ const productupdates = {
                 parent: parent || null,
                 description
             },
-                { new: true }  //returns the updated document
+                { new: true }
             )
 
             if (!updatedCategory) {
-                return res.status(404).json({success:false, message: "Category not found" })
+                return res.status(404).json({ success: false, message: "Category not found" })
             }
 
-             res.status(200).json({success:true, message: "Category updated successfully" })
+            res.status(200).json({ success: true, message: "Category updated successfully" })
         } catch (error) {
             console.log(error)
-            res.status(500).json({success:false, message:"Failed to update Category"})
+            res.status(500).json({ success: false, message: "Failed to update Category" })
         }
     },
     blockCategory: async (req, res) => {
         try {
             const categoryId = req.params.id
-            // console.log(" blockCategory",categoryId)
+
             const categories = await Category.findById(categoryId)
-            // console.log(categories)
 
             if (!categories) {
                 res.status(400).send("Category not Found")
@@ -127,8 +106,8 @@ const productupdates = {
     },
     getCategory: async (req, res) => {
         try {
-            const page = parseInt(req.query.page) || 1;  // Current page
-            const limit = 3;  // Categories per page
+            const page = parseInt(req.query.page) || 1;
+            const limit = 3;
             const searchQuery = req.query.search || "";
 
             const filter = searchQuery
@@ -156,43 +135,43 @@ const productupdates = {
             res.status(500).send("Error fetching categories");
         }
     },
-    addOffer:async(req,res)=>{
-        try{
-            const categoryId=req.params.id
+    addOffer: async (req, res) => {
+        try {
+            const categoryId = req.params.id
             // console.log(categoryId)
-            const {offerPercentage}=req.body
+            const { offerPercentage } = req.body
             // console.log(offerPercentage)
-            const category=await Category.findById(categoryId)
-            if(!category){
-                return res.status(400).json({success:false, message:"Category not found"})
+            const category = await Category.findById(categoryId)
+            if (!category) {
+                return res.status(400).json({ success: false, message: "Category not found" })
             }
-            category.discount=offerPercentage
+            category.discount = offerPercentage
             await category.save();
-            
-            res.json({success: true, message:"Offer added successfully"})
+
+            res.json({ success: true, message: "Offer added successfully" })
 
 
 
-        }catch(error){
+        } catch (error) {
             console.log(error)
             res.status(500).json({ success: false, message: "Internal server error" });
 
         }
     },
-    removeOffer:async(req,res)=>{
-        try{
-            const categoryId=req.params.id
-            // console.log(categoryId)
-            const category=await Category.findById(categoryId)
-            if(!category){
-                return res.status(400).json({success:false, message:"Category not found"})
-            }
-            category.discount=0
-            await category.save();
-            
-            res.json({success: true, message:"Offer removed successfully"})
+    removeOffer: async (req, res) => {
+        try {
+            const categoryId = req.params.id
 
-        }catch(error){
+            const category = await Category.findById(categoryId)
+            if (!category) {
+                return res.status(400).json({ success: false, message: "Category not found" })
+            }
+            category.discount = 0
+            await category.save();
+
+            res.json({ success: true, message: "Offer removed successfully" })
+
+        } catch (error) {
 
         }
     }

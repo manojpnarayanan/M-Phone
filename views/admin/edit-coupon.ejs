@@ -124,7 +124,7 @@
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Show/hide max discount amount field based on discount type
+        
         const discountTypeSelect = document.getElementById('discountTypeSelect');
         const maxDiscountContainer = document.getElementById('maxDiscountContainer');
         
@@ -139,20 +139,20 @@
                 }
             });
             
-            // Trigger on page load
+            
             if (discountTypeSelect.value === 'fixed') {
                 maxDiscountContainer.style.display = 'none';
                 document.getElementById('max_discount').removeAttribute('required');
             }
         }
 
-        // Edit coupon form submission
+    
         const editCouponForm = document.getElementById('editCouponForm');
         if (editCouponForm) {
             editCouponForm.addEventListener('submit', function (e) {
                 e.preventDefault();
                 
-                // Show loading state
+                
                 Swal.fire({
                     title: 'Updating coupon...',
                     html: 'Please wait while we update your coupon',
@@ -162,7 +162,7 @@
                     }
                 });
                 
-                // Collect form data
+                
                 const formData = new FormData(this);
                 const formDataObj = {};
                 formData.forEach((value, key) => {
@@ -173,12 +173,12 @@
                     }
                 });
                 
-                // If isActive checkbox is unchecked, it won't be in formData
+                
                 if (!formData.has('isActive')) {
                     formDataObj.isActive = false;
                 }
                 
-                // Submit form using Fetch API
+            
                 fetch(editCouponForm.action, {
                     method: 'POST',
                     headers: {
@@ -195,7 +195,7 @@
                             text: 'Coupon updated successfully!',
                             showConfirmButton: true
                         }).then(() => {
-                            // Redirect back to coupon list
+                            
                             window.location.href = '/admin/dashboard/coupons';
                         });
                     } else {

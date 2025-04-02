@@ -417,7 +417,7 @@
     <div class="screen-overlay"></div>
     <%- include('./partials/nav') %>
     <main class="main-wrap">
-        <header class="main-header navbar">
+        <!-- <header class="main-header navbar">
             <div class="col-search">
                 <form class="searchform">
                     <div class="input-group">
@@ -435,7 +435,7 @@
             <div class="col-nav">
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
             </div>
-        </header>
+        </header> -->
         <section class="content-main">
             <div class="content-header">
                 <div>
@@ -584,68 +584,7 @@
         </section>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- <script>
-    document.getElementById('exportPdf').addEventListener('click', async () => {
-    const period = document.getElementById('dateRangeSelect').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    console.log(period,startDate,endDate)
-    try {
-        const response = await fetch(`/admin/dashboard/sales-report/download-invoice?period=${period}&startDate=${startDate}&endDate=${endDate}`);
-        const data = await response.json();
-        console.log(data)
 
-        if (data.status === "error") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message,
-            });
-        } else {
-            console.log("reached")
-            // If the response is a file, trigger the download
-            window.location.href = `/admin/dashboard/sales-report/download-invoice?period=${period}&startDate=${startDate}&endDate=${endDate}`;
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An unexpected error occurred.',
-        });
-    }
-});
-
-document.getElementById('exportExcel').addEventListener('click', async () => {
-    const period = document.getElementById('dateRangeSelect').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    console.log(endDate,startDate,period)
-
-    try {
-        const response = await fetch(`/admin/dashboard/sales-report/download-invoice?period=${period}&startDate=${startDate}&endDate=${endDate}&format=excel`);
-        const data = await response.json();
-
-        if (data.status === "error") {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message,
-            });
-        } else {
-            // If the response is a file, trigger the download
-            window.location.href = `/admin/dashboard/sales-report/download-invoice?period=${period}&startDate=${startDate}&endDate=${endDate}&format=excel`;
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An unexpected error occurred.',
-        });
-    }
-});
-</script> -->
 <script>
 document.getElementById('exportPdf').addEventListener('click', async () => {
     const period = document.getElementById('dateRangeSelect').value;
@@ -823,11 +762,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // If all validation passes, submit the form
         this.submit();
     });
     
-    // Smooth scroll to results when filter is applied
+    
     document.getElementById('filterButton').addEventListener('click', function() {
         setTimeout(() => {
             const element = document.getElementById('deliveredproducts');

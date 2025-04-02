@@ -13,16 +13,14 @@ const userController = {
             const user = await User.findOne({ email })
 
             if (!user) {
-                // return res.status(400).send("User not found")
                 return res.redirect('/user/login?error=User not found');
             }
             const isMatch = await bcryptjs.compare(password, user.password)
 
             if (!isMatch) {
-                // return res.status(400).send("Invalid Credentials")
                 return res.redirect('/user/login?error=Invalid Credentials')
             }
-            // GENERATE TOKEN
+
             const token = jwt.sign({
                 id: user._id,
                 email: user.email
@@ -31,13 +29,12 @@ const userController = {
                 {
                     expiresIn: "2h",
                 })
-            // console.log(token)
-            // STORE TOKEN IN HTTP-ONLY COOKIE
+
+
             res.cookie("token", token, { httpOnly: true })
             res.redirect("/user/dashboard?success=Login successful")
         } catch (error) {
             console.log(error)
-            // res.status(500).send("Server error")
             res.redirect('/user/login?error=Server error');
         }
     },
@@ -46,10 +43,7 @@ const userController = {
             const token = req.cookies.token
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
-            // console.log("token decoded",decoded)
             const user = await User.findById(decoded.id)
-
-            //    console.log(userId)
             let query = {}
             if (req.query.search) {
                 query = {
@@ -60,27 +54,28 @@ const userController = {
                 }
             }
             const products = await Product.find(query).populate("category")
-            .limit(8)
-            .sort({createdAt:-1})
+                .limit(8)
+                .sort({ createdAt: -1 })
 
             const cart = await Cart.findOne({ user: decoded.id })
 
             const cartItemCount = cart ? cart.products.length : 0
-            const productWithDiscount=await Promise.all(products.map(async(product)=>{
-                const category=product.category
-                const categoryDiscount=category? category.discount:0
-                const highestDiscount=Math.max(product.discount,categoryDiscount)
-                return{
+            const productWithDiscount = await Promise.all(products.map(async (product) => {
+                const category = product.category
+                const categoryDiscount = category ? category.discount : 0
+                const highestDiscount = Math.max(product.discount, categoryDiscount)
+                return {
                     ...product.toObject(),
                     highestDiscount
                 }
             }))
 
-            // console.log(cartItemCount)
-            res.render("user/home", { user, 
-                products:productWithDiscount, 
-                cartItemCount, 
-                searchQuery: req.query.search || "" })
+            res.render("user/home", {
+                user,
+                products: productWithDiscount,
+                cartItemCount,
+                searchQuery: req.query.search || ""
+            })
 
 
         } catch (error) {
@@ -100,12 +95,12 @@ const userController = {
             const otp = Math.floor(100000 + Math.random() * 900000)
             console.log("forgot password OTP:", otp)
             const otpExpiry = new Date()
-            otpExpiry.setMinutes(otpExpiry.getMinutes() + 1)//otp expires in 1 minute
+            otpExpiry.setMinutes(otpExpiry.getMinutes() + 1)
 
             user.otp = otp
             user.otpExpiry = otpExpiry
             await user.save()
-            // Setup Nodemailer transporter
+
             const transporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
@@ -119,7 +114,7 @@ const userController = {
                 subject: "OTP for Reset Password",
                 text: `Your otp for Reset password is ${otp}`
             }
-            //   console.log(mailOptions.email)
+
             const info = await transporter.sendMail(mailOptions)
 
             console.log(info.response)
@@ -140,7 +135,7 @@ const userController = {
                 return res.status(400).json({ message: "Password do not match" })
             }
             const user = await User.findOne({ email: req.body.email })
-            console.log(user)
+            // console.log(user)
 
             if (user.otp !== otp) {
                 return res.status(400).json({ message: "Invalid OTp" })

@@ -393,16 +393,16 @@
         }
     }
 
-    // Fetch order details when the page loads
+    
     const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get('orderId'); // Assuming orderId is passed as a query parameter
+    const orderId = urlParams.get('orderId'); 
     if (orderId) {
         fetchOrderDetails(orderId);
     }
 
 
     
-    // Add event listeners to all product status dropdowns
+    
     const productStatusDropdowns = document.querySelectorAll('.product-status-dropdown');
 
     productStatusDropdowns.forEach(dropdown => {
@@ -425,7 +425,7 @@
                 confirmButtonText: 'OK',
             });
             
-            // Revert the dropdown to its original status
+            
             event.target.value = currentStatus;
             return;
         }
@@ -445,7 +445,7 @@
                 console.log(result);
 
                 if (response.ok) {
-                    // SweetAlert2 success alert
+                    
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -453,7 +453,7 @@
                         confirmButtonText: 'OK',
                     });
                 } else {
-                    // SweetAlert2 error alert
+                
                     Swal.fire({
                         icon: 'error',
                         title: 'Failed!',
@@ -463,7 +463,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                // SweetAlert2 error alert
+        
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',

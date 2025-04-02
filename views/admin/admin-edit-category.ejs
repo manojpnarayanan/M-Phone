@@ -7,28 +7,7 @@
     <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 <body>
-    <!-- <h2>Edit Category</h2>
-    <form action="/admin/dashboard/products/editcategory/<%= categories._id %>" method="POST">
-        <label for="name">Category Name:</label>
-        <input type="text" id="name" name="name" value="<%= categories.name %>" required>
-        <br>
-
-        <label for="slug">Slug:</label>
-        <input type="text" id="slug" name="slug" value="<%= categories.slug %>" required>
-        <br>
-
-        <label for="parent">Parent Category:</label>
-       
-        <br>
-
-        <label for="description">Description:</label>
-        <textarea id="description" name="description"><%= categories.description %></textarea>
-        <br>
-
-        <button type="submit">Update Category</button>
-    </form>
-    <br>
-    <a href="/admin/dashboard/products/categories">Back to Categories</a> -->
+   
     <form action="/admin/dashboard/products/editcategory/<%= category._id %>" method="POST" enctype="application/x-www-form-urlencoded" id="editform">
         <div class="mb-4">
             <label for="product_name" class="form-label">Name</label>
@@ -58,7 +37,6 @@
         </div>
     
         <div class="d-grid">
-            <!-- <a href="/admin/dashboard/products/categories" class="btn btn-primary btn-sm">Update Category</a> -->
             <button type="submit" class="btn btn-primary btn-sm">Update Category</button>
            
         </div>
@@ -71,7 +49,7 @@
 <script>
 document.getElementById("editform").addEventListener("submit",async function(event){
        event.preventDefault();
-       const form=new FormData(this)  //get form data
+       const form=new FormData(this) 
        const formDataObject = {};
     
     form.forEach((value, key) => {
@@ -82,9 +60,9 @@ document.getElementById("editform").addEventListener("submit",async function(eve
     const response= await fetch(`/admin/dashboard/products/editcategory/${categoryId}`,{
         method:"PUT",
         headers:{
-            "content-type":"application/json"        //send form data as json
+            "content-type":"application/json"        
         },  
-        body:JSON.stringify(formDataObject)   // Convert form data object to JSON
+        body:JSON.stringify(formDataObject)   
        })
        
         if(response.ok){

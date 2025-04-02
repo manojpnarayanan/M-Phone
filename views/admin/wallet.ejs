@@ -163,20 +163,25 @@
                         </table>
                     </div>
                     
-                    <!-- Pagination -->
-                    <div class="pagination-container mt-4">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">
-                                <% for (let i = 1; i <= totalPages; i++) { %>
-                                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                        <a class="page-link" href="#" data-page="<%= i %>"><%= i %></a>
-                                    </li>
-                                <% } %>
-                            </ul>
-                        </nav>
-                    </div>
+                   
                 </div>
             </div>
+
+            <div class="pagination-container mt-4">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <!-- <li class="page-item"><a class="page-link" href=""" data-page="prev">Previous</a></li> -->
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" href="#" data-page="<%= i %>"><%= i %></a>
+                            </li>
+                        <% } %>
+                        <!-- <li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li> -->
+                    </ul>
+                </nav>
+            </div>
+
+
         </section>
 
         <footer class="main-footer font-xs">
@@ -195,113 +200,252 @@
     <script src="/assets/js/vendors/bootstrap.bundle.min.js"></script>
     <script src="/assets/js/main.js" type="text/javascript"></script>
 
+   
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add Funds Button
-            document.getElementById('addFundsBtn')?.addEventListener('click', function() {
+        document.addEventListener("DOMContentLoaded", function() {
+    // Check for URL parameters to show alerts
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('success')) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: urlParams.get('success'),
+            timer: 3000
+        });
+    }
+    if (urlParams.has('error')) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: urlParams.get('error')
+        });
+    }
+    
+    // Search functionality
+    const searchInput = document.getElementById("transactionSearch");
+    
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function() {
+            const searchTerm = searchInput.value.trim();
+            loadTransactions(1, searchTerm);
+        });
+    }
+    
+    // Initial attachment of pagination event listeners
+    attachPaginationEventListeners();
+    
+    // Initial attachment of view order event listeners
+    attachViewOrderEventListeners();
+});
+
+// Function to load transactions with pagination and search
+function loadTransactions(page, searchTerm) {
+    // Show loading indicator
+    const tableBody = document.querySelector("tbody");
+    tableBody.innerHTML = '<tr><td colspan="8" class="text-center">Loading...</td></tr>';
+    
+    // Build URL with parameters
+    const url = new URL(window.location.href);
+    url.searchParams.set('page', page);
+    if (searchTerm) {
+        url.searchParams.set('search', searchTerm);
+    } else {
+        url.searchParams.delete('search');
+    }
+    
+    // Set this for AJAX detection
+    const headers = {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+    };
+    
+    // Fetch data
+    fetch(url.toString(), { headers })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server responded with ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Update the data in the table
+            updateTransactionTable(data.wallet);
+            
+            // Update summary cards
+            updateSummaryCards(data.transactionSummary);
+            
+            // Update pagination
+            updatePagination(data.currentPage, data.totalPages);
+            
+            // Re-attach event listeners
+            attachViewOrderEventListeners();
+            attachPaginationEventListeners();
+            
+            // Show success/error messages if any
+            if (data.success) {
                 Swal.fire({
-                    title: 'Add Funds to Admin Wallet',
-                    input: 'number',
-                    inputLabel: 'Enter Amount',
-                    inputPlaceholder: 'Enter amount to add',
-                    showCancelButton: true,
-                    confirmButtonText: 'Add Funds',
-                    inputValidator: (value) => {
-                        if (!value || value <= 0) {
-                            return 'Please enter a valid amount';
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        fetch('/admin/wallet/add-funds', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ amount: result.value })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire('Success', 'Funds added successfully', 'success')
-                                    .then(() => location.reload());
-                            } else {
-                                Swal.fire('Error', data.message || 'Failed to add funds', 'error');
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire('Error', 'An error occurred', 'error');
-                        });
-                    }
+                    icon: 'success',
+                    title: 'Success',
+                    text: data.success,
+                    timer: 3000
                 });
-            });
-    
-            // Transaction Search
-            const searchInput = document.getElementById('transactionSearch');
-            searchInput.addEventListener('keyup', function() {
-                const searchTerm = searchInput.value.trim();
-    
-                fetch(`/admin/wallet/transactions?search=${searchTerm}`)
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        document.querySelector('tbody').innerHTML = doc.querySelector('tbody').innerHTML;
-                    })
-                    .catch(error => {
-                        Swal.fire('Error', 'Failed to load search results', 'error');
-                    });
-            });
-    
-            // Pagination
-            document.querySelectorAll('.pagination a').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const page = this.getAttribute('data-page');
-                    const searchTerm = document.getElementById('transactionSearch').value.trim();
-    
-                    fetch(`/admin/wallet/transactions?page=${page}&search=${searchTerm}`)
-                        .then(response => response.text())
-                        .then(html => {
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(html, 'text/html');
-                            document.querySelector('tbody').innerHTML = doc.querySelector('tbody').innerHTML;
-                        })
-                        .catch(error => {
-                            Swal.fire('Error', 'Failed to load page', 'error');
-                        });
+            }
+            if (data.error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.error
                 });
+            }
+            
+            // Update URL without refreshing page
+            history.pushState(null, '', url.toString());
+        })
+        .catch(error => {
+            console.error("Error loading transactions:", error);
+            tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Failed to load data. Please try again.</td></tr>';
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to load transaction data'
             });
         });
+}
+
+// Update the transaction table with new data
+function updateTransactionTable(wallet) {
+    const tableBody = document.querySelector("tbody");
     
-        document.addEventListener('DOMContentLoaded', function() {
-        // Add event listener for View Order buttons
-        document.querySelectorAll('.view-order').forEach(button => {
-            button.addEventListener('click', function() {
-                const orderId = this.getAttribute('data-order-id');
-                
-                // Add more robust error checking
-                if (!orderId) {
-                    console.error('No order ID found');
-                    Swal.fire('Error', 'Order ID is missing', 'error');
-                    return;
-                }
+    if (!wallet.transactions || wallet.transactions.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8" class="text-center">No transactions found</td></tr>';
+        return;
+    }
     
-                // Log the orderId to debug
-                console.log('Attempting to view order:', orderId);
-    
-                // Use window.location with error handling
-                window.location.href = `/admin/dashboard/wallet/view-detail/${orderId}`;
-            });
-        });
+    let html = '';
+    wallet.transactions.forEach(transaction => {
+        html += `
+            <tr>
+                <td>${transaction.orderId.user ? transaction.orderId.user.name : 'N/A'}</td>
+                <td>${transaction.transactionId}</td>
+                <td>${transaction.transactionDescription}</td>
+                <td>₹${transaction.transactionAmount.toFixed(2)}</td>
+                <td>
+                    <span class="badge ${
+                        transaction.transactionType && transaction.transactionType.toLowerCase() === 'credit' ? 'bg-success' : 
+                        transaction.transactionType && transaction.transactionType.toLowerCase() === 'debit' ? 'bg-danger' : 
+                        'bg-secondary'
+                    }">
+                        ${transaction.transactionType}
+                    </span>
+                </td>
+                <td>${new Date(transaction.transactionDate).toLocaleDateString()}</td>
+                <td>
+                    <span class="badge ${
+                        transaction.transactionStatus === 'Completed' ? 'bg-success text-white' : 
+                        transaction.transactionStatus === 'Pending' ? 'bg-warning' : 
+                        'bg-danger'
+                    }">
+                        ${transaction.transactionStatus}
+                    </span>
+                </td>
+                <td>
+                    ${transaction.transactionType && transaction.transactionType.toLowerCase() === 'debit' ? 
+                        `<button class="btn btn-sm btn-primary view-order" data-order-id="${transaction.orderId._id}">
+                            ViewOrder
+                        </button>` : 
+                        ''}
+                </td>
+            </tr>
+        `;
     });
     
-    
-       
-        
-        </script>
+    tableBody.innerHTML = html;
+}
 
+// Update the summary cards with new data
+function updateSummaryCards(summary) {
+    // Update main balance card
+    document.querySelector('.balance-card h2').textContent = `₹${(summary.totalCredits - summary.totalDebits).toFixed(2)}`;
+    document.querySelector('.balance-card .text-success').textContent = `₹${summary.totalCredits.toFixed(2)}`;
+    document.querySelector('.balance-card .text-danger').textContent = `₹${summary.totalDebits.toFixed(2)}`;
     
+    // Update summary cards in the row
+    const cards = document.querySelectorAll('.row.mb-4 .card');
+    if (cards.length >= 3) {
+        // Credits card
+        cards[0].querySelector('h3').textContent = `₹${summary.totalCredits.toFixed(2)}`;
+        
+        // Debits card
+        cards[1].querySelector('h3').textContent = `₹${summary.totalDebits.toFixed(2)}`;
+        
+        // Net balance card
+        cards[2].querySelector('h3').textContent = `₹${(summary.totalCredits - summary.totalDebits).toFixed(2)}`;
+    }
+}
+
+// Update pagination controls
+function updatePagination(currentPage, totalPages) {
+    const paginationContainer = document.querySelector('.pagination');
+    if (!paginationContainer) return;
+    
+    let paginationHtml = '';
+    
+    // Add Previous button if not on first page
+    if (currentPage > 1) {
+        paginationHtml += `<li class="page-item">
+            <a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>
+        </li>`;
+    }
+    
+    // Add page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        paginationHtml += `<li class="page-item ${currentPage === i ? 'active' : ''}">
+            <a class="page-link" href="#" data-page="${i}">${i}</a>
+        </li>`;
+    }
+    
+    // Add Next button if not on last page
+    if (currentPage < totalPages) {
+        paginationHtml += `<li class="page-item">
+            <a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>
+        </li>`;
+    }
+    
+    paginationContainer.innerHTML = paginationHtml;
+}
+
+// Pagination event listeners
+function attachPaginationEventListeners() {
+    document.querySelectorAll(".pagination a").forEach(link => {
+        link.addEventListener("click", function(e) {
+            e.preventDefault();
+            const page = this.getAttribute("data-page");
+            const searchTerm = document.getElementById("transactionSearch")?.value.trim() || '';
+            
+            loadTransactions(page, searchTerm);
+        });
+    });
+}
+
+// View order button event listeners
+function attachViewOrderEventListeners() {
+    document.querySelectorAll('.view-order').forEach(button => {
+        button.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-order-id');
+            
+            if (!orderId) {
+                console.error('No order ID found');
+                Swal.fire('Error', 'Order ID is missing', 'error');
+                return;
+            }
+            
+            window.location.href = `/admin/dashboard/wallet/view-detail/${orderId}`;
+        });
+    });
+}
+    </script>
 
 
 </body>

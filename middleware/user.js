@@ -7,16 +7,12 @@ const verifyUser = {
     // console.log("middleware usertoken:",token)
 
     if (!token) {
-      return res.redirect("/user/login")      // Redirect if no token
+      return res.redirect("/user/login")
     }
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      // console.log("Decoded Token:",decoded)    
-      // req.user=decoded
       const userId = decoded.id
-      // console.log(userId)
       const activeUser = await User.findById(userId)
-      // console.log("Active User:",activeUser)
       if (!activeUser) {
         return res.redirect("/user/login")
       }
@@ -67,13 +63,13 @@ const verifyUser = {
       next()
     } catch (error) {
       console.log(error)
-      // Handle specific JWT errors
+
       if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
-        res.clearCookie("token"); // Clear the invalid or expired token
+        res.clearCookie("token");
         return res.status(401).redirect("/user/login");
       }
 
-      // Pass other errors to the error-handling middleware
+
       next(error);
     }
 

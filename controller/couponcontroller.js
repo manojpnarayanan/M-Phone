@@ -1,75 +1,76 @@
-const Coupon=require("../model/coupon")
+const Coupon = require("../model/coupon")
 
 
-const couponController={
-    loadCoupon:async (req,res)=>{
-        try{
-            const today=new Date();
-            today.setHours(0,0,0,0)
+const couponController = {
+    loadCoupon: async (req, res) => {
+        try {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0)
             await Coupon.updateMany({
-                isActive:true,
-                validUntil:{$lt:today}
-            }, 
-        {$set:{isActive:false}}
-    )
-    const page=parseInt(req.query.page)||1;
-    const itemPerPage=5;
-    const searchQuery=req.query.search
-    let query={}
-    if(searchQuery){
-        query={
-            $or:[
-                {name:{$regex:searchQuery, $options:"i"}},
-                {code:{$regex:searchQuery, $options:"i"}}
-            ]
-        }
-    }
-    const totalCoupons=await Coupon.countDocuments(query)
-    const totalPages=Math.ceil(totalCoupons/itemPerPage)
+                isActive: true,
+                validUntil: { $lt: today }
+            },
+                { $set: { isActive: false } }
+            )
+            const page = parseInt(req.query.page) || 1;
+            const itemPerPage = 5;
+            const searchQuery = req.query.search
+            let query = {}
+            if (searchQuery) {
+                query = {
+                    $or: [
+                        { name: { $regex: searchQuery, $options: "i" } },
+                        { code: { $regex: searchQuery, $options: "i" } }
+                    ]
+                }
+            }
+            const totalCoupons = await Coupon.countDocuments(query)
+            const totalPages = Math.ceil(totalCoupons / itemPerPage)
 
-            const coupons=await Coupon.find(query)
-            .sort({createdAt:-1})
-            .skip((page - 1)*itemPerPage)
-            .limit(itemPerPage)
+            const coupons = await Coupon.find(query)
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * itemPerPage)
+                .limit(itemPerPage)
 
-            res.render("admin/coupon",{coupons,
-                currentPage:page,
+            res.render("admin/coupon", {
+                coupons,
+                currentPage: page,
                 totalPages,
                 totalCoupons,
-                search:searchQuery
+                search: searchQuery
             })
 
-        }catch(error){
+        } catch (error) {
             console.log(error)
         }
     },
-    createCoupon:async (req,res)=>{
-        try{
+    createCoupon: async (req, res) => {
+        try {
             console.log(req.body)
             const today = new Date();
-        today.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
 
-        const validFromDate = new Date(req.body.validFrom);
-        if (validFromDate < today) {
-            return res.status(400).json({
-                success: false, 
-                message: "Coupon start date must be today or a future date"
-            });
-        }
+            const validFromDate = new Date(req.body.validFrom);
+            if (validFromDate < today) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Coupon start date must be today or a future date"
+                });
+            }
 
-        const validUntilDate = new Date(req.body.validUntil);
-        if (validUntilDate <= validFromDate) {
-            return res.status(400).json({
-                success: false, 
-                message: "End date must be after start date"
-            });
-        }
+            const validUntilDate = new Date(req.body.validUntil);
+            if (validUntilDate <= validFromDate) {
+                return res.status(400).json({
+                    success: false,
+                    message: "End date must be after start date"
+                });
+            }
 
 
 
-            const coupon =new Coupon({
-                name:req.body.name,
-                code:req.body.code,
+            const coupon = new Coupon({
+                name: req.body.name,
+                code: req.body.code,
                 discountType: req.body.discountType,
                 discountValue: req.body.discountValue,
                 minOrderAmount: req.body.minOrderAmount,
@@ -80,63 +81,63 @@ const couponController={
             })
             console.log(coupon)
             await coupon.save()
-            res.status(200).json({success:true, message:"coupon added suceesfully"})
+            res.status(200).json({ success: true, message: "coupon added suceesfully" })
 
-        }catch(error){
+        } catch (error) {
             console.log(error)
-            res.status(500).json({success:false, message:"Failed to add coupon"})
+            res.status(500).json({ success: false, message: "Failed to add coupon" })
         }
     },
-    loadeditcoupon:async(req,res)=>{
-        try{
-            const couponId=req.params.id
+    loadeditcoupon: async (req, res) => {
+        try {
+            const couponId = req.params.id
             console.log(couponId)
-            const coupon=await Coupon.findById(couponId)
+            const coupon = await Coupon.findById(couponId)
 
-            res.render("admin/edit-coupon",{coupon})
+            res.render("admin/edit-coupon", { coupon })
 
-        }catch(error){
+        } catch (error) {
 
         }
     },
-    blockCoupon:async(req,res)=>{
-        try{
-            const couponId=req.params.id
-            
-            if(!couponId){
-              return  res.status(400).json({success:false, message:"coupon required"})
-            }
-            const coupon=await Coupon.findById(couponId)
+    blockCoupon: async (req, res) => {
+        try {
+            const couponId = req.params.id
 
-            if(!coupon){
-               return res.status(400).json({success:false, message:"Coupon not found"})
+            if (!couponId) {
+                return res.status(400).json({ success: false, message: "coupon required" })
+            }
+            const coupon = await Coupon.findById(couponId)
+
+            if (!coupon) {
+                return res.status(400).json({ success: false, message: "Coupon not found" })
             }
             coupon.isActive = !coupon.isActive;
 
-        await coupon.save()
+            await coupon.save()
 
-        return res.status(200).json({ 
-            success: true, 
-            message: `Coupon ${coupon.isActive ? 'activated' : 'deactivated'} successfully`,
-            isActive: coupon.isActive 
-        });
+            return res.status(200).json({
+                success: true,
+                message: `Coupon ${coupon.isActive ? 'activated' : 'deactivated'} successfully`,
+                isActive: coupon.isActive
+            });
 
-        }catch(error){
+        } catch (error) {
             console.log(error)
             return res.status(500).json({ success: false, message: 'Internal server error' });
         }
     },
-    updateEditCoupon: async (req,res)=>{
-        try{
-            const{ name,code,discountType,discountValue,minOrderAmount,maxDiscountAmount,validFrom, validUntil,usageLimit,isActive}=req.body
-            const couponId=req.params.id
-            const coupon=await Coupon.findById(couponId)
-            console.log("couponId",couponId)
+    updateEditCoupon: async (req, res) => {
+        try {
+            const { name, code, discountType, discountValue, minOrderAmount, maxDiscountAmount, validFrom, validUntil, usageLimit, isActive } = req.body
+            const couponId = req.params.id
+            const coupon = await Coupon.findById(couponId)
+            console.log("couponId", couponId)
             // console.log("coupon",coupon)
-            if(!coupon){
-                return res.status(400).json({success:false,message:"Coupon not found"})
+            if (!coupon) {
+                return res.status(400).json({ success: false, message: "Coupon not found" })
             }
-           
+
             // console.log(req.body)
             coupon.name = name;
             coupon.code = code;
@@ -149,13 +150,13 @@ const couponController={
             coupon.usageLimit = usageLimit || 0;
             coupon.isActive = isActive;
             await coupon.save();
-            res.status(200).json({success:true,  messsage:"Coupon updated successfully"})
+            res.status(200).json({ success: true, messsage: "Coupon updated successfully" })
 
 
-        }catch(error){
+        } catch (error) {
             console.log(error)
-            return res.status(500).json({ 
-                success: false, 
+            return res.status(500).json({
+                success: false,
                 message: "An error occurred while updating the coupon",
                 error: error.message
             });
@@ -163,4 +164,4 @@ const couponController={
         }
     }
 }
-module.exports=couponController
+module.exports = couponController

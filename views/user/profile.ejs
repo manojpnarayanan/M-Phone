@@ -1704,10 +1704,7 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
 
         const amount = document.getElementById('amount').value;
 
-        // if (!amount || amount <= 0) {
-        //     alert('Please enter a valid amount.');
-        //     return;
-        // }
+       
 
         try {
             const response = await fetch('/user/myprofile/wallet/add-funds', {
@@ -2064,17 +2061,6 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
         });
     }
 }
-        
-
-//   document.querySelectorAll(".profile-nav .nav-link").forEach(link => {
-//     link.addEventListener("click", function (e) {
-//       e.preventDefault();
-//       document.querySelectorAll(".content-section").forEach(sec => sec.style.display = "none");
-//       document.querySelector(this.getAttribute("href")).style.display = "block";
-//       document.querySelectorAll(".profile-nav .nav-link").forEach(nav => nav.classList.remove("active"));
-//       this.classList.add("active");
-//     });
-//   });
 
 document.querySelectorAll(".edit-address").forEach(button=>{
     button.addEventListener("click",function(){
@@ -2084,7 +2070,6 @@ document.querySelectorAll(".edit-address").forEach(button=>{
     })
 })
 
-// Handle Delete Address
   
 document.querySelectorAll('.delete-address').forEach(button => {
     button.addEventListener('click', async function () {

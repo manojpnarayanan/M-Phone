@@ -12,12 +12,12 @@ const addproducts = {
       const { name, description, price, stock, isActive, brand, croppedImages, category, discount, availability, deliveryTime, tags } = req.body
       // console.log(req.body)
       if (!croppedImages) {
-        return res.status(400).json({success:false, message:"Product adding Failed, Add At Least 3 images"});
+        return res.status(400).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
       }
 
       const croppedImagesArray = JSON.parse(croppedImages);
       if (croppedImagesArray.length < 3) {
-        return res.status(400).json({success:false, message:"Product adding Failed, Add At Least 3 images"});
+        return res.status(400).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
       }
       let imagePaths = [];
       const uploadDir = "public/uploads/product-images/";
@@ -25,16 +25,16 @@ const addproducts = {
       for (let i = 0; i < croppedImagesArray.length; i++) {
         const base64Data = croppedImagesArray[i].replace(/^data:image\/\w+;base64,/, "");
         if (!base64Data || base64Data.trim() === "") {
-          return res.status(400).json({success:false, message:"Invalid image files Add only jpg/png"});
+          return res.status(400).json({ success: false, message: "Invalid image files Add only jpg/png" });
         }
-       
+
         const imageName = `image-${Date.now()}-${i}.jpg`;
         const imagePath = `${uploadDir}${imageName}`;
         fs.writeFileSync(imagePath, Buffer.from(base64Data, "base64"));
 
-        // Optimize image using sharp
+
         await sharp(imagePath)
-          .resize(500, 500) // Resize to 500x500px
+          .resize(500, 500)
           .toFile(`${uploadDir}optimized-${imageName}`);
 
         imagePaths.push(`uploads/product-images/optimized-${imageName}`);
@@ -56,10 +56,10 @@ const addproducts = {
 
     } catch (error) {
       console.log(error)
-      res.status(400).json({success:false, message:"Product adding Failed"});
+      res.status(400).json({ success: false, message: "Product adding Failed" });
     }
   },
-  
+
   getProduct: async (req, res) => {
     try {
       const productsPerPage = 3
@@ -75,7 +75,7 @@ const addproducts = {
         .sort({ createdAt: -1 })
         .lean()
       const categories = await Category.find({ isActive: true })
-      // console.log(categories)
+
       res.render("admin/page-products-list", {
         products,
         search,
@@ -95,7 +95,7 @@ const addproducts = {
       if (!blockProduct) {
         return res.status(404).json({ message: "Product not Found" })
       }
-      blockProduct.isActive = !blockProduct.isActive;  // Toggle the boolean value
+      blockProduct.isActive = !blockProduct.isActive;
       await blockProduct.save();
 
       res.status(200).json({
@@ -122,21 +122,21 @@ const addproducts = {
 
   updateEditProduct: async (req, res) => {
     try {
-      // Destructure fields from the form body
-      const { name, description, price, stock, category, brand, tags, isActive } = req.body;
-      // console.log("updateEditProduct req.body:", req.body);
 
-      // Find the product in the database
+      const { name, description, price, stock, category, brand, tags, isActive } = req.body;
+
+
+
       const product = await Product.findById(req.params.id);
       if (!product) {
         return res.status(404).send("Product not found");
       }
       const categoryDoc = await Category.findOne({ parent: category })
-      // console.log("categoryDoc",categoryDoc)
+
       if (!categoryDoc) {
         return res.status(400).send("Category not found");
       }
-      // Update text/numeric/boolean fields
+
       product.name = name;
       product.description = description;
       product.price = Number(price);
@@ -146,51 +146,50 @@ const addproducts = {
       product.tags = tags ? tags.split(",") : [];
       product.isActive = isActive === "on";
 
-      // Get the existing images from the hidden inputs (as an array)
-      // They come as req.body.existingImages[] automatically
+
       let currentImages = req.body.existingImages;
       if (!Array.isArray(currentImages)) {
-        // In case there's only one image, convert to array
+
         currentImages = [currentImages];
       }
 
-      // Prepare an array to store final image paths after replacements
+
       let finalImages = [];
 
-      // For each existing image, check if a replacement file was uploaded
+
       for (let i = 0; i < currentImages.length; i++) {
-        // Build the expected field name for this replacement file
+
         const fieldName = "replacementImage" + i;
-        // Find the file in req.files (if any)
+
         const file = req.files.find(file => file.fieldname === fieldName);
         if (file) {
-          // Define the path for the optimized image
+
           const optimizedPath = path.join(__dirname, "../public/uploads/product-images/optimized-" + file.filename);
-          // Resize the image to 500x500 and save the optimized version
+
           await sharp(file.path)
             .resize(500, 500)
             .toFile(optimizedPath);
-          // Push the relative path to the finalImages array
+
           finalImages.push("uploads/product-images/optimized-" + file.filename);
-          // Remove the original uploaded file
+
           await fs.promises.unlink(file.path);
-          // Also, delete the old image file from the server if it exists
+
           const oldImagePath = path.join(__dirname, "../public", currentImages[i]);
           if (fs.existsSync(oldImagePath)) {
             await fs.promises.unlink(oldImagePath);
           }
         } else {
-          // No replacement file provided for this image; keep the original
+
           finalImages.push(currentImages[i]);
         }
       }
 
-      // Ensure at least 3 images remain
+
       if (finalImages.length < 3) {
         return res.status(400).send("A product must have at least 3 images");
       }
 
-      // Delete any images that were in the product previously but are no longer in finalImages
+
       for (let img of product.image) {
         if (!finalImages.includes(img)) {
           const imagePath = path.join(__dirname, "../public", img);
@@ -200,10 +199,10 @@ const addproducts = {
         }
       }
 
-      // Update the product's image array
+
       product.image = finalImages;
 
-      // Save the updated product
+
       await product.save();
 
       res.redirect("/admin/dashboard/productlist");
@@ -221,46 +220,46 @@ const addproducts = {
       console.log(error)
     }
   },
-  addOffer:async(req,res)=>{
-    try{
-      const productId=req.params.id
-      // console.log(productId)
-      const {offerPercentage}=req.body
-      // console.log(offerPercentage)
-      const product=await Product.findById(productId)
-      if(!product){
-        return res.status(404).json({success:false, message:"Product not found"})
+  addOffer: async (req, res) => {
+    try {
+      const productId = req.params.id
+
+      const { offerPercentage } = req.body
+
+      const product = await Product.findById(productId)
+      if (!product) {
+        return res.status(404).json({ success: false, message: "Product not found" })
       }
-      product.discount=offerPercentage
+      product.discount = offerPercentage
       await product.save()
-      res.status(200).json({success:true, message:"Offer added successfully"})
+      res.status(200).json({ success: true, message: "Offer added successfully" })
 
 
-    }catch(error){
+    } catch (error) {
       console.log(error)
-      res.status(500).json({success:false, message:"Failed to add offer"})
-
-        }
-  },
-  removeOffer:async(req,res)=>{
-    try{
-      const productId=req.params.id
-      const product=await Product.findById(productId)
-      if(!product){
-        return res.status(404).json({success:false, message:"Product not found"})
-      }
-      product.discount=0
-      await product.save()
-      res.status(200).json({success:true, message:"Offer removed successfully"})
-    }catch(error){
-      console.log(error)
-      res.status(500).json({success:false, message:"Failed to remove offer"})
+      res.status(500).json({ success: false, message: "Failed to add offer" })
 
     }
-   
+  },
+  removeOffer: async (req, res) => {
+    try {
+      const productId = req.params.id
+      const product = await Product.findById(productId)
+      if (!product) {
+        return res.status(404).json({ success: false, message: "Product not found" })
+      }
+      product.discount = 0
+      await product.save()
+      res.status(200).json({ success: true, message: "Offer removed successfully" })
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({ success: false, message: "Failed to remove offer" })
+
+    }
+
   }
-  
- 
+
+
 
 }
 

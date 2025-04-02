@@ -31,17 +31,13 @@ const client = {
     blockUser: async (req, res) => {
         try {
             const userId = req.params.id;
-            // console.log("User ID:", userId);
-
             const user = await User.findById(userId);
-            // console.log("User Found:", user);
 
             if (!user) {
                 return res.status(404).json({ success: false, message: "User not found" });
             }
 
-            // Correct logic: isActive=true means Active, isActive=false means Blocked
-            user.isActive = !user.isActive; // Toggle status
+            user.isActive = !user.isActive;
             await user.save();
 
             const newStatus = user.isActive ? "Active" : "Blocked";

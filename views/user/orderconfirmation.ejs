@@ -3,198 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-   <style>
-
-    /* General Styles */
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f7f7f7;
-        color: #333;
-        margin: 0;
-        padding: 0;
-        line-height: 1.6;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start; /* Align content to the top */
-        min-height: 100vh;
-        padding-top: 50px; /* Add padding to the top for better spacing */
-    }
-
-    .container {
-        max-width: 1200px;
-        width: 100%;
-        margin: 20px;
-        padding: 20px;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    h1 {
-        color: #2874f0;
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 28px;
-        font-weight: 600;
-    }
-
-    h2 {
-        color: #333;
-        font-size: 22px;
-        font-weight: 500;
-        margin-top: 30px;
-        margin-bottom: 15px;
-        border-bottom: 2px solid #2874f0;
-        padding-bottom: 10px;
-    }
-
-    p {
-        margin: 10px 0;
-        font-size: 16px;
-    }
-
-    ul {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    ul li {
-        background: #f9f9f9;
-        margin: 10px 0;
-        padding: 15px;
-        border-radius: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: 1px solid #e0e0e0;
-    }
-
-    ul li strong {
-        color: #2874f0;
-    }
-
-    button {
-        display: block;
-        width: 100%;
-        max-width: 300px;
-        margin: 30px auto 0;
-        padding: 15px;
-        background-color: #2874f0;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        text-align: center;
-        transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-        background-color: #2362c7;
-    }
-
-    .address-details {
-        background: #f9f9f9;
-        padding: 20px;
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
-        margin-top: 20px;
-    }
-
-    .address-details p {
-        margin: 8px 0;
-        font-size: 16px;
-    }
-
-    .order-summary {
-        margin-top: 20px;
-        padding: 20px;
-        background: #f9f9f9;
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
-    }
-
-    .order-summary p {
-        font-size: 18px;
-        font-weight: 500;
-        margin: 10px 0;
-    }
-
-    .order-summary p strong {
-        color: #2874f0;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
+    <title>Order Confirmation</title>
+    <style>
+        /* Enhanced Professional Styles */
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #0b1b35;
+            --success-color: #2ecc71;
+            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --border-color: #e0e0e0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-weight: 600;
+            color: white;
+        }
+        
         .container {
-            padding: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
         }
-
-        h1 {
-            font-size: 24px;
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
         }
-
-        h2 {
+        
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card-header h2 {
+            color: var(--secondary-color);
+            margin: 0;
             font-size: 20px;
+            font-weight: 600;
         }
-
-        ul li {
+        
+        .order-id {
+            background-color: rgba(74, 108, 247, 0.1);
+            border: 1px dashed var(--primary-color);
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+        
+        .order-id span {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .address-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px 20px;
+        }
+        
+        .address-details p {
+            margin: 8px 0;
+            display: flex;
             flex-direction: column;
-            align-items: flex-start;
         }
-
-        ul li strong {
+        
+        .address-details strong {
+            margin-bottom: 4px;
+            color: var(--secondary-color);
+        }
+        
+        .product-list {
+            margin: 20px 0;
+        }
+        
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--light-gray);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .product-details {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            color: var(--secondary-color);
             margin-bottom: 5px;
         }
-
-        button {
-            width: 100%;
-        }
-    }
-
-   </style>
-</head>
-<body>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Order Confirmation</title>
-</head>
-<body>
-    <h1>Thank you for your order!</h1>
-    <p><strong>Order ID:</strong> <%= order.orderId %></p>
-    <h2>Shipping Address</h2>
-    <p>
-        <strong>Name:</strong> <%= order.shippingAddress.name %><br>
-        <strong>Phone:</strong> <%= order.shippingAddress.mobilenumber %><br>
-        <strong>Address:</strong> <%= order.shippingAddress.housename %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> - <%= order.shippingAddress.pincode %><br>
-        <strong>Country:</strong> <%= order.shippingAddress.country %><br>
-        <strong>Address Type:</strong> <%= order.shippingAddress.addresstype %>
         
-    </p>
-
-    <h2>Order Details</h2>
-    <ul>
-        <% order.products.forEach(item => { %>
-            <li>
-                <strong>Product:</strong> <%= item.product.name %> -
-                <strong>Quantity:</strong> <%= item.quantity %> -
-                <strong>Price:</strong> $<%= item.price %>
-            </li>
-        <% }) %>
-    </ul>
-    <p><strong>Total Amount:</strong> $<%= order.totalAmount %></p>
-    <p><strong>Final Amount (after discount):</strong> $<%= order.finalAmount %></p>
-    <p><strong>Payment Status:</strong> <%= order.paymentStatus %></p>
-    <p><strong>Order Status:</strong> <%= order.orderStatus %></p>
-
-    <!-- Continue Shopping Button -->
-    <button onclick="window.location.href='/user/dashboard/shopping'">Continue Shopping</button>
-</body>
-</html>
-
+        .product-meta {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .product-price {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 17px;
+            text-align: right;
+            white-space: nowrap;
+            margin-left: 15px;
+        }
+        
+        .order-summary {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .final-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-badge.paid {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: var(--success-color);
+        }
+        
+        .status-badge.processing {
+            background-color: rgba(74, 108, 247, 0.15);
+            color: var(--primary-color);
+        }
+        
+        .action-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 30px auto 10px;
+            padding: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover {
+            background-color: #3a5bd9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 108, 247, 0.2);
+        }
+        
+        .thank-you {
+            text-align: center;
+            margin: 30px 0 10px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px 30px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .product-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .product-price {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Order Confirmation</h1>
+    </div>
+    
+    <div class="container">
+        <div class="thank-you">
+            <h2>Thank you for your purchase!</h2>
+            <p>Your order has been received and is being processed.</p>
+        </div>
+        
+        <div class="order-id">
+            <span>Order ID:</span> <%= order.orderId %>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Shipping Information</h2>
+            </div>
+            <div class="address-details">
+                <p>
+                    <strong>Name</strong>
+                    <%= order.shippingAddress.name %>
+                </p>
+                <p>
+                    <strong>Phone</strong>
+                    <%= order.shippingAddress.mobilenumber %>
+                </p>
+                <p>
+                    <strong>Address Type</strong>
+                    <%= order.shippingAddress.addresstype %>
+                </p>
+                <p>
+                    <strong>Address</strong>
+                    <%= order.shippingAddress.housename %>, <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> - <%= order.shippingAddress.pincode %>
+                </p>
+                <p>
+                    <strong>Country</strong>
+                    <%= order.shippingAddress.country %>
+                </p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Order Summary</h2>
+            </div>
+            
+            <div class="product-list">
+                <% order.products.forEach(item => { %>
+                    <div class="product-item">
+                        <div class="product-details">
+                            <div class="product-name"><%= item.product.name %></div>
+                            <div class="product-meta">Quantity: <%= item.quantity %></div>
+                        </div>
+                        <div class="product-price"><%= item.price %></div>
+                    </div>
+                <% }) %>
+            </div>
+            
+            <div class="order-summary">
+                <div class="summary-row">
+                    <div>Subtotal:</div>
+                    <div><%= order.totalAmount %></div>
+                </div>
+                
+                <% if (order.totalAmount !== order.finalAmount) { %>
+                <div class="summary-row">
+                    <div>Discount:</div>
+                    <div><%= (order.totalAmount - order.finalAmount).toFixed(2) %></div>
+                </div>
+                <% } %>
+                
+                <div class="summary-row final-amount">
+                    <div>Total:</div>
+                    <div><%= order.finalAmount %></div>
+                </div>
+                
+                <div class="summary-row">
+                    <div>Payment Status:</div>
+                    <div>
+                        <span class="status-badge <%= order.paymentStatus.toLowerCase() === 'paid' ? 'paid' : '' %>">
+                            <%= order.paymentStatus %>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="summary-row">
+                    <div>Order Status:</div>
+                    <div>
+                        <span class="status-badge processing">
+                            <%= order.orderStatus %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="action-button" onclick="window.location.href='/user/dashboard/shopping'">Continue Shopping</button>
+    </div>
 </body>
 </html>

@@ -28,7 +28,7 @@ const brandscontroller = {
     },
     getBrands: async (req, res) => {
         try {
-            const brandsPerPage = 5
+            const brandsPerPage = 10
             const page = parseInt(req.query.page) || 1
             const search = req.query.search || ""
             const query = search ? { name: { $regex: search, $options: "i" } } : {};

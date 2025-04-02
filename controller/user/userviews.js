@@ -8,8 +8,8 @@ const Wishlist = require("../../model/wishlist")
 const Order = require("../../model/order")
 const Wallet = require("../../model/wallet")
 const Review = require("../../model/review")
-const Referral=require("../../model/referral")
-const nodemailer=require("nodemailer")
+const Referral = require("../../model/referral")
+const nodemailer = require("nodemailer")
 
 
 
@@ -19,31 +19,30 @@ const userViews = {
             const token = req.cookies.token
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
             const userId = decoded.id
-            const user=await User.findById(userId)
+            const user = await User.findById(userId)
             const productId = req.params.id
-            const cart= await Cart.findOne({user:userId})
-            const cartItemCount=cart? cart.products.length:0
+            const cart = await Cart.findOne({ user: userId })
+            const cartItemCount = cart ? cart.products.length : 0
             const product = await Product.findById(req.params.id)
-            .populate("category")
+                .populate("category")
             // console.log(product)
             if (!product) {
                 return res.status(404).send("Product not found")
             }
             const reviews = await Review.find({ product: productId })
                 .populate("user", "name")
-                const category=await Category.findById(product.category)
-                const categoryDiscount=category? category.discount:0
+            const category = await Category.findById(product.category)
+            const categoryDiscount = category ? category.discount : 0
 
-                const highestDiscount=Math.max(product.discount,categoryDiscount)
+            const highestDiscount = Math.max(product.discount, categoryDiscount)
 
-            
+
             const relatedProducts = await Product.find({
                 brand: product.brand,
                 _id: { $ne: product._id }
             }
             )
             // console.log( relatedProducts)
-        
 
             res.render("user/product-details", {
                 product,
@@ -66,7 +65,7 @@ const userViews = {
         page = parseInt(page) || 1
         const limit = 8
         const skip = (page - 1) * limit;
-        let query = {}
+        let query = { isActive: true }
         if (search) {
             query.$or = [
                 { name: { $regex: search, $options: "i" } },
@@ -111,13 +110,12 @@ const userViews = {
 
             const totalProducts = await Product.countDocuments(query)
             const totalPages = Math.ceil(totalProducts / limit)
-             
-            const cart=await Cart.findOne({user:decoded.id})
-            const cartItemCount=cart? cart.products.length : 0
-            
+
+            const cart = await Cart.findOne({ user: decoded.id })
+            const cartItemCount = cart ? cart.products.length : 0
 
             res.render("user/shop", {
-                user, products,cartItemCount,
+                user, products, cartItemCount,
                 sort,
                 totalPages,
                 search,
@@ -134,10 +132,9 @@ const userViews = {
     loadMyProfile: async (req, res) => {
         try {
             const userId = req.params.id
-            console.log("User ID in loadMyProfile:",userId)
+            // console.log("User ID in loadMyProfile:",userId)
             const user = await User.findById(userId)
             // console.log("userId in profile",user)
-            // const addresses=await address.findOne(user)
             const address = await Address.find({ user: userId })
             //    console.log("Addresses:", address);
             const wishlist = await Wishlist.findOne({ user: userId }).populate("wishlist")
@@ -151,14 +148,11 @@ const userViews = {
                 .sort({ createdAt: -1 })
             // console.log("loadprofile", orders)
 
-            
             let wallet = await Wallet.findOne({ userId })
-            if(!wallet){
-                wallet= new Wallet({
+            if (!wallet) {
+                wallet = new Wallet({
                     userId,
-                    // walletBalance: 0,
-
-                    transactions:[]
+                    transactions: []
                 })
                 await wallet.save();
             }
@@ -166,25 +160,24 @@ const userViews = {
             const users = await User.findById(userId).populate({
                 path: 'referralDetails.userId',
                 select: 'name email createdAt'
-              });
-              const referrals = users.referralDetails.map(detail => ({
+            });
+            const referrals = users.referralDetails.map(detail => ({
                 name: detail.name,
                 email: detail.email,
                 createdAt: detail.joinedAt || (detail.userId ? detail.userId.createdAt : new Date()),
                 referralRewards: detail.status === 'active' ? 200 : 0
-              })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-            // const referralRewards = await ReferralReward.findOne({ user: userId });
-            
+
             const referralRewards = {
                 total: users.referralRewards || 0,
                 history: referrals.map(ref => ({
-                  description: `Reward for referring ${ref.name}`,
-                  amount: 200,
-                  date: ref.createdAt,
-                  status: ref.status === 'active' ? 'Credited' : 'Pending'
+                    description: `Reward for referring ${ref.name}`,
+                    amount: 200,
+                    date: ref.createdAt,
+                    status: ref.status === 'active' ? 'Credited' : 'Pending'
                 }))
-              };
+            };
 
             const processedOrders = orders.map(order => {
                 order.products = order.products.map(item => {
@@ -196,22 +189,9 @@ const userViews = {
                 return order;
             });
             const safeOrders = processedOrders || [];
-            //     if(!address||!wishlist){
-            //         res.render("user/profile",{user,
-            //             addresses:null,
-            //             wishlist:null,
-            //             orders:null,
-            //     })
-            //         }else{
-            //             res.render("user/profile",{user,addresses:address,
-            //                  wishlist:wishlists,
-            //                 orders:safeOrders,
-            //                 wallet: wallet || { walletBalance: 0, transactions: [] }
 
-            //             })
-            //         }   
-           const cart=await Cart.findOne({user:userId})
-           const cartItemCount=cart? cart.products.length : 0
+            const cart = await Cart.findOne({ user: userId })
+            const cartItemCount = cart ? cart.products.length : 0
             res.render("user/profile", {
                 user,
                 cartItemCount,
@@ -263,39 +243,23 @@ const userViews = {
             } else {
 
                 const existingProduct = cart.products.find(item => item.product.toString() === productId.toString())
-                console.log(existingProduct)
-                // if (existingProduct) {
-                //     if (existingProduct.quantity >= 5 || existingProduct.quantity > product.stock) {
-                //         return res.status(400).json({ success: false,
-                //              message:existingProduct.quantity >= 5 
-                //              ? "Maximum items per product is limited to 5" 
-                //              : `Only ${product.stock} units available in stock` })
-                //     }
-                //     existingProduct.quantity += 1
-                // } else {
-                //     cart.products.push({
-                //         product: productId,
-                //         quantity: 1
-                //     })
-                // }
+
                 if (existingProduct) {
-                    
                     const newQuantity = existingProduct.quantity + 1;
-                    
                     if (newQuantity > 5) {
-                        return res.status(400).json({ 
-                            success: false, 
-                            message: "Maximum items per product is limited to 5" 
+                        return res.status(400).json({
+                            success: false,
+                            message: "Maximum items per product is limited to 5"
                         });
                     }
-                    
+
                     if (newQuantity > product.stock) {
-                        return res.status(400).json({ 
-                            success: false, 
-                            message: `Only ${product.stock} units available in stock` 
+                        return res.status(400).json({
+                            success: false,
+                            message: `Only ${product.stock} units available in stock`
                         });
                     }
-                    
+
                     existingProduct.quantity = newQuantity;
                 } else {
                     cart.products.push({
@@ -320,10 +284,10 @@ const userViews = {
             }
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
             // const productId=req.params.id
-            // const product=await Product.findById(productId)
+
             // console.log("product",product)
             const user = await User.findById(decoded.id)
-            // console.log("addtocart user:",user)
+
             if (!user) {
                 return res.status(400).json({ message: "User not found" });
             }
@@ -332,20 +296,17 @@ const userViews = {
                 return res.status(401).json({ message: "User is Blocked Contact support team" });
             }
             let cart = await Cart.findOne({ user: decoded.id }).populate('products.product')
-            // console.log(user,cart)
-            // console.log(user)
-            if(!cart){
-                cart=new Cart({
-                    user:user._id,
-                    products:[]
+
+
+            if (!cart) {
+                cart = new Cart({
+                    user: user._id,
+                    products: []
                 })
                 await cart.save();
-                // console.log("Cart created",cart);
-            }
-            // if(!cart){
-            //   return  res.render("user/addtocart",{user,cartItems:cart,totalItems,totalPrice})
 
-            // }
+            }
+
             let cartItems = [];
             let totalItems = 0;
             let totalPrice = 0;
@@ -358,9 +319,6 @@ const userViews = {
                 })
                 cartItems = cart.products;
             }
-            
-
-
             res.render("user/addtocart", { user, cartItems, totalItems, totalPrice });
         } catch (error) {
             console.error(error);
@@ -368,95 +326,61 @@ const userViews = {
         }
 
     },
-    // updateCart: async (req, res) => {
-    //     try {
-    //         const productId = req.params.id
-    //         const { quantity } = req.body
-    //         const token = req.cookies.token
-    //         if (!token) {
-    //             return res.status(401).json({ success: false, message: "User not found" })
-    //         }
-    //         // console.log("reachged")
-    //         const Products=await Product.findById(productId)
-    //         // console.log("Product.stock",Products.stock)
-    //         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    //         const userId = decoded.id
-    //         const cart = await Cart.findOne({ user: userId })
-    //         if (!cart) {
-    //             return res.status(404).json({success: false, message: "Cart not found" })
-    //         }
-    //         const product = cart.products.find(item => item.product.toString() === productId)
-    //         if (!product) {
-    //             return res.status(404).json({success: false, message: "Product not found" })
-    //         }
-    //         if(quantity>Products.stock){
-    //             return res.status(200).json({success: false, message:`only ${Products.stock} left`})
-    //         }
-    //         if (quantity > 5) {
-    //             return res.status(400).json({ success: false, message: "you can add only 5 units of this product" })
-    //         }
-    //         product.quantity = quantity
-    //         await cart.save();
-    //         res.json({ success: true })
-    //     } catch (error) {
-    //         console.log(error)
-    //         res.status(500).json({success: false, message: "Internal Server Error" });
-    //     }
-    // },
-    
+
+
     updateCart: async (req, res) => {
         try {
             const productId = req.params.id;
             const { quantity } = req.body;
             const token = req.cookies.token;
-    
+
             if (!token) {
                 return res.status(401).json({ success: false, message: "User not found" });
             }
-    
+
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const userId = decoded.id;
-    
-        
+
+
             const product = await Product.findById(productId);
             if (!product) {
                 return res.status(404).json({ success: false, message: "Product not found" });
             }
-    
-            
+
+
             const cart = await Cart.findOne({ user: userId });
             if (!cart) {
                 return res.status(404).json({ success: false, message: "Cart not found" });
             }
-    
-            
+
+
             const cartProduct = cart.products.find(item => item.product.toString() === productId);
             if (!cartProduct) {
                 return res.status(404).json({ success: false, message: "Product not found in cart" });
             }
-    
-            
+
+
             if (quantity > product.stock) {
                 return res.status(200).json({ success: false, message: `Only ${product.stock} units left in stock` });
             }
-    
-            
+
+
             if (quantity > 5) {
                 return res.status(200).json({ success: false, message: "You can add only 5 units of this product" });
             }
-    
-            
+
+
             cartProduct.quantity = quantity;
             await cart.save();
-    
+
             res.json({ success: true });
         } catch (error) {
             console.log(error);
             res.status(500).json({ success: false, message: "Internal Server Error" });
         }
     },
-    
-    
+
+
     removeFromCart: async (req, res) => {
         try {
             const productId = req.params.id
@@ -474,56 +398,48 @@ const userViews = {
                 return res.status(404).json({ message: "Cart not found" });
             }
 
-            // cart.products = cart.products.filter(item => item.product.toString() !== productId);
-            // await cart.save();
-            // req.flash("success","item removed succssfully")
-            // res.redirect("/user/dashboard/addtocart")
-            return res.json({ success: true, message: "Item removed successfully" });
+            return res.json({ success: true, message: "Item removed successfully" })
 
-            // res.json({ success: true , message:"Item removed "});
-            
 
         } catch (error) {
             console.log(error)
             console.error(error);
-            // req.flash("false","Internal server error")
-            // res.redirect("/user/dashboard/addtocart")
+
             return res.status(500).json({ success: false, message: "Internal server error" });
-            // res.status(500).json({ message: "Internal Server Error" })
         }
     },
-    sendInvite:async(req,res)=>{
-        try{
-            const {email,referralCode}=req.body
-            console.log(email,referralCode)
-            if(!email){
-                return res.status(400).json({success:false, message:"email not found"})
+    sendInvite: async (req, res) => {
+        try {
+            const { email, referralCode } = req.body
+            console.log(email, referralCode)
+            if (!email) {
+                return res.status(400).json({ success: false, message: "email not found" })
             }
-            let transporter=nodemailer.createTransport({
-                service:"gmail",
-                auth:{
-                   user:process.env.GMAIL_USER,
-                   pass: process.env.GMAIL_PASS
+            let transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: process.env.GMAIL_USER,
+                    pass: process.env.GMAIL_PASS
                 }
             })
-            let mailOptions={
-                from:process.env.GMAIL_USER,
-                to :email,
-                subject:"Join our referral Program",
-                text:`Hey! Use my referral code  ${referralCode} and get ₹250 off! Visit:http://localhost:3000/user/signup`
+            let mailOptions = {
+                from: process.env.GMAIL_USER,
+                to: email,
+                subject: "Join our referral Program",
+                text: `Hey! Use my referral code  ${referralCode} and get ₹250 off! Visit:http://localhost:3000/user/signup`
             }
             await transporter.sendMail(mailOptions);
-            res.status(200).json({success:true, message:"Invitation sent successfully"})
-    
-        }catch(error){
+            res.status(200).json({ success: true, message: "Invitation sent successfully" })
+
+        } catch (error) {
             console.log(error)
             res.json({ message: 'Error sending invitation.' });
 
 
         }
     }
-    
 
-       
+
+
 }
 module.exports = userViews

@@ -43,13 +43,13 @@
                                     <input name="stock" type="number" class="form-control" required>
                                 </div>
                              </div>
-                             <!-- Discount Percentage -->
+                             
                                 <div class="mb-4">
                                     <label class="form-label">Discount Percentage</label>
                                     <input name="discount" type="number" class="form-control" min="0" max="100" required>
                                 </div>
                         </div>
-                        <!-- Availability -->
+                        
 <div class="mb-4">
     <label class="form-label">Availability</label>
     <select name="availability" class="form-select">
@@ -63,7 +63,7 @@
                             <span class="form-check-label"> IsActive </span>
                         </label>
 
-                        <!-- Image Upload with Cropping -->
+                        
                         <div class="mb-4">
                             <label class="form-label">Upload Images (Min 3)</label>
                             <input type="file" class="form-control" id="imageUpload" multiple accept="image/*" required>
@@ -71,7 +71,7 @@
                             <input type="hidden" name="croppedImages" id="croppedImages">
                         </div>
 
-                        <!-- Image Cropping Modal -->
+                        
                         <div id="cropModal" style="display: none;">
                             <div style="max-width: 500px; margin: auto;">
                                 <img id="cropImage" style="max-width: 100%;">
@@ -126,81 +126,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- <script>
-        let cropper;
-        let croppedImagesData = [];
+    
 
-        document.getElementById("imageUpload").addEventListener("change", function(event) {
-            let preview = document.getElementById("imagePreview");
-            preview.innerHTML = "";
-            const files = event.target.files;
-            if (files.length < 3) {
-                alert("Please upload at least 3 images.");
-                return;
-            }
-
-            let imageIndex = 0;
-            function processImage() {
-                if (imageIndex >= files.length) {
-                    document.getElementById("croppedImages").value = JSON.stringify(croppedImagesData);
-                    return;
-                }
-
-                let file = files[imageIndex];
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    let img = document.createElement("img");
-                    img.src = e.target.result;
-                    img.id = "cropImage";
-                    img.style.maxWidth = "100%";
-                    
-                    document.getElementById("cropModal").style.display = "block";
-                    document.getElementById("cropModal").innerHTML = "";
-                    document.getElementById("cropModal").appendChild(img);
-                    
-                    cropper = new Cropper(img, {
-                        aspectRatio: 1,
-                        viewMode: 1,
-                        autoCropArea: 0.8,
-                    });
-
-                    let cropBtn = document.createElement("button");
-                    cropBtn.innerText = "Crop";
-                    cropBtn.classList.add("btn", "btn-primary", "mt-2");
-                    document.getElementById("cropModal").appendChild(cropBtn);
-                    
-                    cropBtn.addEventListener("click", function() {
-                        let canvas = cropper.getCroppedCanvas();
-                        croppedImagesData.push(canvas.toDataURL("image/jpeg"));
-                        let croppedImg = document.createElement("img");
-                        croppedImg.src = canvas.toDataURL("image/jpeg");
-                        croppedImg.style.width = "100px";
-                        croppedImg.style.height = "100px";
-                        croppedImg.classList.add("rounded", "border");
-                        preview.appendChild(croppedImg);
-                        document.getElementById("cropModal").style.display = "none";
-                        cropper.destroy();
-                        imageIndex++;
-                        processImage();
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
-
-            processImage();
-        });
-
-        document.getElementById("productForm").addEventListener("submit", function(event) {
-            if (croppedImagesData.length < 3) {
-                event.preventDefault();
-                alert("Please crop at least 3 images before submitting.");
-            }
-        });
-    </script> -->
-
-<!-- //corrected one  -->
  <script>
-  // Initialize variables
+  
 let cropper;
 let croppedImagesData = [];
 let processingImages = false;
@@ -221,7 +150,7 @@ document.getElementById("imageUpload").addEventListener("change", function(event
         });        return;
     }
     
-    // Set flag that we're processing images
+    
     processingImages = true;
     croppedImagesData = [];
 
@@ -234,9 +163,9 @@ document.getElementById("imageUpload").addEventListener("change", function(event
     
     let imageIndex = 0;
     
-    // Process images one by one
+    
     function processImage() {
-        // If all images are processed, update hidden field and reset flag
+        
         if (imageIndex >= files.length) {
             document.getElementById("croppedImages").value = JSON.stringify(croppedImagesData);
             processingImages = false;
@@ -306,7 +235,7 @@ document.getElementById("imageUpload").addEventListener("change", function(event
                 imageIndex++;
                 processImage();
                 
-                return false; // Extra safety to prevent form submission
+                return false; 
             });
         };
         
@@ -317,9 +246,9 @@ document.getElementById("imageUpload").addEventListener("change", function(event
     processImage();
 });
 
-// Form submission handler
+
 document.getElementById("productForm").addEventListener("submit", function(event) {
-    // If we're still processing images, prevent submission
+
     if (processingImages) {
         event.preventDefault();
         Swal.fire({
@@ -331,7 +260,7 @@ document.getElementById("productForm").addEventListener("submit", function(event
             return false;
     }
     
-    // Check if we have enough images
+    
     if (croppedImagesData.length < 3) {
         event.preventDefault();
         Swal.fire({
@@ -342,7 +271,7 @@ document.getElementById("productForm").addEventListener("submit", function(event
         });
             return false;
     } else {
-        // Make sure the cropped images are set in the hidden field before submission
+    
         document.getElementById("croppedImages").value = JSON.stringify(croppedImagesData);
         Swal.fire({
             title: 'Creating Product',
@@ -358,9 +287,7 @@ document.getElementById("productForm").addEventListener("submit", function(event
 });
 </script> 
     
-<script>
-    
-</script>
+
 
 
 

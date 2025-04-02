@@ -590,14 +590,7 @@
   const brand = document.getElementById('brandFilter').value;
       
 
-    //   const queryParams = new URLSearchParams({
-    //     price: priceRange,
-    //     category: category,
-    //     brand: brand,
-        
-    //   });
-    //   window.location.href = `/user/dashboard/shopping?${queryParams.toString()}`;
-    // }
+    
     const urlParams = new URLSearchParams(window.location.search);
   
   // Update with new filter values
@@ -616,26 +609,7 @@
   window.location.href = `/user/dashboard/shopping?${urlParams.toString()}`;
 }
     
-    // Update price range value display
-    // const priceRangeInput = document.getElementById('priceRange');
-    // const priceValues = document.getElementById('priceValue');
-    // if (priceRangeInput && priceValues) {
-    //   priceValues.textContent = priceRangeInput.value;
-    //   priceRangeInput.addEventListener('input', () => {
-    //     priceValues.textContent = priceRangeInput.value;
-    //   });
-    // }
-//     const priceRangeInput = document.getElementById('priceRange');
-// const priceValue = document.getElementById('priceValue');
-
-// if (priceRangeInput && priceValue) {
-//   priceValue.textContent = priceRangeInput.value;
-//   priceRangeInput.addEventListener('input', () => {
-//     priceValue.textContent = priceRangeInput.value;
-//   });
-// }
-
-// Update the sort dropdown onchange handler
+   
 document.getElementById('sort').addEventListener('change', function() {
   const sortValue = this.value;
   
@@ -679,53 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
     
-    // Toggle wishlist function
-    // async function toggleWishlist(productId){
-    //   try{
-    //     const response = await fetch(`/user/dashboard/shopping/${productId}`,{
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json"
-    //       }
-    //     });
-        
-    //     if (response.ok) {
-    //       const data = await response.json();
-    //       const wishlistIcon = document.querySelector(`.wishlist-icon[data-product-id='${productId}']`);
-
-    //       // Toggle the icon class
-    //       if (data.isInWishlist) {
-    //         wishlistIcon.classList.remove('far');
-    //         wishlistIcon.classList.add('fas');
-    //         Swal.fire({
-    //       toast: true,
-    //       position: 'top-end',
-    //       icon: 'success',
-    //       title: 'Added to wishlist!',
-    //       showConfirmButton: false,
-    //       timer: 2000,
-    //       timerProgressBar: true,
-    //     });
-    //       } else {
-    //         wishlistIcon.classList.remove('fas');
-    //         wishlistIcon.classList.add('far');
-    //         Swal.fire({
-    //       toast: true,
-    //       position: 'top-end',
-    //       icon: 'success',
-    //       title: 'Removed from wishlist!',
-    //       showConfirmButton: false,
-    //       timer: 2000,
-    //       timerProgressBar: true,
-    //     });
-    //       }
-    //     } else {
-    //       console.error('Failed to toggle wishlist');
-    //     }
-    //   } catch(error) {
-    //     console.log(error);
-    //   }
-    // }
+   
   
     async function toggleWishlist(productId) {
     try {

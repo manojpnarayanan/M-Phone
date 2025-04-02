@@ -9,7 +9,7 @@ const reviewController = {
     loadReviewPage: async (req, res) => {
         try {
             const orderId = req.params.id
-            console.log(orderId)
+            // console.log(orderId)
             const order = await Order.findById(orderId)
                 .populate("products.product")
             if (!order) {
@@ -20,15 +20,15 @@ const reviewController = {
             if (!products || products.length === 0) {
                 return res.status(404).send('No products found in this order');
             }
-            console.log("Products in order:", products);
+            // console.log("Products in order:", products);
 
             const productInOrder = order.products[0];
             if (!productInOrder) {
                 return res.status(404).send('No products found in this order');
             }
             const productId = productInOrder.product._id;
-            console.log("loadproductpage,productId", productId)
-            console.log("loadreview Page:", order)
+            // console.log("loadproductpage,productId", productId)
+            // console.log("loadreview Page:", order)
 
             res.render("user/writereview", {
                 orderId: order._id,
@@ -44,9 +44,9 @@ const reviewController = {
     submitReview: async (req, res) => {
         try {
             const orderId = req.params.id
-            console.log("orderId", orderId)
+            // console.log("orderId", orderId)
             const { productId, rating, comment } = req.body
-            console.log("req.body", req.body)
+            // console.log("req.body", req.body)
             if (!productId || !rating || !comment) {
                 return res.status(400).json({ success: false, message: 'All fields are required' });
             }

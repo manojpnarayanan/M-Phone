@@ -505,8 +505,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const categoryId = this.getAttribute("data-id");
                 const isRemoveAction = this.textContent.trim() === 'Remove';
                 
-                // Rest of the toggle offer code...
-                // (This is a duplicate of the code above, but needed for reattaching events)
+              
             });
         });
     }
@@ -531,13 +530,13 @@ document.addEventListener("DOMContentLoaded", function () {
                             const doc = parser.parseFromString(html, "text/html");
                             document.querySelector("tbody").innerHTML = doc.querySelector("tbody").innerHTML;
                             
-                            // Reattach event listeners after pagination
+                            
                             document.querySelectorAll(".toggle-category").forEach(button => {
-                                // Reattach toggle category event listeners
+                        
                             });
                             
                             document.querySelectorAll(".toggle-offer-btn").forEach(button => {
-                                // Reattach toggle offer event listeners
+                    
                             });
                             attachEventListeners();
                         })

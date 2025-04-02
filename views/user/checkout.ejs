@@ -497,10 +497,7 @@
                                                                 Type: <%= address.addresstype %>
                                         </p>
                                     </label>
-                                    <!-- <div class="address-actions">
-                                        <button class="btn btn-outlined">Edit</button>
-                                        <button class="btn btn-outlined">Remove</button>
-                                    </div> -->
+                                   
                                 </div>
                                 <% }) %>
                                     <% } else { %>
@@ -618,7 +615,7 @@
                     </div>
                 </div>
 
-                <!-- Promo Code -->
+            
                 <!-- Promo Code Section -->
 <div class="card">
     <div class="card-header">
@@ -793,13 +790,13 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 // Close loading dialog
                 Swal.close();
 
-                // Store Razorpay order ID for retry functionality
+                
                 razorpayOrderId = result.orderId;
 
                 // Initialize Razorpay payment
                 const options = {
-                    key: '<%= process.env.KEY_ID %>', // Your Razorpay Key ID
-                    amount: currentTotalAmount * 100, // Amount in paise
+                    key: '<%= process.env.KEY_ID %>', 
+                    amount: currentTotalAmount * 100, 
                     currency: 'INR',
                     name: 'M Store',
                     description: 'Purchase from M Store',
@@ -854,17 +851,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
             }).then(() => {
                 window.location.href = `/user/myprofile/failed-payment/${verifyResult.orderId}`;
             });
-                                // Show error message
-                                // Swal.fire({
-                                //     icon: 'error',
-                                //     title: 'Payment Verification Failed',
-                                //     text: verifyResult.message || 'Failed to verify payment. Please contact support.',
-                                //     confirmButtonText: 'OK'
-                                // });
-                                
-                                // Show retry button
-                                // document.getElementById('retryPayment').style.display = 'block';
-                                // window.location.href="/user/myprofile/failed-paymentpage"
+                               
                             }
                         } catch (error) {
                             console.error("Error verifying payment:", error);
@@ -895,18 +882,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
         });
     }
 },
-                    //         Swal.fire({
-                    //             icon: 'error',
-                    //             title: 'Error',
-                    //             text: 'An unexpected error occurred during payment verification. Please try again.'
-                    //         });
-                            
-                    //         // Show retry button
-                    //         document.getElementById('retryPayment').style.display = 'block';
-                    //         // window.location.href="/user/myprofile/failed-paymentpage"
-
-                    //     }
-                    // },
+                  
                     prefill: {
                         name: '<%= user.name %>',
                         email: '<%= user.email %>',

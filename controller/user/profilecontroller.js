@@ -49,11 +49,11 @@ const profilecontroller = {
       if (!user || !token) {
         return res.status(401).json({ message: "User not found" })
       }
-      const nameRegex = /^[A-Za-z\s\-]+$/; 
+      const nameRegex = /^[A-Za-z\s\-]+$/;
       if (!nameRegex.test(name)) {
         return res.status(400).json({ message: "Name should only contain letters, spaces, and hyphens" });
       }
-      const pincodeRegex = /^\d{6}$/; 
+      const pincodeRegex = /^\d{6}$/;
       if (!pincodeRegex.test(pincode)) {
         return res.status(400).json({ message: "Pincode must be exactly 6 digits" });
       }
@@ -75,7 +75,7 @@ const profilecontroller = {
       });
       // console.log(address)
       await address.save()
-      // res.redirect(`/user/myprofile/${userId}`)
+
       res.status(200).json({ message: "Address saved successfully" });
     } catch (error) {
       console.log(error)
@@ -109,13 +109,12 @@ const profilecontroller = {
         state,
         country,
         addresstype,
-        user: decoded.id // Ensure the user field is populated
+        user: decoded.id
 
       }, { new: true })
       // console.log("address of user:",updateAddress)
 
-      // res.redirect(`/user/myprofile?success=true`);
-      // res.redirect(`/user/myprofile/${decoded.id}`)
+
       res.status(200).json({ message: 'Address updated successfully' });
     } catch (error) {
       console.log(error)
@@ -141,25 +140,24 @@ const profilecontroller = {
   userProfileUpdate: async (req, res) => {
     console.log(req.body)
     const { fullName, currentEmail, changedEmail, phone } = req.body;
-    const token=req.cookies.token;
-    const decoded=jwt.verify(token,process.env.JWT_SECRET)
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
     // console.log(req.file)
-    try{
-      const updateData={
-        name:fullName,
+    try {
+      const updateData = {
+        name: fullName,
         // email:changedEmail || currentEmail,
         // phone:phone
       };
-      if(req.file){
-        updateData.photo= `/uploads/profile-pictures/${req.file.filename}`;
+      if (req.file) {
+        updateData.photo = `/uploads/profile-pictures/${req.file.filename}`;
       }
-      const updateUser=await User.findByIdAndUpdate(decoded.id, updateData,{new:true})
+      const updateUser = await User.findByIdAndUpdate(decoded.id, updateData, { new: true })
 
-      // res.status(200).json({success:true, message:"photo added successfully"})
-      req.flash("success","Photo added successfully")
+      req.flash("success", "Photo added successfully")
       res.redirect(`/user/myprofile/${decoded.id}`)
 
-    }catch(error){
+    } catch (error) {
       res.status(500).json({ success: false, message: error.message });
 
 
@@ -171,14 +169,14 @@ const profilecontroller = {
       console.log("changepassword:", req.body)
       const { currentPassword, newPassword, confirmPassword } = req.body
       const hashedpassword = await bcryptjs.hash(newPassword, 10)
-      console.log("hashedpassword",hashedpassword)
+      console.log("hashedpassword", hashedpassword)
       const token = req.cookies.token
       const decoded = jwt.verify(token, process.env.JWT_SECRET)
       const user = await User.findByIdAndUpdate(decoded.id,
         { password: hashedpassword },
         { new: true }
       )
-      console.log("user",user)
+      console.log("user", user)
       req.flash("success", "Password changed successfully");
       res.redirect(`/user/myprofile/${decoded.id}`)
     } catch (error) {

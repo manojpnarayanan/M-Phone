@@ -24,7 +24,7 @@
     <main class="main-wrap">
         <header class="main-header navbar">
             <div class="col-search">
-                <!-- Search form removed as in the original template -->
+            
             </div>
         </header>
         <section class="content-main">
@@ -206,7 +206,7 @@
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Toggle coupon active status
+        
         document.querySelectorAll(".toggle-coupon").forEach(button => {
             button.addEventListener("click", function () {
                 const couponId = this.getAttribute("data-id");
@@ -229,12 +229,12 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Update button text and class
+                                
                                 this.textContent = data.isActive ? "Deactivate" : "Activate";
                                 this.classList.toggle("btn-success", !data.isActive);
                                 this.classList.toggle("btn-danger", data.isActive);
 
-                                // Update status badge
+                                
                                 const statusBadge = this.closest('tr').querySelector('.badge');
                                 if (statusBadge) {
                                     statusBadge.textContent = data.isActive ? "Active" : "Inactive";
@@ -267,7 +267,7 @@
             });
         });
 
-        // Show/hide max discount amount field based on discount type
+        
         const discountTypeSelect = document.querySelector('select[name="discountType"]');
         const maxDiscountContainer = document.getElementById('maxDiscountContainer');
         
@@ -282,14 +282,14 @@
                 }
             });
             
-            // Trigger on page load
+            
             if (discountTypeSelect.value === 'fixed') {
                 maxDiscountContainer.style.display = 'none';
                 document.getElementById('max_discount').removeAttribute('required');
             }
         }
 
-        // Coupon search functionality
+        
         const searchInput = document.getElementById("couponSearch");
         if (searchInput) {
             searchInput.addEventListener("keyup", function () {
@@ -315,59 +315,32 @@
             });
         }
 
-        // Pagination functionality
-        // const paginationLinks = document.querySelectorAll(".pagination a");
-        // paginationLinks.forEach(link => {
-        //     link.addEventListener("click", function (e) {
-        //         e.preventDefault();
-        //         const page = this.getAttribute("data-page");
-        //         const searchTerm = document.getElementById("couponSearch").value.trim();
-
-        //         fetch(`/admin/dashboard/coupons?page=${page}&search=${searchTerm}`)
-        //             .then(response => response.text())
-        //             .then(html => {
-        //                 const parser = new DOMParser();
-        //                 const doc = parser.parseFromString(html, "text/html");
-        //                 const newTableBody = doc.querySelector("tbody");
-        //                 if (newTableBody) {
-        //                     document.querySelector("tbody").innerHTML = newTableBody.innerHTML;
-        //                 }
-                        
-        //                 // Update pagination active state
-        //                 document.querySelectorAll(".page-item").forEach(item => {
-        //                     item.classList.remove("active");
-        //                 });
-        //                 this.closest(".page-item").classList.add("active");
-        //             })
-        //             .catch(error => console.error(error));
-        //     });
-        // });
+       
     
         document.querySelectorAll(".pagination a").forEach(link => {
         link.addEventListener("click", function (e) {
             e.preventDefault();
             const url = this.getAttribute("href");
             
-            // Get the current search term
+            
             const searchTerm = document.getElementById("couponSearch")?.value.trim() || '';
             const separator = url.includes('?') ? '&' : '?';
             const finalUrl = searchTerm ? `${url}${separator}search=${encodeURIComponent(searchTerm)}` : url;
             
-            // Do a full page navigation instead of trying to update just the table
             window.location.href = finalUrl;
         });
     });
 
-    // Add this to your existing script section
+    
 
-    // Get the coupon form
+    
     const couponForm = document.querySelector('form[action="/admin/dashboard/coupons"]');
     console.log(couponForm)
     if (couponForm) {
         couponForm.addEventListener('submit', function (e) {
             e.preventDefault();
             
-            // Show loading state
+            
             Swal.fire({
                 title: 'Creating coupon...',
                 html: 'Please wait while we create your coupon',
@@ -377,14 +350,14 @@
                 }
             });
             
-            // Collect form data
+            
             const formData = new FormData(this);
             const formDataObj = {};
             formData.forEach((value, key) => {
                 formDataObj[key] = value;
             });
             
-            // Submit form using Fetch API
+    
             fetch('/admin/dashboard/coupons', {
                 method: 'POST',
                 headers: {
@@ -401,7 +374,7 @@
                         text: 'Coupon created successfully!',
                         showConfirmButton: true
                     }).then(() => {
-                        // Reload the page to show the new coupon
+                        
                         window.location.reload();
                     });
                 } else {
@@ -425,7 +398,7 @@
         });
     }
     
-    // Keep your existing code for toggle-coupon, discount type, search, and pagination here
+
 });
     
     

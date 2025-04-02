@@ -61,31 +61,11 @@ const walletController = {
             if (!userId || !amount || amount <= 0) {
                 return res.status(400).json({ message: "Invalid request data" })
             }
-            // let wallet= await Wallet.findOne({userId})
-            // if(!wallet){
-            //     wallet=new Wallet({
-            //         userId,
-            //         walletBalance:0,
-            //         transactions:[],
-            //     })
-            // }        console.log("Current wallet balance:", wallet.walletBalance);
 
-            //  // Add a credit transaction
-            //  wallet.transactions.push({
-            //     transactionType: 'credit',
-            //     transactionAmount: amount,
-            //     transactionDescription: 'Funds added to wallet',
-            //     transactionStatus: 'completed',
-            //     transactionDate: new Date()
-            // });
-            // wallet.walletBalance += amount;
-            // console.log("Updated wallet balance:", wallet.walletBalance);
-            // await wallet.save();
-            // res.status(200).json({ message: 'Funds added successfully'})
             const wallet = await Wallet.findOneAndUpdate(
                 { userId },
                 {
-                    $inc: { walletBalance: amount }, // Atomically increment balance
+                    $inc: { walletBalance: amount },
                     $push: {
                         transactions: {
                             transactionType: 'credit',
@@ -96,7 +76,7 @@ const walletController = {
                         },
                     },
                 },
-                { upsert: true, new: true } // Create wallet if it doesn't exist
+                { upsert: true, new: true }
             );
             res.status(200).json({ message: 'Funds added successfully', wallet });
 
