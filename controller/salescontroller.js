@@ -290,9 +290,9 @@ const generateInvoiceController = {
 
 
                 let orderId = order._id.toString();
-                if (orderId.length > 10) {
-                    orderId = orderId.substring(0, 10) + '...';
-                }
+                // if (orderId.length > 10) {
+                //     orderId = orderId.substring(0, 10) + '...';
+                // }
 
 
                 const orderDate = new Date(order.createdAt).toLocaleDateString();

@@ -291,18 +291,12 @@
                 <% } %>
                 <div class="card mt-3">
                     <div class="card-body">
-                        <h5>Specifications:</h5>
-                        <ul class="list-unstyled">
-                            <% if (product.specs && Array.isArray(product.specs)) { %>
-                                <% product.specs.forEach(spec => { %>
-                                    <li class="mb-2">• <%= spec %></li>
-                                <% }) %>
-                            <% } else { %>
-                                <li>No specifications available.</li>
-                            <% } %>
-                        </ul>
+                      <h5>Description:</h5>
+                      <div class="mb-2">
+                        <%= product.description %>
+                      </div>
                     </div>
-                </div>
+                  </div>
             </div>
         </div>
 

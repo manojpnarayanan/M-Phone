@@ -44,7 +44,7 @@ const userController = {
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
             const user = await User.findById(decoded.id)
-            let query = {}
+            let query = {isActive:true}
             if (req.query.search) {
                 query = {
                     $or: [

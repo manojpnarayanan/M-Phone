@@ -1,7 +1,7 @@
 const User = require("../model/user")
 const product = require("../model/addproduct")
 const Order = require("../model/order")
-const { generateInvoice } = require("../utils/invoiceGenerator"); // Assume you have a utility to generate invoices
+const { generateInvoice } = require("../utils/invoicegenerator"); // Assume you have a utility to generate invoices
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const path = require('path');
@@ -19,7 +19,7 @@ const ordermanagement = {
             const itemsPerPage = 6;
             const searchTerm = req.query.search || "";
             console.log("searchTerm", searchTerm)
-            let searchQuery = {};
+            let searchQuery = {paymentStatus:"completed"};
 
             if (searchTerm) {
                 const matchingUsers = await User.find({
