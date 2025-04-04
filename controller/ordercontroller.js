@@ -1,7 +1,7 @@
 const User = require("../model/user")
 const product = require("../model/addproduct")
 const Order = require("../model/order")
-const { generateInvoice } = require("../utils/invoicegenerator"); // Assume you have a utility to generate invoices
+const { generateInvoice } = require("../utils/invoicegenerator"); 
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const path = require('path');
