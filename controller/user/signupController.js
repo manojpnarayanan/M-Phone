@@ -26,8 +26,14 @@ const signupController = {
       if (/^\s*$/.test(name)) {
         return res.status(400).json({ message: "Empty spaces not allowed" })
       }
-      if (password.length < 6) {
-        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      // if (password.length < 6) {
+      //   return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      // }
+      const strongPasswordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+      if (!strongPasswordRegex.test(password)) {
+        return res.status(400).json({
+          message: "Password must be at least 6 characters and include at least one letter, one number, and one special character"
+        });
       }
 
       if (password !== confirmPassword) {

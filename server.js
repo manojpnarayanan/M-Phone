@@ -14,6 +14,7 @@ const userRouter=require("./router/user/user")
 const passport=require("./database/passportConfig")
 const flash = require('connect-flash');
 const middleware=require("./middleware/admin")
+const userViews=require("./controller/user/userviews")
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -39,7 +40,7 @@ app.use((req, res, next) => {
 
 
 app.use(passport.initialize());
-app.get("/",(req,res)=>{res.render("user/landingpage")})
+app.get("/",userViews.loadLandingpage)
 app.use("/admin",adminRouter)
 app.use("/user",userRouter)
 

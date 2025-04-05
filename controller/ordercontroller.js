@@ -16,7 +16,7 @@ const ordermanagement = {
     loadOrderDetails: async (req, res) => {
         try {
             const page = parseInt(req.query.page) || 1;
-            const itemsPerPage = 6;
+            const itemsPerPage = 10;
             const searchTerm = req.query.search || "";
             console.log("searchTerm", searchTerm)
             let searchQuery = {paymentStatus:"completed"};

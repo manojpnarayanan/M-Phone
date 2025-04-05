@@ -14,6 +14,43 @@ const nodemailer = require("nodemailer")
 
 
 const userViews = {
+    loadLandingpage:async(req,res)=>{
+        try{
+
+            const token = req.user?.token || req.session?.token; // Ensure token exists
+            if (!token) {
+                return res.status(401).json({ message: "Unauthorized access" });
+            }
+        
+            if(token){
+                try{
+                    const decoded=jwt.verify(token,process.env.JWT_SECRET)
+                    const userId=decoded.id
+                    const user=await User.findById(userId)
+                    if(user && user.isActive){
+                        return res.redirect("/user/dashboard")
+                    }
+                }catch(tokenError){
+                    res.clearCookie('token')
+                }
+            }
+            const products=await Product.find({isActive:true})
+            .sort({createdAt:-1})
+            .limit(8)
+          
+            const categories=await Category.find({isActive:true})
+            res.render("/user/landingpage",{
+                products,
+                categories,
+            })
+
+
+        }catch(error){
+            console.log(error)
+            res.status(500).send({ message: "Something went wrong" });
+
+        }
+    },
     productDetails: async (req, res) => {
         try {
             const token = req.cookies.token

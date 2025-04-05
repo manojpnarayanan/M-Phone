@@ -1751,8 +1751,10 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
 
 
 
-     function returnOrder(orderId) {
+     function returnOrder(orderId,productId) {
     console.log(orderId);
+    console.log(productId);
+
     Swal.fire({
         title: 'Are you sure?',
         text: 'Do you want to return this order?',
@@ -1763,7 +1765,7 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
         confirmButtonText: 'Yes, return it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch(`/user/myprofile/return-order/${orderId}`, {
+            fetch(`/user/myprofile/return-order/${orderId}/${productId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -1778,7 +1780,7 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
                         text: 'Your return request has been successfully submitted!',
                         confirmButtonText: 'OK'
                     }).then(() => {
-                        // Reload the page or update the UI
+                  
                         window.location.reload();
                     });
                 } else {
@@ -1809,25 +1811,25 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
                 const response = await fetch(`/user/myprofile/cancel-order/${orderId}`, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json", // Corrected header name
+                        "Content-Type": "application/json", 
                     },
                 });
                 const result = await response.json();
                 console.log(result);
 
                 if (response.ok) {
-                    // SweetAlert2 success alert
+                    
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
                         text: 'Order cancelled successfully!',
                         confirmButtonText: 'OK',
                     }).then(() => {
-                        // Optionally, refresh the page or update the UI
-                        window.location.reload(); // Reload the page to reflect changes
+                      
+                        window.location.reload(); 
                     });
                 } else {
-                    // SweetAlert2 error alert
+              
                     Swal.fire({
                         icon: 'error',
                         title: 'Failed!',
@@ -1837,7 +1839,7 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
                 }
             } catch (error) {
                 console.error("Error:", error);
-                // SweetAlert2 error alert
+              
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
@@ -1870,8 +1872,8 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
                 text: data.message || 'Product added to cart successfully!',
                 confirmButtonText: 'OK',
             }).then(() => {
-                // Optionally, redirect to the cart page or update the UI
-                window.location.href = "/user/dashboard/addtocart"; // Redirect to cart page
+                
+                window.location.href = "/user/dashboard/addtocart"; 
             });
         } else {
             // Show error message
@@ -1898,13 +1900,13 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-  // Event delegation for removing items from the wishlist
+
   document.getElementById('wishlist-items').addEventListener('click', async function (e) {
     if (e.target.classList.contains('remove-from-wishlist')) {
       const productId = e.target.getAttribute('data-product-id');
       console.log("Product ID to remove:", productId);
 
-      // Confirmation Dialog
+      
       const confirmRemove = await Swal.fire({
         title: 'Are you sure?',
         text: 'Do you want to remove this product from your wishlist?',
@@ -1918,7 +1920,7 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
 
       if (confirmRemove.isConfirmed) {
         try {
-          // Send DELETE request to remove the product
+        
           const response = await fetch(`/user/myprofile/deletewishlist/${productId}`, {
             method: 'DELETE',
             headers: {
@@ -1968,13 +1970,13 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
       const navLinks = document.querySelectorAll('.profile-nav .nav-link');
       const contentSections = document.querySelectorAll('.content-section');
 
-      // Function to show the selected content section
+    
       function showContent(sectionId) {
         contentSections.forEach((section) => {
           section.style.display = 'none';
         });
         document.getElementById(sectionId).style.display = 'block';
-         // Fetch wishlist data if the wishlist section is shown
+      
     if (sectionId === "wishlist") {
       fetchWishlist();
     }
@@ -1982,11 +1984,11 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
      
   
 
-      // Add click event listeners to sidebar links
+    
       navLinks.forEach((link) => {
         link.addEventListener('click', function (e) {
           e.preventDefault();
-          const targetSection = this.getAttribute('href').substring(1); // Remove the '#' from href
+          const targetSection = this.getAttribute('href').substring(1); 
           showContent(targetSection);
 
           // Update active class
@@ -1995,7 +1997,7 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
         });
       });
 
-      // Show the default content (Account Overview) on page load
+      
       showContent('account-overview');
     });
 
@@ -2006,7 +2008,7 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
             headers: {
                 "Content-Type": "application/json",
             },
-            credentials: "include", // Include cookies for authentication
+            credentials: "include", 
         });
 
         if (!response.ok) {
@@ -2017,11 +2019,11 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
 
         if (data.success) {
             const wishlistItems = document.getElementById("wishlist-items");
-            wishlistItems.innerHTML = ""; // Clear existing items
+            wishlistItems.innerHTML = ""; 
 
             if (data.wishlist.length > 0) {
                 data.wishlist.forEach((product) => {
-                    // Create a wishlist item with full product details
+                  
                     const listItem = document.createElement("li");
                     listItem.className = "wishlist-item";
 

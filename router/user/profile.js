@@ -36,7 +36,7 @@ router.post("/retry-payment",razorpayController.retryPayment)
 
 router.get("/order-confirmed/:id",orderController.getOrderConfirmationPage)
 router.post("/cancel-order/:id",orderController.cancelOrder)
-router.post("/return-order/:id",orderController.returnOrder)
+router.post("/return-order/:orderId/:productId",orderController.returnOrder)
 router.post("/cancel-product/:orderId/:productId",orderController.cancelIndividualProduct)
 
 router.get("/write-review/:id",reviewController.loadReviewPage)

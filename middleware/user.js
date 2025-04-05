@@ -34,7 +34,7 @@ const verifyUser = {
         const userId = decoded.id
         console.log(decoded)
         const activeUser = await User.findById(userId)
-        if (req.path == "/login" || req.path == "/signup") {
+        if (req.path == "/login" || req.path == "/signup" || req.path== "/") {
           return res.redirect("/user/dashboard")
         }
 
