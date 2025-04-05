@@ -407,6 +407,7 @@ const orderController = {
     returnOrder: async (req, res) => {
         try {
             const {orderId , productId}=req.params
+            const {returnReason}=req.body
 
             console.log("return orderid :", orderId,productId);
             const order = await Order.findById(orderId)
@@ -467,6 +468,7 @@ const orderController = {
         // );
 
         order.products[productIndex].status = "Return Request";
+        order.products[productIndex].returnReason = returnReason;
        
        
         const allReturned = order.products.every(item => item.status === "Returned" || item.quantity === 0);

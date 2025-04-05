@@ -17,32 +17,39 @@ const userViews = {
     loadLandingpage:async(req,res)=>{
         try{
 
-            const token = req.user?.token || req.session?.token; // Ensure token exists
-            if (!token) {
-                return res.status(401).json({ message: "Unauthorized access" });
-            }
+            // const token = req.user?.token || req.session?.token; // Ensure token exists
+            // if (!token) {
+            //     return res.status(401).json({ message: "Unauthorized access" });
+            // }
         
-            if(token){
-                try{
-                    const decoded=jwt.verify(token,process.env.JWT_SECRET)
-                    const userId=decoded.id
-                    const user=await User.findById(userId)
-                    if(user && user.isActive){
-                        return res.redirect("/user/dashboard")
-                    }
-                }catch(tokenError){
-                    res.clearCookie('token')
-                }
-            }
+            // if(token){
+            //     try{
+            //         const decoded=jwt.verify(token,process.env.JWT_SECRET)
+            //         const userId=decoded.id
+            //         const user=await User.findById(userId)
+            //         if(user && user.isActive){
+            //             return res.redirect("/user/dashboard")
+            //         }
+            //     }catch(tokenError){
+            //         res.clearCookie('token')
+            //     }
+            // }
             const products=await Product.find({isActive:true})
             .sort({createdAt:-1})
             .limit(8)
           
+            const user=null;
+            const searchQuery = req.query.search || '';
+
             const categories=await Category.find({isActive:true})
-            res.render("/user/landingpage",{
+            res.render("user/landingpage",{
                 products,
                 categories,
+                user,
+                searchQuery
             })
+            
+            
 
 
         }catch(error){

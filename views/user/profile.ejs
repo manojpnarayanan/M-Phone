@@ -1754,22 +1754,52 @@ document.getElementById('addFundsForm').addEventListener('submit', async functio
      function returnOrder(orderId,productId) {
     console.log(orderId);
     console.log(productId);
+    const returnReasons = [
+        'Damaged Product',
+        'Wrong Product', 
+        'Product Not As Described', 
+        'Quality Issue', 
+        'Size/Fit Issue', 
+        'Changed Mind',
+        'Other'
+    ];
+    let reasonOptions = returnReasons.map(reason => 
+        `<option value="${reason}">${reason}</option>`
+    ).join('');
 
     Swal.fire({
-        title: 'Are you sure?',
-        text: 'Do you want to return this order?',
+        title: 'Return Order',
+        html: `
+            <p>Please select a reason for returning this order:</p>
+            <select id="return-reason" class="swal2-select" style="width: 100%; padding: 8px; margin-top: 10px;">
+                <option value="">-- Select a reason --</option>
+                ${reasonOptions}
+            </select>
+        `,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, return it!'
+        confirmButtonText: 'Submit Return Request',
+        preConfirm: () => {
+            const reason = document.getElementById('return-reason').value;
+            if (!reason) {
+                Swal.showValidationMessage('Please select a return reason');
+                return false;
+            }
+            return reason;
+        }
     }).then((result) => {
         if (result.isConfirmed) {
+          const returnReason = result.value;
             fetch(`/user/myprofile/return-order/${orderId}/${productId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
+                body:JSON.stringify({
+                  returnReason: returnReason,
+                })
             })
             .then(response => response.json())
             .then(data => {

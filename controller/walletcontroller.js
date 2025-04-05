@@ -43,6 +43,9 @@ const walletController = {
             const validTransactions = wallet.transactions.filter(transaction =>
                 transaction.orderId && typeof transaction.orderId === 'object'
             )
+            validTransactions.sort((a, b) => {
+                return new Date(b.transactionDate) - new Date(a.transactionDate);
+            });
 
 
             const getTransactionSummary = (transactions) => {
