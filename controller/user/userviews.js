@@ -259,7 +259,7 @@ const userViews = {
                 return res.status(401).json({ message: "User not found" });
             }
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
-            // console.log("add to cart",decoded)
+            console.log("add to cart",decoded)
             const userId = decoded.id
             // console.log(userId)
             const productId = req.params.id
@@ -329,7 +329,7 @@ const userViews = {
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
             // const productId=req.params.id
 
-            // console.log("product",product)
+            console.log("product",decoded)
             const user = await User.findById(decoded.id)
 
             if (!user) {
@@ -339,7 +339,9 @@ const userViews = {
             if (user.isActive == false) {
                 return res.status(401).json({ message: "User is Blocked Contact support team" });
             }
+            console.log("reached")
             let cart = await Cart.findOne({ user: decoded.id }).populate('products.product')
+            console.log(cart)
 
 
             if (!cart) {
@@ -350,15 +352,19 @@ const userViews = {
                 await cart.save();
 
             }
+            console.log("reached")
 
             let cartItems = [];
             let totalItems = 0;
             let totalPrice = 0;
+            console.log("reached")
 
             if (cart) {
                 cart.products.forEach(item => {
                     totalItems += item.quantity;
                     totalPrice += item.quantity * item.product.price;
+                    console.log(totalItems)
+                    console.log(totalPrice)
 
                 })
                 cartItems = cart.products;

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="/adminloginpage.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
    
@@ -15,7 +16,7 @@
 
 
 
-    <form action="/admin/login" method="POST">
+    <form action="/admin/login" method="POST"  id="loginForm">
         <h3>Login Here</h3>
         
         <input type="text" id="message" value="<%= message %>" name="message" hidden>
@@ -34,5 +35,61 @@
               <a href="/user/login">Switch to User</a>
          </div>    
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const message = document.getElementById('message').value;
+            if (message && message !== '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: message
+                });
+            }
+        });
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Login successful',
+                        timer: 1500
+                    }).then(() => {
+                        window.location.href = '/admin/dashboard';
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Failed',
+                        text: data.message || 'Something went wrong'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Server error, please try again later'
+                });
+            }
+        });
+    </script>
+
+
 </body>
 </html>

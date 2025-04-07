@@ -16,6 +16,7 @@ const verifyUser = {
       if (!activeUser) {
         return res.redirect("/user/login")
       }
+      
 
       next();
     } catch (error) {
@@ -26,13 +27,13 @@ const verifyUser = {
   },
   preventLoginpage: async (req, res, next) => {
     const token = req.cookies.token
-    console.log("prevent Login:", token)
-    console.log(req.path)
+    // console.log("prevent Login:", token)
+    // console.log(req.path)
     if (token) {
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id
-        console.log(decoded)
+        // console.log(decoded)
         const activeUser = await User.findById(userId)
         if (req.path == "/login" || req.path == "/signup" || req.path== "/") {
           return res.redirect("/user/dashboard")

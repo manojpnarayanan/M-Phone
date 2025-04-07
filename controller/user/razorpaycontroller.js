@@ -134,6 +134,17 @@ const razorpayController = {
                 return res.status(400).json({ success: false, message: "Cart is empty" })
             }
 
+            for (const item of cart.products){
+                const product=await Product.findById(item.product)
+                console.log(product)
+                if(!product){
+                    return res.status(404).json({success:false, message:"Product not found"})
+                }
+                if(product.stock<item.quantity){
+                    return res.status(400).json({success:false, message:"Insufficient stock"})
+                }
+            }
+
             const options = {
                 amount: Math.round(amount),
                 currency,

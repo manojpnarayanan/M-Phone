@@ -27,7 +27,8 @@ const admincontroller = {
                 secure: process.env.NODE_ENV === "production",
                 maxAge: 3600000
             })
-            return res.redirect("/admin/dashboard")
+            // return res.redirect("/admin/dashboard")
+            return res.status(200).json({ message: "Login successful" })
 
         } catch (error) {
             console.error(error)
