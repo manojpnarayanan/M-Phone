@@ -8,7 +8,7 @@ dotenv.config();
 passport.use(new googleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/user/google/callback",
+    callbackURL: "https://www.m-phone.cloud/user/google/callback",
 },
     async (accessToken, refreshToken, profile, done) => {
         try {
