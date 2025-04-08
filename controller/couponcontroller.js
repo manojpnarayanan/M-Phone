@@ -65,6 +65,13 @@ const couponController = {
                     message: "End date must be after start date"
                 });
             }
+            if(req.body.discountValue<1 ||req.body.discountValue>100 ){
+                return res.status(400).json({
+                    success: false,
+                    message: "Value should be between 1 and 100"
+                });
+            }
+            
 
 
 
