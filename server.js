@@ -41,6 +41,10 @@ app.use((req, res, next) => {
 
 app.use(passport.initialize());
 app.get("/",userViews.loadLandingpage)
+app.get("/home",userViews.loadLandingHomePage)
+app.get("/shop",userViews.loadlandingShop)
+app.get("/products/:id",userViews.landingProductdetails)
+
 app.use("/admin",adminRouter)
 app.use("/user",userRouter)
 

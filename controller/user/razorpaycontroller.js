@@ -121,6 +121,7 @@ const razorpayController = {
     razorpayOrder: async (req, res) => {
         try {
             const { amount, email, currency, receipt, orderData } = req.body
+            console.log("req.body",req.body)
 
             if (!amount || !currency || !receipt) {
                 return res.status(400).json({ success: false, message: "Missing required fields" })

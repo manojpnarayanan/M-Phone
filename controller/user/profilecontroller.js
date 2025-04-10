@@ -57,7 +57,7 @@ const profilecontroller = {
       if (!pincodeRegex.test(pincode)) {
         return res.status(400).json({ message: "Pincode must be exactly 6 digits" });
       }
-      const phoneRegex = /^\d{10}$/; // Exactly 10 digits
+      const phoneRegex = /^\d{10}$/; 
       if (!phoneRegex.test(mobilenumber)) {
         return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
       }

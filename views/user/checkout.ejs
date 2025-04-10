@@ -670,7 +670,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Store original values for calculations
+
     const originalValues = {
         totalPrice: <%= totalPrice %>,
         totalDiscount: <%= totalDiscount %>,
@@ -679,14 +679,14 @@
         gst: <%= gst %>
     };
 
-    // Store order data for retry functionality
+    
     let lastOrderData = null;
     let razorpayOrderId = null;
 
-    // Function to process payment based on selected method
+    
     async function processPayment() {
         try {
-            // Check if a payment method is selected
+            
             const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
             if (!selectedPaymentMethod) {
                 Swal.fire({
@@ -694,10 +694,10 @@
                     title: 'Error',
                     text: 'Please select a payment method.'
                 });
-                return; // Stop execution if no payment method is selected
+                return; 
             }
             
-            // Check if an address is selected
+            
             const selectedAddress = document.querySelector('input[name="address"]:checked');
             if (!selectedAddress) {
                 Swal.fire({
@@ -705,10 +705,10 @@
                     title: 'Error',
                     text: 'Please select a delivery address.'
                 });
-                return; // Stop execution if no address is selected
+                return;
             }
             
-            // Get the current total amount from the UI
+            
             const selectedCoupon = document.querySelector('.coupon.applied');
 const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '';
 
@@ -717,7 +717,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 ? parseFloat(document.getElementById('couponDiscount').textContent.replace('-₹', ''))
                 : 0;
             
-            // Gather data from the page
+            
             const orderData = {
                 userId: "<%= user._id %>",
                 shippingAddress: selectedAddress.value,
@@ -741,18 +741,18 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 }
             };
 
-            // Save order data for retry functionality
+        
             lastOrderData = orderData;
 
-            // If payment method is Cash on Delivery, use the existing placeOrder function
+            
             if (selectedPaymentMethod.value === 'cash_on_delivery') {
                 placeOrder();
                 return;
             }
 
-            // If payment method is Razorpay, initiate Razorpay payment
+            
             if (selectedPaymentMethod.value === 'razor-pay') {
-                // Show loading state
+                
                 Swal.fire({
                     title: 'Initializing payment...',
                     didOpen: () => {
@@ -762,14 +762,14 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     showConfirmButton: false
                 });
 
-                // Create Razorpay order
+            
                 const response = await fetch('/user/myprofile/create-razorpay-order', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        amount: currentTotalAmount * 100, // Razorpay expects amount in paise
+                        amount: currentTotalAmount * 100, 
                         currency: 'INR',
                         receipt: 'order_' + Date.now(),
                         orderData: orderData
@@ -787,13 +787,13 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     return;
                 }
 
-                // Close loading dialog
+            
                 Swal.close();
 
                 
                 razorpayOrderId = result.orderId;
 
-                // Initialize Razorpay payment
+                
                 const options = {
                     key: '<%= process.env.KEY_ID %>', 
                     amount: currentTotalAmount * 100, 
@@ -802,7 +802,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     description: 'Purchase from M Store',
                     order_id: result.orderId,
                     handler: async function (response) {
-                        // Show loading state
+                
                         Swal.fire({
                             title: 'Verifying payment...',
                             didOpen: () => {
@@ -813,7 +813,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                         });
 
                         try {
-                            // Verify payment with your server
+                            
                             const verifyResponse = await fetch('/user/myprofile/verify-razorpay-payment', {
                                 method: 'POST',
                                 headers: {
@@ -831,14 +831,14 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                             console.log("verifyResult",verifyResult)
 
                             if (verifyResponse.ok) {
-                                // Show success message
+                                
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Payment Successful!',
                                     text: 'Your order has been placed successfully.',
                                     confirmButtonText: 'OK'
                                 }).then(() => {
-                                    // Redirect to order confirmation page
+                                
                                     window.location.href = `/user/myprofile/order-confirmed/${verifyResult.orderId}`;
                                 });
                             } else {
@@ -855,7 +855,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                             }
                         } catch (error) {
                             console.error("Error verifying payment:", error);
-                            // Create an order anyway but mark it as payment_failed, then redirect
+                        
         fetch('/user/myprofile/create-failed-order', {
             method: 'POST',
             headers: {
@@ -877,7 +877,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
         })
         .catch(err => {
             console.error("Error creating failed order:", err);
-            // Fallback to homepage if we can't create an order
+            
             window.location.href = "/user/myprofile/cart";
         });
     }
@@ -914,7 +914,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
         })
         .catch(err => {
             console.error("Error creating failed order:", err);
-            // Fallback to cart if we can't create an order
+        
             window.location.href = "/user/myprofile/cart";
         });
 
@@ -922,7 +922,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     }
                 };
 
-                // Open Razorpay payment form
+                
                 const razorpayInstance = new Razorpay(options);
                 razorpayInstance.open();
             }
@@ -934,14 +934,14 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 text: 'An unexpected error occurred. Please try again.'
             });
             
-            // Show retry button
+            
             document.getElementById('retryPayment').style.display = 'block';
             // window.location.href="/user/myprofile/failed-paymentpage"
 
         }
     }
 
-    // Function to retry payment
+    
     function retryPayment() {
         if (lastOrderData) {
             processPayment();
@@ -954,10 +954,10 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
         }
     }
 
-    // Function to place the order
+
     async function placeOrder() {
         try {
-            // Check if a payment method is selected
+            
             const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
             if (!selectedPaymentMethod) {
                 Swal.fire({
@@ -965,9 +965,9 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     title: 'Error',
                     text: 'Please select a payment method.'
                 });
-                return; // Stop execution if no payment method is selected
+                return; 
             }
-            // Check if an address is selected
+            
             const selectedAddress = document.querySelector('input[name="address"]:checked');
             if (!selectedAddress) {
                 Swal.fire({
@@ -975,10 +975,10 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     title: 'Error',
                     text: 'Please select a delivery address.'
                 });
-                return; // Stop execution if no address is selected
+                return; 
             }
             
-            // Get the current total amount from the UI
+            
             const selectedCoupon = document.querySelector('.coupon.applied');
 const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '';
 
@@ -987,7 +987,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 ? parseFloat(document.getElementById('couponDiscount').textContent.replace('-₹', ''))
                 : 0;
             
-            // Gather data from the page
+        
             const orderData = {
                 userId: "<%= user._id %>",
                 shippingAddress: selectedAddress.value,
@@ -1011,7 +1011,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 }
             };
 
-            // Send the order data to the backend using Fetch API
+            
             const response = await fetch('/user/myprofile/order-placed', {
                 method: 'POST',
                 headers: {
@@ -1020,23 +1020,23 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 body: JSON.stringify(orderData)
             });
 
-            // Parse the response
+    
             const result = await response.json();
             console.log(result);
 
             if (response.ok) {
-                // Show success message with SweetAlert
+                
                 Swal.fire({
                     icon: 'success',
                     title: 'Order Placed!',
                     text: 'Your order has been successfully placed.',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    // Redirect to the order confirmation page
+                    
                     window.location.href = `/user/myprofile/order-confirmed/${result.orderId}`;
                 });
             } else {
-                // Show error message with SweetAlert
+        
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -1045,7 +1045,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
             }
         } catch (error) {
             console.error("Error placing order:", error);
-            // Show error message with SweetAlert
+            
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -1056,7 +1056,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
           
     async function applyCoupon(couponId, userId) {
     try {
-        // Show loading state
+    
         console.log("Applying coupon:", couponId, "for user:", userId);
         
         Swal.fire({
@@ -1082,11 +1082,11 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
         // console.log("Response data:", result);
 
         if (response.ok) {
-            // Get the coupon element and its data
+            
             const couponElement = document.querySelector(`.coupon[data-id="${couponId}"]`);
             const couponCode = couponElement.getAttribute('data-code');
             
-            // Update UI with the applied coupon
+            
             updateUIWithCoupon(couponId, couponCode, result.discountAmount);
             
             Swal.fire({
@@ -1114,7 +1114,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
 
     async function removeCoupon(couponId, userId) {
         try {
-            // Show loading state
+    
             Swal.fire({
                 title: 'Removing coupon...',
                 didOpen: () => {
@@ -1124,8 +1124,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 showConfirmButton: false
             });
             
-            // Here you would typically have an API endpoint to remove the coupon
-            // For now, we'll simulate it with a timeout
+        
             const response = await fetch(`/user/myprofile/checkout/${userId}/remove-coupon`, {
                 method: "POST",
                 headers: {
@@ -1134,11 +1133,11 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 body: JSON.stringify({couponId, userId})
             });
 
-            // Assuming the response structure
+            
             const result = await response.json();
 
             if (response.ok) {
-                // Update UI to remove coupon effects
+            
                 resetCouponUI();
                 
                 Swal.fire({
@@ -1157,8 +1156,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
         } catch (error) {
             console.error("Error removing coupon:", error);
             
-            // For demo purposes, we'll still update the UI even if there's an error
-            // In a real application, you would handle this differently
+        
             resetCouponUI();
             
             Swal.fire({
@@ -1170,15 +1168,15 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
         }
     }
 
-    // Function to update UI when a coupon is applied
+
     function updateUIWithCoupon(couponId, couponCode, discountAmount) {
-    // 1. Update all coupon buttons - change all to "Apply" except the applied one
+    
     document.querySelectorAll('.coupon').forEach(coupon => {
         const currentCouponId = coupon.getAttribute('data-id');
         const buttonElement = coupon.querySelector('button');
         
         if (currentCouponId === couponId) {
-            // This is the applied coupon
+        
             coupon.classList.add('applied');
             buttonElement.className = 'btn btn-danger';
             buttonElement.textContent = 'Remove';
@@ -1186,7 +1184,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 removeCoupon(couponId, '<%= user._id %>'); 
             };
         } else {
-            // Reset other coupons
+            
             coupon.classList.remove('applied');
             buttonElement.className = 'btn btn-outlined';
             buttonElement.textContent = 'Apply';
@@ -1196,15 +1194,15 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
         }
     });
     
-    // 2. Update price details
+
     const couponDiscountAmount = parseFloat(discountAmount) || 0;
     
-    // Show coupon discount row
+    
     document.getElementById('couponDiscountRow').style.display = '';
     document.getElementById('appliedCouponCode').textContent = `(${couponCode})`;
     document.getElementById('couponDiscount').textContent = `-₹${couponDiscountAmount.toFixed(2)}`;
     
-    // 3. Update total amount
+    
     const totalPrice = parseFloat(document.getElementById('totalPrice').textContent.replace('₹', ''));
     const totalDiscount = parseFloat(document.getElementById('totalDiscount').textContent.replace('-₹', ''));
     const deliveryCharges = document.getElementById('deliveryCharges').textContent.includes('FREE') ? 0 : 100;
@@ -1213,17 +1211,17 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
     const newTotalAmount = totalPrice - totalDiscount - couponDiscountAmount + deliveryCharges + gst;
     document.getElementById('totalAmount').textContent = `₹${newTotalAmount.toFixed(2)}`;
     
-    // 4. Update pay button amount
+    
     document.getElementById('finalPayAmount').textContent = newTotalAmount.toFixed(2);
     
-    // 5. Update savings message
+
     const totalSavings = totalDiscount + couponDiscountAmount;
     document.getElementById('totalSavings').textContent = totalSavings.toFixed(2);
 }
 
-    // Function to reset UI when coupon is removed
+
     function resetCouponUI() {
-        // 1. Reset all coupon buttons to "Apply"
+
         document.querySelectorAll('.coupon').forEach(coupon => {
             coupon.classList.remove('applied');
             const buttonElement = coupon.querySelector('button');
@@ -1236,12 +1234,12 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
             };
         });
         
-        // 2. Hide coupon discount row
+    
         document.getElementById('couponDiscountRow').style.display = 'none';
         document.getElementById('appliedCouponCode').textContent = '';
         document.getElementById('couponDiscount').textContent = '-₹0.00';
         
-        // 3. Recalculate total amount without coupon discount
+    
         const totalPrice = originalValues.totalPrice;
         const totalDiscount = originalValues.totalDiscount;
         const deliveryCharges = originalValues.deliveryCharges;
@@ -1250,10 +1248,10 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
         const newTotalAmount = totalPrice - totalDiscount + deliveryCharges + gst;
         document.getElementById('totalAmount').textContent = `₹${newTotalAmount.toFixed(2)}`;
         
-        // 4. Update pay button amount
+    
         document.getElementById('finalPayAmount').textContent = newTotalAmount.toFixed(2);
         
-        // 5. Update savings message (without coupon discount)
+    
         document.getElementById('totalSavings').textContent = totalDiscount.toFixed(2);
     }
 </script>

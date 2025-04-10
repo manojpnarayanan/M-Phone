@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.name %> - Product Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* All existing styles remain the same until zoom-related styles */
+        :root {
+    --primary-color: #131921;
+    --secondary-color: #232f3e;
+    --accent-color: #febd69;
+    --text-color: #333;
+    --light-bg: #f5f5f5;
+}
+        
+        .breadcrumb {
+            background: none;
+            padding: 0;
+        }
+        .product-container {
+            margin-top: 20px;
+        }
+        .img-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .img-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .img-thumbnail:hover {
+            border-color: #0066c0;
+            transform: scale(1.1);
+        }
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 500px;
+            background: #fff;
+            border: 1px solid #eee;
+            overflow: visible;
+            border-radius: 8px;
+        }
+        .main-image {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            object-fit: contain;
+            padding: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+        /* Modified zoom styles for better functionality */
+        .zoom-lens {
+            position: absolute;
+            border: 1px solid #ccc;
+            width: 150px;
+            height: 150px;
+            display: none;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: crosshair;
+            pointer-events: none;
+        }
+        .zoom-result {
+            position: absolute;
+            top: 0;
+            left: 105%;
+            width: 500px;
+            height: 500px;
+            border: 1px solid #ddd;
+            background: white;
+            display: none;
+            overflow: hidden;
+            z-index: 999;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .zoom-result img {
+            position: absolute;
+            max-width: none;
+        }
+        /* Rest of your existing styles remain exactly the same */
+        .price-tag {
+            font-size: 28px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+        .stock-status {
+            font-weight: bold;
+        }
+
+        .related-product-image {
+            width: 100%;
+            height: 140px; /* Adjusted height */
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .related-products {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px; /* Adjust the gap between cards */
+            padding: 10px 0;
+        }
+        .related-products .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+        .related-products .card img:hover {
+            transform: scale(1.1);
+        }
+        .card {
+            border: none;
+            transition: box-shadow 0.3s ease-in-out;
+            border-radius: 8px;
+        }
+        .card:hover {
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+        }
+        .review {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        @media (max-width: 992px) {
+            .zoom-result {
+                display: none !important;
+            }
+            .main-image {
+                cursor: default;
+            }
+        }
+       
+       
+        .related-product-card {
+            width: 180px; /* Fixed width for each card */
+            padding: 10px;
+            background: #fff;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            flex: 0 0 auto; /* Prevent flex items from growing or shrinking */
+        }
+
+
+        .related-product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-img-top {
+            border-radius: 8px 8px 0 0;
+        }
+
+
+        .related-product-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 6px;
+            text-align: center;
+            color: #333;
+        }
+
+        .related-product-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e41e31;
+            margin: 4px 0;
+        }
+        .related-products .col-auto {
+            margin-bottom: 15px;
+        }
+        .review {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .review strong {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .review p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .cart-icon {
+            position: relative;
+            display: inline-block;
+            padding: 0.5rem 1rem; /* Add padding to ensure proper spacing */
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px; /* Adjust this value to move the badge up or down */
+            right: -5px; /* Adjust this value to move the badge left or right */
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            background-color: #dc3545; /* Red background for the badge */
+            color: white; /* White text color */
+            border-radius: 50%; /* Make the badge circular */
+            min-width: 20px; /* Ensure the badge has a minimum width */
+            text-align: center; /* Center the text inside the badge */
+            line-height: 1; /* Adjust line height for better alignment */
+        }
+    
+    /* Navbar specific styles */
+    .navbar {
+        background-color: #343a40 !important; /* Dark background */
+        padding: 0.8rem 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-nav {
+        align-items: center;
+    }
+
+    .nav-link {
+        color: rgba(255,255,255,0.85) !important;
+        font-weight: 500;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.3s ease;
+        margin: 0 0.25rem;
+    }
+
+    .nav-link:hover, .nav-link.active {
+        color: #ffc107 !important; /* Yellow accent color */
+        text-decoration: none;
+    }
+
+    .signup-btn {
+        background-color: #ffc107; /* Yellow accent */
+        color: #343a40 !important; /* Dark text */
+        border-radius: 4px;
+        font-weight: 600;
+        margin-left: 0.5rem;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .signup-btn:hover {
+        background-color: #e0a800; /* Darker yellow */
+        color: #343a40 !important;
+        transform: translateY(-1px);
+    }
+
+    .navbar-toggler {
+        border-color: rgba(255,255,255,0.1);
+    }
+
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    /* Make navbar sticky if desired */
+    /* .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+    } */
+     /* Modal styling */
+.signup-modal .modal-header {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.signup-modal .modal-title {
+    font-weight: 600;
+}
+
+.signup-modal .modal-body {
+    padding: 2rem;
+}
+
+.signup-modal .btn-primary {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    border: none;
+    font-weight: 600;
+}
+
+.signup-modal .btn-primary:hover {
+    background-color: #f0ad4e;
+}
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark  bg-dark">
+        <div class="container">
+          <a class="navbar-brand" href="/">M Store</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+              <li class="nav-item"><a class="nav-link active" href="/shop">Shop</a></li>
+              <li class="nav-item">
+                <a class="btn signup-btn" href="/user/signup">Sign Up</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    <div class="container product-container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/user/dashboard">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><%= product.name %></li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="img-gallery me-3">
+                        <% if (product.image && product.image.length > 0) { %>
+                            <% product.image.forEach(img => { %>
+                                <img src="/<%= img %>" class="img-thumbnail" onclick="changeImage('/<%= img %>')" alt="Thumbnail">
+                            <% }) %>
+                        <% } %>
+                    </div>
+                    <div class="product-image-container">
+                        <div class="zoom-lens" id="zoomLens"></div>
+                        <% if (product.image && product.image.length > 0) { %>
+                            <img id="mainImage" src="/<%= product.image[0] %>" class="main-image" alt="<%= product.name %>">
+                        <% } else { %>
+                            <img id="mainImage" src="/images/default.png" class="main-image" alt="No Image Available">
+                        <% } %>
+                        <div class="zoom-result" id="zoomResult">
+                            <img id="zoomedImage" src="/<%= product.image[0] %>" alt="Zoomed Image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2><%= product.name %></h2>
+                <p>⭐ <%= product.ratings %> / 5 ( <%= product.reviews ? product.reviews.length : 0 %> Reviews )</p>
+                <p class="price-tag">₹<%= product.price %></p>
+                <% if (highestDiscount > 0) { %>
+                    <p class="text-success">Discount: <%= highestDiscount %>% OFF</p>
+                <% } %>
+                <% if (product.stock > 0) { %>
+                    <% if (isLoggedIn) { %>
+                        <form id="addToCartForm" action="/user/dashboard/addtocart/<%= product._id %>" method="POST">
+                            <button id="addToCart" type="submit" class="btn btn-primary">Add to Cart</button>
+                        </form>
+                    <% } else { %>
+                        <button id="loginReqBtn" class="btn btn-primary" onclick="showSignupModal(event)">Add to Cart</button>
+                    <% } %>
+                    <p class="text-success stock-status">In Stock: <%= product.stock %> left</p>
+                <% } else { %>
+                    <p class="text-danger stock-status">Out of Stock</p>
+                <% } %>
+                <div class="card mt-3">
+                    <div class="card-body">
+                      <h5>Description:</h5>
+                      <div class="mb-2">
+                        <%= product.description %>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+
+        <h4 class="mt-5">Reviews</h4>
+        <div id="reviews">
+            <% if (reviews && reviews.length > 0) { %>
+                <% reviews.forEach(review => { %>
+                    <div class="review mb-3 p-3">
+                        <strong><%= review.user.name %></strong>
+                        <p>⭐ <%= review.rating %> / 5</p>
+                        <p class="mb-0"><%= review.comment %></p>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>No reviews yet. Be the first to review this product!</p>
+            <% } %>
+        </div>
+
+        <h4 class="mt-5">Related Products</h4>
+        <div class="related-products">
+            <% if (relatedProducts && relatedProducts.length > 0) { %>
+                <% relatedProducts.forEach(related => { %>
+                    <div class="related-product-card">
+                        <a href="/products/<%= related._id %>" class="text-decoration-none">
+                            <% if (related.image && related.image.length > 0) { %>
+                                <img src="/<%= related.image[0] %>" alt="<%= related.name %>" class="related-product-image">
+                            <% } else { %>
+                                <img src="/images/default.png" alt="No Image Available" class="related-product-image">
+                            <% } %>
+                            <div class="related-product-title"><%= related.name %></div>
+                            <div class="related-product-price">₹<%= related.price %></div>
+                        </a>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>No related products found.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Login Required Modal -->
+    <!-- <div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Login Required</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>You need to sign up or log in to add items to your cart.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="/register" class="btn btn-success">Sign Up</a>
+                    <a href="/login" class="btn btn-primary">Login</a>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- Replace this in your product details page -->
+<!-- Signup Modal -->
+<div class="modal fade signup-modal" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Sign Up Required</h5>
+                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-user-plus mb-4" style="font-size: 3rem; color: var(--accent-color);"></i>
+                <h4 class="mb-3">Create an account to continue</h4>
+                <p class="mb-4">You need to sign up or log in to add items to your cart or wishlist.</p>
+                <div class="d-grid gap-2">
+                    <a href="/user/signup" class="btn btn-primary">Sign Up Now</a>
+                    <a href="/user/login" class="btn btn-outline-secondary">Log In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 M Store. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+
+    
+// function showSignupModal(event) {
+//     event.preventDefault();
+//     event.stopPropagation();
+//     const modal = new bootstrap.Modal(document.getElementById('loginRequiredModal'));
+//     modal.show();
+// }
+
+function showSignupModal(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    
+    const modalElement = document.getElementById('loginRequiredModal');
+    const modal = new bootstrap.Modal(modalElement);
+    
+    
+    modal.show();
+    
+    
+    modalElement.addEventListener('hidden.bs.modal', function() {
+        
+        document.body.classList.remove('modal-open');
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+    });
+}
+
+if (document.getElementById('loginReqBtn')) {
+    document.getElementById('loginReqBtn').addEventListener('click', showSignupModal);
+}
+
+
+if (loginReqBtn) {
+    loginReqBtn.addEventListener('click', showSignupModal);
+}
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainImage = document.getElementById('mainImage');
+            const zoomLens = document.getElementById('zoomLens');
+            const zoomResult = document.getElementById('zoomResult');
+            const zoomedImage = document.getElementById('zoomedImage');
+            const loginReqBtn = document.getElementById('loginReqBtn');
+            
+            // Show login required modal for non-logged in users
+            if (loginReqBtn) {
+                loginReqBtn.addEventListener('click', function() {
+                    const loginModal = new bootstrap.Modal(document.getElementById('loginRequiredModal'));
+                    loginModal.show();
+                });
+            }
+            
+            const ZOOM_LEVEL = 3; // Increased zoom level for better detail
+            
+            function initZoom() {
+                if (!mainImage.complete) {
+                    mainImage.onload = calculateZoom;
+                } else {
+                    calculateZoom();
+                }
+            }
+            
+            function calculateZoom() {
+                const zoomedWidth = mainImage.naturalWidth * ZOOM_LEVEL;
+                const zoomedHeight = mainImage.naturalHeight * ZOOM_LEVEL;
+                
+                zoomedImage.style.width = `${zoomedWidth}px`;
+                zoomedImage.style.height = `${zoomedHeight}px`;
+            }
+            
+            function getMousePosition(event) {
+                const rect = mainImage.getBoundingClientRect();
+                const scaleX = mainImage.naturalWidth / rect.width;
+                const scaleY = mainImage.naturalHeight / rect.height;
+                
+                return {
+                    x: (event.clientX - rect.left) * scaleX,
+                    y: (event.clientY - rect.top) * scaleY
+                };
+            }
+            
+            function moveLens(mousePos) {
+                const rect = mainImage.getBoundingClientRect();
+                const lensRect = zoomLens.getBoundingClientRect();
+                
+                // Calculate lens position
+                let x = mousePos.x - (lensRect.width / 2);
+                let y = mousePos.y - (lensRect.height / 2);
+                
+                // Boundary checks
+                const maxX = rect.width - lensRect.width;
+                const maxY = rect.height - lensRect.height;
+                
+                x = Math.min(Math.max(0, x), maxX);
+                y = Math.min(Math.max(0, y), maxY);
+                
+                // Update lens position
+                zoomLens.style.left = `${x}px`;
+                zoomLens.style.top = `${y}px`;
+                
+                // Calculate zoom position
+                const zoomX = x * ZOOM_LEVEL;
+                const zoomY = y * ZOOM_LEVEL;
+                
+                zoomedImage.style.left = `-${zoomX}px`;
+                zoomedImage.style.top = `-${zoomY}px`;
+            }
+            
+            function changeImage(src) {
+                mainImage.src = src;
+                zoomedImage.src = src;
+                
+                // Reset zoom calculations
+                initZoom();
+            }
+            
+            // Mouse event handlers
+            mainImage.addEventListener('mouseenter', function(e) {
+                if (window.innerWidth >= 992) {
+                    zoomLens.style.display = 'block';
+                    zoomResult.style.display = 'block';
+                    const mousePos = getMousePosition(e);
+                    moveLens(mousePos);
+                }
+            });
+            
+            mainImage.addEventListener('mouseleave', function() {
+                zoomLens.style.display = 'none';
+                zoomResult.style.display = 'none';
+            });
+            
+            mainImage.addEventListener('mousemove', function(e) {
+                if (window.innerWidth < 992) return;
+                e.preventDefault();
+                const mousePos = getMousePosition(e);
+                moveLens(mousePos);
+            });
+            
+            // Thumbnail click handler
+            const thumbnails = document.querySelectorAll('.img-thumbnail');
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    const src = this.getAttribute('src');
+                    changeImage(src);
+                });
+            });
+            
+            // Window resize handler
+            window.addEventListener('resize', function() {
+                if (window.innerWidth < 992) {
+                    zoomLens.style.display = 'none';
+                    zoomResult.style.display = 'none';
+                }
+                initZoom();
+            });
+            
+            // Initialize zoom on page load
+            initZoom();
+
+            // Add to cart form handler for logged in users
+            const addToCartForm = document.getElementById('addToCartForm');
+            if (addToCartForm) {
+                addToCartForm.addEventListener("submit", function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(addToCartForm);
+                    fetch(addToCartForm.action, {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Product Added to Cart',
+                                text: 'Your product has been successfully added to the cart!',
+                                confirmButtonText: 'OK'
+                            });
+                            const cartBadge = document.querySelector('.cart-badge');
+                            if (cartBadge) {
+                                const currentCount = parseInt(cartBadge.textContent) || 0;
+                                cartBadge.textContent = currentCount + 1;
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: data.message || 'Something went wrong!',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Something went wrong!',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

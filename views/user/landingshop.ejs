@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>M Store - Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary-color: #131921;
+      --secondary-color: #232f3e;
+      --accent-color: #febd69;
+      --text-color: #333;
+      --light-bg: #f5f5f5;
+      --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      --hover-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-color);
+    }
+
+    /* Navbar styling */
+    .navbar {
+      background-color: var(--primary-color) !important;
+      padding: 0.8rem 1rem;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white !important;
+    }
+
+    .nav-link, .signup-btn {
+      color: white !important;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover, .signup-btn:hover {
+      color: var(--accent-color) !important;
+    }
+
+    .nav-link.active {
+      color: var(--accent-color) !important;
+      text-decoration: none !important; 
+    }
+
+    .signup-btn {
+      background-color: var(--accent-color);
+      color: var(--primary-color) !important;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .signup-btn:hover {
+      background-color: #f0ad4e;
+      color: var(--primary-color) !important;
+    }
+
+    /* Search bar */
+    .search-container {
+      background-color: var(--secondary-color);
+      padding: 1rem 0;
+    }
+
+    .search-form {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .search-input {
+      border-radius: 20px 0 0 20px;
+      border: none;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+    }
+
+    .search-button {
+      background-color: var(--accent-color);
+      color: var(--primary-color);
+      border: none;
+      border-radius: 0 20px 20px 0;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .search-button:hover {
+      background-color: #f0ad4e;
+      color: var(--primary-color);
+    }
+
+    /* Filter section */
+    .filter-section {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .filter-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .filter-row .form-label {
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+
+    .form-select, .form-range {
+      border-color: #ddd;
+    }
+
+    .form-select:focus, .form-range:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 0.25rem rgba(254, 189, 105, 0.25);
+    }
+
+    /* Product grid */
+    .products-section {
+      padding: 2rem 0;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 80px;
+      height: 3px;
+      background-color: var(--accent-color);
+    }
+
+    .product-card {
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+      transition: all 0.3s ease;
+      height: 100%;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .product-image {
+      height: 200px;
+      width: 100%;
+      object-fit: contain;
+      background-color: #f9f9f9;
+      padding: 1rem;
+    }
+
+    .product-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #dc3545;
+      color: white;
+      font-weight: 600;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .product-content {
+      padding: 1.2rem;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+      height: 2.4rem;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .product-description {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      height: 2.7rem;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .product-price {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #B12704;
+      margin-bottom: 1rem;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-cart {
+      background-color: var(--accent-color);
+      color: var(--primary-color);
+      font-weight: 600;
+      border: none;
+      flex-grow: 1;
+      transition: all 0.3s ease;
+    }
+
+    .btn-cart:hover {
+      background-color: #f0ad4e;
+      color: var(--primary-color);
+    }
+
+    .wishlist-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 1.5rem;
+      color: #aaa;
+      background-color: rgba(255, 255, 255, 0.8);
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .wishlist-icon:hover {
+      color: #dc3545 !important;
+      transform: scale(1.1);
+    }
+
+    /* Pagination */
+    .pagination {
+      margin: 2rem 0;
+    }
+
+    .page-link {
+      color: var(--primary-color);
+      border-color: #ddd;
+      margin: 0 0.2rem;
+      border-radius: 4px;
+    }
+
+    .page-item.active .page-link {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+      color: var(--primary-color);
+    }
+
+    .page-link:hover {
+      background-color: #f5f5f5;
+      color: var(--primary-color);
+    }
+
+    /* Footer */
+    .footer {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 2rem 0;
+      margin-top: 3rem;
+    }
+
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .footer-logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-link {
+      color: #ddd;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: var(--accent-color);
+    }
+
+    .footer-copyright {
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    /* Modal styling */
+    .signup-modal .modal-header {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .signup-modal .modal-title {
+      font-weight: 600;
+    }
+
+    .signup-modal .modal-body {
+      padding: 2rem;
+    }
+
+    .signup-modal .btn-primary {
+      background-color: var(--accent-color);
+      color: var(--primary-color);
+      border: none;
+      font-weight: 600;
+    }
+
+    .signup-modal .btn-primary:hover {
+      background-color: #f0ad4e;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .product-image {
+        height: 180px;
+      }
+      
+      .filter-section {
+        padding: 1rem;
+      }
+      
+      .section-title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">M Store</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/shop">Shop</a></li>
+          <li class="nav-item">
+            <a class="btn signup-btn" href="/user/signup">Sign Up</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+   
+  <!-- Search Bar -->
+  <div class="search-container">
+    <div class="container">
+      <form action="/shop" method="get" class="d-flex search-form" id="searchForm">
+        <input type="text" name="search" class="form-control search-input flex-grow-1" placeholder="Search products..." value="<%= search || '' %>">
+        
+        <!-- Hidden inputs to preserve other parameters -->
+        <input type="hidden" name="category" value="<%= category || 'all' %>">
+        <input type="hidden" name="brand" value="<%= brand || 'all' %>">
+        <input type="hidden" name="price" value="<%= price || '0' %>">
+        <input type="hidden" name="sort" value="<%= sort || '' %>">
+        
+        <button type="submit" class="btn search-button">Search</button>
+      </form>
+    </div>
+  </div>
+    
+  <!-- Filters Section -->
+  <div class="container">
+    <div class="filter-section">
+      <div class="row align-items-end">
+        <!-- Left: Filters -->
+        <div class="col-md-8">
+          <div class="filter-title mb-3">Refine Your Results</div>
+          <div class="row g-3 align-items-end">
+            <!-- Price Range Filter -->
+            <div class="col-md-4">
+              <label for="priceRange" class="form-label">Price Range</label>
+              <input type="range" class="form-range" id="priceRange" min="0" max="1000000" step="1000" 
+                     value="<%= price || 0 %>" onchange="applyFilters()">
+              <p class="mb-0">₹<span id="priceValue"><%= price || 0 %></span></p>
+            </div>
+            <!-- Category Filter -->
+            <div class="col-md-4">
+              <label for="categoryFilter" class="form-label">Category</label>
+              <select class="form-select" id="categoryFilter" onchange="applyFilters()">
+                <option value="all" <%= category === 'all' ? 'selected' : '' %>>All Categories</option>
+                <option value="Premium" <%= category === 'Premium' ? 'selected' : '' %>>Premium Phones</option>
+                <option value="Business" <%= category === 'Business' ? 'selected' : '' %>>Business Phones</option>
+                <option value="Featured" <%= category === 'Featured' ? 'selected' : '' %>>Featured Phones</option>
+              </select>
+            </div>
+            <!-- Brand Filter -->
+            <div class="col-md-4">
+              <label for="brandFilter" class="form-label">Brand</label>
+              <select class="form-select" id="brandFilter" onchange="applyFilters()">
+                <option value="all" <%= brand === 'all' ? 'selected' : '' %>>All Brands</option>
+                <option value="Apple" <%= brand === 'Apple' ? 'selected' : '' %>>Apple</option>
+                <option value="Samsung" <%= brand === 'Samsung' ? 'selected' : '' %>>Samsung</option>
+                <option value="Xiomi" <%= brand === 'Xiomi' ? 'selected' : '' %>>Xiomi</option>
+                <option value="Poco" <%= brand === 'Poco' ? 'selected' : '' %>>Poco</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- Right: Sort Dropdown -->
+        <div class="col-md-4 d-flex align-items-end">
+          <div class="w-100">
+            <label for="sort" class="form-label mb-1">Sort By</label>
+            <select id="sort" class="form-select">
+              <option value="price_low_to_high" <%= sort === 'price_low_to_high' ? 'selected' : '' %>>Price: Low to High</option>
+              <option value="price_high_to_low" <%= sort === 'price_high_to_low' ? 'selected' : '' %>>Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="container products-section">
+    <h2 class="section-title">Shop All Products</h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+      <% if (products && products.length > 0) { %>
+        <% products.forEach(product => { %>
+          <div class="col">
+            <div class="product-card">
+              <a href="/products/<%= product._id %>" class="text-decoration-none">
+                <% if (product.image && product.image.length > 0) { %>
+                  <img src="/<%= product.image[0] %>" class="product-image" alt="<%= product.name %>">
+                <% } else { %>
+                  <img src="/images/default.png" class="product-image" alt="No Image Available">
+                <% } %>
+                <% if (product.sale) { %>
+                  <span class="product-badge">SALE</span>
+                <% } %>
+                <div class="product-content">
+                  <h5 class="product-title"><%= product.name %></h5>
+                  <p class="product-description"><%= product.description.substring(0, 50) %>...</p>
+                  <p class="product-price">₹<%= product.price %></p>
+                  <div class="product-actions">
+                    <button class="btn btn-cart" onclick="showSignupModal(event)">Add to Cart</button>
+                  </div>
+                </div>
+              </a>
+              <!-- Wishlist Icon -->
+              <div class="wishlist-icon far" 
+                data-product-id="<%= product._id %>"
+                onclick="showSignupModal(event)">
+                <i class="fa-heart"></i>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="col-12">
+          <div class="alert alert-info text-center py-5">
+            <i class="fas fa-search mb-3" style="font-size: 3rem;"></i>
+            <h4>No products available</h4>
+            <p>Try adjusting your search or filter criteria</p>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- Pagination -->
+  <div class="d-flex justify-content-center">
+    <nav>
+      <ul class="pagination">
+        <% if (currentPage > 1) { %>
+          <li class="page-item">
+            <a class="page-link" href="/shop?page=<%= currentPage - 1 %>&search=<%= search || '' %>&sort=<%= sort || '' %>&category=<%= category || 'all' %>&brand=<%= brand || 'all' %>&price=<%= price || '0' %>">
+              <i class="fas fa-chevron-left"></i>
+            </a>
+          </li>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+            <a class="page-link" href="/shop?page=<%= i %>&search=<%= search || '' %>&sort=<%= sort || '' %>&category=<%= category || 'all' %>&brand=<%= brand || 'all' %>&price=<%= price || '0' %>"><%= i %></a>
+          </li>
+        <% } %>
+        <% if (currentPage < totalPages) { %>
+          <li class="page-item">
+            <a class="page-link" href="/shop?page=<%= currentPage + 1 %>&search=<%= search || '' %>&sort=<%= sort || '' %>&category=<%= category || 'all' %>&brand=<%= brand || 'all' %>&price=<%= price || '0' %>">
+              <i class="fas fa-chevron-right"></i>
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">M Store</div>
+        <div class="footer-links">
+          <a href="#" class="footer-link">About Us</a>
+          <a href="#" class="footer-link">Contact</a>
+          <a href="#" class="footer-link">Terms & Conditions</a>
+          <a href="#" class="footer-link">Privacy Policy</a>
+        </div>
+        <p class="footer-copyright">&copy; 2025 M Store. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Signup Modal -->
+<div class="modal fade signup-modal" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signupModalLabel">Sign Up Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-user-plus mb-4" style="font-size: 3rem; color: var(--accent-color);"></i>
+                <h4 class="mb-3">Create an account to continue</h4>
+                <p class="mb-4">You need to sign up or log in to add items to your cart or wishlist.</p>
+                <div class="d-grid gap-2">
+                    <a href="/user/signup" class="btn btn-primary">Sign Up Now</a>
+                    <a href="/user/login" class="btn btn-outline-secondary">Log In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+   // Updated showSignupModal function
+function showSignupModal(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Initialize the modal
+    const modalElement = document.getElementById('signupModal');
+    const modal = new bootstrap.Modal(modalElement);
+    
+    // Show the modal
+    modal.show();
+    
+    // Add event listener for when modal is hidden
+    modalElement.addEventListener('hidden.bs.modal', function() {
+        // Remove modal-open class from body
+        document.body.classList.remove('modal-open');
+        
+        // Remove any remaining modal backdrops
+        const backdrops = document.getElementsByClassName('modal-backdrop');
+        while (backdrops.length > 0) {
+            backdrops[0].parentNode.removeChild(backdrops[0]);
+        }
+        
+        // Reset body padding if it was modified
+        document.body.style.paddingRight = '';
+    });
+}
+
+// Add this to your existing DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', function() {
+    // ... your existing code ...
+    
+    // Ensure all elements that should trigger the modal have the correct event listeners
+    document.querySelectorAll('.wishlist-icon, .btn-cart').forEach(item => {
+        item.addEventListener('click', showSignupModal);
+    });
+    
+    // If you have any other modal triggers, add them here
+});
+
+    // Apply filters function
+    function applyFilters() {
+      const priceRange = document.getElementById('priceRange').value;
+      const category = document.getElementById('categoryFilter').value;
+      const brand = document.getElementById('brandFilter').value;
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // Update with new filter values
+      urlParams.set('price', priceRange);
+      urlParams.set('category', category);
+      urlParams.set('brand', brand);
+      
+      
+      const currentSearch = urlParams.get('search');
+      if (currentSearch) {
+        urlParams.set('search', currentSearch);
+      }
+      
+      
+      urlParams.set('page', '1');
+      
+      window.location.href = `/shop?${urlParams.toString()}`;
+    }
+    
+    
+    document.getElementById('sort').addEventListener('change', function() {
+      const sortValue = this.value;
+      
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      
+      urlParams.set('sort', sortValue);
+      
+    
+      window.location.href = `/shop?${urlParams.toString()}`;
+    });
+
+    
+    document.addEventListener('DOMContentLoaded', function() {
+    
+      const priceRangeInput = document.getElementById('priceRange');
+      const priceValue = document.getElementById('priceValue');
+      
+      if (priceRangeInput && priceValue) {
+        priceValue.textContent = priceRangeInput.value;
+        priceRangeInput.addEventListener('input', () => {
+          priceValue.textContent = priceRangeInput.value;
+        });
+      }
+
+    
+      document.querySelectorAll('.product-card a').forEach(item => {
+        item.addEventListener('click', function(e) {
+        
+        });
+      });
+
+      
+      document.querySelectorAll('.wishlist-icon, .btn-cart').forEach(item => {
+        item.addEventListener('click', showSignupModal);
+      });
+    });
+  </script>
+</body>
+</html>

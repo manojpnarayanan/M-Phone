@@ -171,7 +171,9 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Save Address</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="/user/myprofile/<%= user._id %>">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </a>
                     </div>
                 </form>
             </div>
@@ -188,11 +190,11 @@
    
 
     <script>
-        // Handle form submission
+        
         document.getElementById("addressForm").addEventListener("submit", async function (event) {
-            event.preventDefault(); // Prevent the default form submission
+            event.preventDefault(); 
     
-            // Get form data
+            
             const formData = {
                 name: document.getElementById("name").value.trim(),
                 mobilenumber: document.getElementById("mobilenumber").value.trim(),
@@ -204,7 +206,7 @@
                 addresstype: document.getElementById('addresstype').value.trim(),
             };
     
-            // Validate form data
+            
             if (!formData.name || !formData.mobilenumber || !formData.housename || !formData.city || !formData.pincode || !formData.state || !formData.country) {
                 Swal.fire({
                     icon: 'error',
@@ -214,7 +216,7 @@
                 return;
             }
     
-            // Check if mobile number is valid (10 digits)
+        
             if (!/^\d{10}$/.test(formData.mobilenumber)) {
                 Swal.fire({
                     icon: 'error',
@@ -224,7 +226,7 @@
                 return;
             }
     
-            // Check if pincode is valid (6 digits)
+    
             if (!/^\d{6}$/.test(formData.pincode)) {
                 Swal.fire({
                     icon: 'error',
@@ -235,7 +237,7 @@
             }
     
             try {
-                // Send the form data to the server
+            
                 const response = await fetch(`/user/myprofile/addaddress/<%=user._id%>`, {
                     method: "POST",
                     headers: {
@@ -251,22 +253,28 @@
                 const result = await response.json();
                 console.log(result);
     
-                // Show success alert using SweetAlert
+                
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
                     text: 'Address saved successfully!',
-                }).then(() => {
-                    // Close the modal after the user clicks "OK"
-                    const modalElement = document.getElementById('addressModal');
-                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                    modalInstance.hide();
-                    window.location.href = `/user/myprofile/<%=user._id%>`; // Replace with your desired URL
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+        const modalElement = document.getElementById('addressModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+        
+        window.location.replace(`/user/myprofile/<%=user._id%>`);
+    }
+                    
                 });
             } catch (error) {
                 console.error('Error:', error);
     
-                // Show error alert using SweetAlert
+                
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',

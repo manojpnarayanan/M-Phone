@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,20 +28,30 @@
     <style>
         /* Custom animations */
         @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0px); }
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
         }
+
         .float-animation {
             animation: float 3s ease-in-out infinite;
         }
-        
+
         /* Custom gradient for cards */
         .card-gradient {
-            background-image: linear-gradient(to bottom, rgba(255,255,255,0), rgba(249,250,251,1));
+            background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(249, 250, 251, 1));
         }
     </style>
 </head>
+
 <body class="font-sans bg-gray-100">
     <!-- Navbar -->
     <nav class="bg-dark sticky top-0 z-50 shadow-md">
@@ -49,23 +60,28 @@
                 <a href="#" class="text-2xl font-bold">
                     <span class="text-accent">M</span> <span class="text-white">Store</span>
                 </a>
-                
+
                 <button class="lg:hidden text-white" type="button" id="navbarToggler">
                     <i class="fas fa-bars"></i>
                 </button>
-                
+
                 <div class="hidden lg:flex items-center space-x-6" id="navMenu">
                     <a href="#" class="text-white font-medium hover:text-accent transition-colors">Home</a>
-                    <a href="/user/dashboard/shopping" class="text-white font-medium hover:text-accent transition-colors">Shop</a>
-                    <a href="/user/myprofile/<%= user._id%>" class="text-white font-medium hover:text-accent transition-colors">My Profile</a>
-                    <a href="/user/dashboard/addtocart" class="text-white font-medium hover:text-accent transition-colors relative">
+                    <a href="/user/dashboard/shopping"
+                        class="text-white font-medium hover:text-accent transition-colors">Shop</a>
+                    <a href="/user/myprofile/<%= user._id%>"
+                        class="text-white font-medium hover:text-accent transition-colors">My Profile</a>
+                    <a href="/user/dashboard/addtocart"
+                        class="text-white font-medium hover:text-accent transition-colors relative">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="absolute -top-2 -right-2 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                            <%= typeof cartItemCount !== 'undefined' ? cartItemCount : 0 %>
+                        <span
+                            class="absolute -top-2 -right-2 bg-danger text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            <%= typeof cartItemCount !=='undefined' ? cartItemCount : 0 %>
                         </span>
                     </a>
                     <form id="logoutForm" action="/user/logout" method="post">
-                        <button type="submit" class="bg-dark text-white font-medium hover:text-accent transition-colors">Logout</button>
+                        <button type="submit"
+                            class="bg-dark text-white font-medium hover:text-accent transition-colors">Logout</button>
                     </form>
                 </div>
             </div>
@@ -75,49 +91,62 @@
     <!-- Hero Section -->
     <section class="relative overflow-hidden rounded-lg shadow-lg mx-4 mt-6">
         <img src="/uploads/image-1738661995255.jpg" class="w-full h-auto object-cover" alt="Hero Image">
-        <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black bg-opacity-40 px-4">
+        <div
+            class="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black bg-opacity-40 px-4">
             <h2 class="text-3xl md:text-4xl font-bold mb-2 drop-shadow-lg">Life is easier on iPhone.</h2>
             <p class="text-lg mb-6 drop-shadow-md">Discover the latest technology at unbeatable prices.</p>
-            <a href="/user/dashboard/shopping" class="bg-accent hover:bg-accent/90 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition hover:-translate-y-1">Shop Now</a>
+            <a href="/user/dashboard/shopping"
+                class="bg-accent hover:bg-accent/90 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform transition hover:-translate-y-1">Shop
+                Now</a>
         </div>
     </section>
-    
+
     <!-- Category Section -->
     <div class="container mx-auto px-4 mt-10">
         <div class="bg-white rounded-xl shadow-md p-6 flex flex-wrap justify-around gap-4">
             <a href="#" class="group">
-                <div class="flex flex-col items-center p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all w-28 h-32">
-                    <img src="/assets/imgs/products/iphone.png" alt="Premium Phones" class="w-16 h-16 object-contain mb-2 group-hover:scale-110 transition-transform">
+                <div
+                    class="flex flex-col items-center p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all w-28 h-32">
+                    <img src="/assets/imgs/products/iphone.png" alt="Premium Phones"
+                        class="w-16 h-16 object-contain mb-2 group-hover:scale-110 transition-transform">
                     <p class="text-xs font-bold text-center text-gray-800">PREMIUM PHONES</p>
                 </div>
             </a>
             <a href="#" class="group">
-                <div class="flex flex-col items-center p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all w-28 h-32">
-                    <img src="/assets/imgs/products/s23_Ultra-removebg-preview.png" alt="Business Phones" class="w-16 h-16 object-contain mb-2 group-hover:scale-110 transition-transform">
+                <div
+                    class="flex flex-col items-center p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all w-28 h-32">
+                    <img src="/assets/imgs/products/s23_Ultra-removebg-preview.png" alt="Business Phones"
+                        class="w-16 h-16 object-contain mb-2 group-hover:scale-110 transition-transform">
                     <p class="text-xs font-bold text-center text-gray-800">BUSINESS PHONES</p>
                 </div>
             </a>
             <a href="#" class="group">
-                <div class="flex flex-col items-center p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all w-28 h-32">
-                    <img src="/assets/imgs/products/iphone.png" alt="Featured Phones" class="w-16 h-16 object-contain mb-2 group-hover:scale-110 transition-transform">
+                <div
+                    class="flex flex-col items-center p-4 rounded-lg bg-white shadow-sm border border-gray-200 hover:shadow-md hover:-translate-y-1 transition-all w-28 h-32">
+                    <img src="/assets/imgs/products/iphone.png" alt="Featured Phones"
+                        class="w-16 h-16 object-contain mb-2 group-hover:scale-110 transition-transform">
                     <p class="text-xs font-bold text-center text-gray-800">FEATURED PHONES</p>
                 </div>
             </a>
         </div>
     </div>
-   
+
     <!-- Search Bar -->
     <div class="container mx-auto px-4 mt-8">
         <div class="bg-white rounded-xl shadow-md p-4">
             <form action="/user/dashboard/products" method="GET" class="flex flex-wrap gap-2">
-                <input class="flex-1 min-w-0 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent" 
-                       type="search" name="search" value="<%= searchQuery %>" 
-                       placeholder="Search for phones, accessories and more..." aria-label="Search">
-                <button class="bg-accent hover:bg-accent/90 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2" type="submit">
+                <input
+                    class="flex-1 min-w-0 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent"
+                    type="search" name="search" value="<%= searchQuery %>"
+                    placeholder="Search for phones, accessories and more..." aria-label="Search">
+                <button
+                    class="bg-accent hover:bg-accent/90 text-white font-medium px-4 py-2 rounded-lg flex items-center gap-2"
+                    type="submit">
                     <i class="fas fa-search"></i>
                     Search
                 </button>
-                <a href="/user/dashboard" class="bg-secondary hover:bg-secondary/90 text-white font-medium px-4 py-2 rounded-lg">Clear</a>
+                <a href="/user/dashboard"
+                    class="bg-secondary hover:bg-secondary/90 text-white font-medium px-4 py-2 rounded-lg">Clear</a>
             </form>
         </div>
     </div>
@@ -125,142 +154,164 @@
     <!-- Product Grid -->
     <div class="container mx-auto px-4 my-10">
         <h2 class="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-accent inline-block">Our Products</h2>
-        
+
         <!-- Product Cards Grid with perfect alignment -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            <% if (products && products.length > 0) { %>
-                <% products.forEach(product => { %>
+            <% if (products && products.length> 0) { %>
+                <% products.forEach(product=> { %>
                     <!-- Product Card - Creative and Professional Design -->
                     <div class="group h-full">
                         <a href="/user/dashboard/products/<%= product._id %>" class="block h-full">
-                            <div class="bg-white rounded-2xl overflow-hidden h-full flex flex-col relative shadow-md group-hover:shadow-xl transition-all duration-300 border border-gray-100">
+                            <div
+                                class="bg-white rounded-2xl overflow-hidden h-full flex flex-col relative shadow-md group-hover:shadow-xl transition-all duration-300 border border-gray-100">
                                 <!-- Decorative elements -->
-                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
-                                
+                                <div
+                                    class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary">
+                                </div>
+
                                 <!-- Image Container - Fixed height for consistency -->
                                 <div class="relative h-64 overflow-hidden bg-gray-50">
                                     <!-- Background pattern -->
-                                    <div class="absolute inset-0 opacity-5 bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px]"></div>
-                                    
+                                    <div
+                                        class="absolute inset-0 opacity-5 bg-[radial-gradient(#333_1px,transparent_1px)] [background-size:20px_20px]">
+                                    </div>
+
                                     <!-- Product Image - Centered and consistent size -->
                                     <div class="absolute inset-0 flex items-center justify-center p-6">
-                                        <% if (product.image && product.image.length > 0) { %>
-                                            <img src="/<%= product.image[0] %>" 
-                                                class="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-500 float-animation" 
+                                        <% if (product.image && product.image.length> 0) { %>
+                                            <img src="/<%= product.image[0] %>"
+                                                class="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-500 float-animation"
                                                 alt="<%= product.name %>">
-                                        <% } else { %>
-                                            <img src="/images/default.png" 
-                                                class="max-h-full max-w-full object-contain" 
-                                                alt="No Image Available">
-                                        <% } %>
+                                            <% } else { %>
+                                                <img src="/images/default.png"
+                                                    class="max-h-full max-w-full object-contain"
+                                                    alt="No Image Available">
+                                                <% } %>
                                     </div>
-                                    
+
                                     <!-- Badges -->
                                     <div class="absolute top-0 right-0 p-3 flex flex-col gap-2">
-                                        <% if (product.highestDiscount > 0) { %>
-                                            <div class="bg-danger text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-lg transform -rotate-3 group-hover:rotate-0 transition-transform">
+                                        <% if (product.highestDiscount> 0) { %>
+                                            <div
+                                                class="bg-danger text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-lg transform -rotate-3 group-hover:rotate-0 transition-transform">
                                                 <%= product.highestDiscount %>% OFF
                                             </div>
-                                        <% } %>
-                                        
-                                        <% if (product.stock <= 5 && product.stock > 0) { %>
-                                            <div class="bg-amber-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-lg transform rotate-3 group-hover:rotate-0 transition-transform">
-                                                ONLY <%= product.stock %> LEFT
-                                            </div>
-                                        <% } %>
+                                            <% } %>
+
+                                                <% if (product.stock <=5 && product.stock> 0) { %>
+                                                    <div
+                                                        class="bg-amber-500 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-lg transform rotate-3 group-hover:rotate-0 transition-transform">
+                                                        ONLY <%= product.stock %> LEFT
+                                                    </div>
+                                                    <% } %>
                                     </div>
-                                    
+
                                     <!-- Availability Badge -->
-                                    <% if (product.availability !== 'in_stock') { %>
-                                        <div class="absolute top-3 left-3 bg-secondary text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg uppercase transform rotate-3 group-hover:rotate-0 transition-transform">
-                                            <%= product.availability.replace('_', ' ') %>
+                                    
+                                    <% if (product.stock <=0) { %>
+                                        <div
+                                            class="absolute top-3 left-3 bg-secondary text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg uppercase transform rotate-3 group-hover:rotate-0 transition-transform">
+                                            out of stock
                                         </div>
-                                    <% } %>
+                                        <% } %>
                                 </div>
-                                
+
                                 <!-- Product Info -->
                                 <div class="p-5 flex-1 flex flex-col relative card-gradient">
                                     <!-- Brand Badge -->
-                                    <div class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full mb-2 font-medium">
+                                    <div
+                                        class="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full mb-2 font-medium">
                                         <%= product.brand %>
                                     </div>
-                                    
+
                                     <!-- Title -->
-                                    <h3 class="font-bold text-gray-800 text-lg mb-2 line-clamp-2"><%= product.name %></h3>
-                                    
+                                    <h3 class="font-bold text-gray-800 text-lg mb-2 line-clamp-2">
+                                        <%= product.name %>
+                                    </h3>
+
                                     <!-- Description -->
-                                    <p class="text-sm text-gray-600 mb-4 line-clamp-2 flex-grow"><%= product.description.substring(0, 50) %>...</p>
-                                    
+                                    <p class="text-sm text-gray-600 mb-4 line-clamp-2 flex-grow">
+                                        <%= product.description.substring(0, 50) %>...
+                                    </p>
+
                                     <!-- Divider -->
                                     <div class="w-full h-px bg-gray-200 my-3"></div>
-                                    
+
                                     <!-- Price Section -->
                                     <div class="mt-auto">
                                         <!-- Price Display -->
                                         <div class="flex items-baseline gap-2 mb-3">
-                                            <% if (product.discount > 0) { %>
-                                                <span class="text-2xl font-bold text-accent">₹<%= Math.round(product.price * (1 - product.discount/100)) %></span>
-                                                <span class="text-sm text-gray-500 line-through">₹<%= product.price %></span>
-                                                <span class="text-xs text-green-600 font-medium ml-auto">Save ₹<%= Math.round(product.price * (product.discount/100)) %></span>
-                                            <% } else { %>
-                                                <span class="text-2xl font-bold text-accent">₹<%= product.price %></span>
-                                            <% } %>
+                                            <% if (product.discount> 0) { %>
+                                                <span class="text-2xl font-bold text-accent">₹<%=
+                                                        Math.round(product.price * (1 - product.discount/100)) %></span>
+                                                <span class="text-sm text-gray-500 line-through">₹<%= product.price %>
+                                                        </span>
+                                                <span class="text-xs text-green-600 font-medium ml-auto">Save ₹<%=
+                                                        Math.round(product.price * (product.discount/100)) %></span>
+                                                <% } else { %>
+                                                    <span class="text-2xl font-bold text-accent">₹<%= product.price %>
+                                                            </span>
+                                                    <% } %>
                                         </div>
-                                        
+
                                         <!-- Bottom Row with Stock and Buy Button -->
                                         <div class="flex items-center justify-between">
                                             <!-- Stock Status with Icon -->
                                             <div class="text-xs font-medium">
-                                                <% if (product.stock > 10) { %>
+                                                <% if (product.stock> 10) { %>
                                                     <span class="text-green-600 flex items-center">
                                                         <i class="fas fa-check-circle mr-1"></i>In Stock
                                                     </span>
-                                                <% } else if (product.stock > 0) { %>
-                                                    <span class="text-amber-500 flex items-center">
-                                                        <i class="fas fa-exclamation-circle mr-1"></i>Low Stock
-                                                    </span>
-                                                <% } else { %>
-                                                    <span class="text-red-600 flex items-center">
-                                                        <i class="fas fa-times-circle mr-1"></i>Out of Stock
-                                                    </span>
-                                                <% } %>
+                                                    <% } else if (product.stock> 0) { %>
+                                                        <span class="text-amber-500 flex items-center">
+                                                            <i class="fas fa-exclamation-circle mr-1"></i>Low Stock
+                                                        </span>
+                                                        <% } else { %>
+                                                            <span class="text-red-600 flex items-center">
+                                                                <i class="fas fa-times-circle mr-1"></i>Out of Stock
+                                                            </span>
+                                                            <% } %>
                                             </div>
-                                            
+
                                             <!-- Buy Now Button -->
-                                            <button class="bg-primary hover:bg-primary/90 text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5">
+                                            <button
+                                                class="bg-primary hover:bg-primary/90 text-white font-medium px-5 py-2 rounded-lg shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5">
                                                 Buy Now
                                             </button>
                                         </div>
-                                        
+
                                         <!-- Delivery Time if available -->
                                         <% if (product.deliveryTime) { %>
                                             <div class="text-xs text-gray-500 mt-2 flex items-center">
-                                                <i class="fas fa-truck mr-1"></i> Delivery in <%= product.deliveryTime %> days
+                                                <i class="fas fa-truck mr-1"></i> Delivery in <%= product.deliveryTime
+                                                    %> days
                                             </div>
-                                        <% } %>
+                                            <% } %>
                                     </div>
                                 </div>
                             </div>
                         </a>
                     </div>
-                <% }) %>
-            <% } else { %>
-                <div class="col-span-full text-center py-10">
-                    <div class="bg-blue-50 text-blue-800 p-6 rounded-lg">
-                        <h4 class="text-xl font-semibold mb-2">No products found</h4>
-                        <p>Try a different search or check back later for new products.</p>
-                    </div>
-                </div>
-            <% } %>
+                    <% }) %>
+                        <% } else { %>
+                            <div class="col-span-full text-center py-10">
+                                <div class="bg-blue-50 text-blue-800 p-6 rounded-lg">
+                                    <h4 class="text-xl font-semibold mb-2">No products found</h4>
+                                    <p>Try a different search or check back later for new products.</p>
+                                </div>
+                            </div>
+                            <% } %>
         </div>
     </div>
-    
+
     <!-- Footer -->
     <footer class="bg-dark text-white pt-12 pb-6 mt-12">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div class="text-center md:text-left">
-                    <h5 class="text-xl font-semibold mb-4 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:md:left-0 after:-translate-x-1/2 after:md:translate-x-0 after:w-12 after:h-0.5 after:bg-accent">M Store</h5>
+                    <h5
+                        class="text-xl font-semibold mb-4 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:md:left-0 after:-translate-x-1/2 after:md:translate-x-0 after:w-12 after:h-0.5 after:bg-accent">
+                        M Store</h5>
                     <p>Your one-stop destination for premium mobile phones and accessories.</p>
                     <div class="mt-4 space-x-3">
                         <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook"></i></a>
@@ -268,29 +319,39 @@
                         <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
-                
+
                 <div class="text-center md:text-left">
-                    <h5 class="text-xl font-semibold mb-4 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:md:left-0 after:-translate-x-1/2 after:md:translate-x-0 after:w-12 after:h-0.5 after:bg-accent">Quick Links</h5>
+                    <h5
+                        class="text-xl font-semibold mb-4 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:md:left-0 after:-translate-x-1/2 after:md:translate-x-0 after:w-12 after:h-0.5 after:bg-accent">
+                        Quick Links</h5>
                     <a href="#" class="block mb-2 text-gray-300 hover:text-white">Home</a>
                     <a href="/user/dashboard/shopping" class="block mb-2 text-gray-300 hover:text-white">Shop</a>
-                    <a href="/user/myprofile/<%= user._id%>" class="block mb-2 text-gray-300 hover:text-white">My Profile</a>
+                    <a href="/user/myprofile/<%= user._id%>" class="block mb-2 text-gray-300 hover:text-white">My
+                        Profile</a>
                     <a href="/user/dashboard/addtocart" class="block mb-2 text-gray-300 hover:text-white">My Cart</a>
                 </div>
-                
+
                 <div class="text-center md:text-left">
-                    <h5 class="text-xl font-semibold mb-4 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:md:left-0 after:-translate-x-1/2 after:md:translate-x-0 after:w-12 after:h-0.5 after:bg-accent">Customer Support</h5>
-                    <p class="mb-2">Email: <a href="/cdn-cgi/l/email-protection" class="text-gray-300 hover:text-white __cf_email__" data-cfemail="03707673736c7177436e70776c71662d606c6e">[email&#160;protected]</a></p>
+                    <h5
+                        class="text-xl font-semibold mb-4 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:md:left-0 after:-translate-x-1/2 after:md:translate-x-0 after:w-12 after:h-0.5 after:bg-accent">
+                        Customer Support</h5>
+                    <p class="mb-2">Email: <a href="/cdn-cgi/l/email-protection"
+                            class="text-gray-300 hover:text-white __cf_email__"
+                            data-cfemail="03707673736c7177436e70776c71662d606c6e">[email&#160;protected]</a></p>
                     <p class="mb-2">Phone: +91 98765 43210</p>
                     <p class="mb-2">Hours: 9 AM - 6 PM, Mon-Sat</p>
                 </div>
-                
+
                 <div class="text-center md:text-left">
-                    <h5 class="text-xl font-semibold mb-4 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:md:left-0 after:-translate-x-1/2 after:md:translate-x-0 after:w-12 after:h-0.5 after:bg-accent">We Accept</h5>
-                    <img src="/assets/imgs/payment-methods.png" class="max-w-[200px] mx-auto md:mx-0" alt="Payment Methods">
+                    <h5
+                        class="text-xl font-semibold mb-4 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-1/2 after:md:left-0 after:-translate-x-1/2 after:md:translate-x-0 after:w-12 after:h-0.5 after:bg-accent">
+                        We Accept</h5>
+                    <img src="/assets/imgs/payment-methods.png" class="max-w-[200px] mx-auto md:mx-0"
+                        alt="Payment Methods">
                     <p class="mt-3">Secure payments with all major credit cards and UPI</p>
                 </div>
             </div>
-            
+
             <div class="text-center pt-8 mt-8 border-t border-gray-700 text-sm">
                 <p>&copy; 2025 M Store. All rights reserved.</p>
             </div>
@@ -299,7 +360,7 @@
 
     <script>
         // Mobile menu toggle
-        document.getElementById('navbarToggler').addEventListener('click', function() {
+        document.getElementById('navbarToggler').addEventListener('click', function () {
             const menu = document.getElementById('navMenu');
             menu.classList.toggle('hidden');
             menu.classList.toggle('flex');
@@ -316,5 +377,5 @@
         });
     </script>
 </body>
-</html>
 
+</html>
