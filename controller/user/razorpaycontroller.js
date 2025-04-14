@@ -137,12 +137,15 @@ const razorpayController = {
 
             for (const item of cart.products){
                 const product=await Product.findById(item.product)
-                console.log(product)
+                // console.log(product)
                 if(!product){
                     return res.status(404).json({success:false, message:"Product not found"})
                 }
                 if(product.stock<item.quantity){
                     return res.status(400).json({success:false, message:"Insufficient stock"})
+                }
+                if(!product.isActive){
+                    return res.status(400).json({success:false, message:"Product is blocked "})
                 }
             }
 

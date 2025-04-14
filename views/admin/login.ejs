@@ -1,95 +1,250 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="/adminloginpage.css">
+    <meta charset="utf-8">
+    <title>Evara Dashboard - Admin Login</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg">
+    <!-- Template CSS -->
+    <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom right, #f5f6f9, #ebeef5);
+            padding: 20px;
+        }
+        .login-card {
+            max-width: 450px;
+            width: 100%;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .login-header {
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .login-body {
+            padding: 30px;
+        }
+        .login-logo {
+            width: 70px;
+            height: 70px;
+            background-color: #3bb77e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .login-logo i {
+            font-size: 30px;
+            color: white;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .form-control:focus {
+            border-color: #3bb77e;
+            box-shadow: 0 0 0 3px rgba(59, 183, 126, 0.1);
+            outline: none;
+        }
+        .login-footer {
+            padding: 15px 30px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .btn-login {
+            width: 100%;
+            background-color: #3bb77e;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-login:hover {
+            background-color: #2d9d64;
+        }
+        .alert {
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .alert-danger {
+            background-color: #fee2e2;
+            border: 1px solid #f87171;
+            color: #dc2626;
+        }
+        .login-options {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .login-options a {
+            color: #3bb77e;
+            text-decoration: none;
+        }
+        .login-options a:hover {
+            text-decoration: underline;
+        }
+        .material-icons {
+            font-family: 'Material Icons';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
+
 <body>
-   
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="material-icons">lock</i>
+                </div>
+                <h2>M-Phone Admin Login</h2>
+                <p class="text-muted">Log in to access your admin dashboard</p>
+            </div>
+            <div class="login-body">
+                <div id="errorAlert" class="alert alert-danger" role="alert">
+                    <span id="errorMessage"></span>
+                </div>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Your email address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Your password" required>
+                    </div>
+                    <!-- <div class="form-group">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <input type="checkbox" id="rememberMe">
+                                <label for="rememberMe">Remember me</label>
+                            </div>
+                            <a href="/admin/forgot-password" class="text-muted">Forgot password?</a>
+                        </div>
+                    </div> -->
+                    <button type="submit" class="btn-login" id="loginButton">
+                        <span id="buttonText">Log In</span>
+                    </button>
+                </form>
 
+                <div class="login-options">
+                    <a href="/user/login">Switch to User Login</a>
+                </div>
+            </div>
+            <div class="login-footer">
+                <p>© <script>document.write(new Date().getFullYear())</script>, Evara - HTML Ecommerce Template.</p>
+            </div>
+        </div>
+    </div>
 
-
-
-
-
-
-    <form action="/admin/login" method="POST"  id="loginForm">
-        <h3>Login Here</h3>
-        
-        <input type="text" id="message" value="<%= message %>" name="message" hidden>
-        
-        <label for="username">username</label>
-        <input name="email" type="text" placeholder="Email or Phone" id="username" >
-    
-        <label for="password">Password</label>
-        <input name="password" type="password" name="Password" id="password" >
-    
-        <button>Log In</button>
-    
-         <div class="social">
-            
-            
-              <a href="/user/login">Switch to User</a>
-         </div>    
-    </form>
-
+    <script src="/assets/js/vendors/jquery-3.6.0.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const message = document.getElementById('message').value;
-            if (message && message !== '') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: message
-                });
-            }
-        });
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+            const loginForm = document.getElementById('loginForm');
+            const buttonText = document.getElementById('buttonText');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
             
-            const email = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            try {
-                const response = await fetch('/admin/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
                 
-                const data = await response.json();
+                // Show loading state
+                buttonText.textContent = 'Logging in...';
+                document.getElementById('loginButton').disabled = true;
+                errorAlert.style.display = 'none';
                 
-                if (response.ok) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: 'Login successful',
-                        timer: 1500
-                    }).then(() => {
-                        window.location.href = '/admin/dashboard';
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                try {
+                    const response = await fetch('/admin/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
                     });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Login Failed',
-                        text: data.message || 'Something went wrong'
-                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Login successful',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = '/admin/dashboard';
+                        });
+                    } else {
+                        // Show error message
+                        errorMessage.textContent = data.message || 'Invalid credentials';
+                        errorAlert.style.display = 'block';
+                        
+                        // Reset button state
+                        buttonText.textContent = 'Log In';
+                        document.getElementById('loginButton').disabled = false;
+                    }
+                } catch (error) {
+                    // Show error message for network/server errors
+                    errorMessage.textContent = 'Server error, please try again later';
+                    errorAlert.style.display = 'block';
+                    
+                    // Reset button state
+                    buttonText.textContent = 'Log In';
+                    document.getElementById('loginButton').disabled = false;
                 }
-            } catch (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Server error, please try again later'
-                });
-            }
+            });
         });
     </script>
-
-
 </body>
+
 </html>

@@ -104,6 +104,9 @@ const orderController = {
                 if (product.stock < item.quantity) {
                     return res.status(400).json({ success: false, message: `Insufficient stock for product: ${product.name}, Only ${product.stock} left` });
                 }
+                if(! product.isActive){
+                    return res.status(400).json({success:false, message:"Product is blocked by admin"})
+                }
 
             }
             if (couponApplied && couponApplied.code) {
@@ -428,44 +431,7 @@ const orderController = {
             return res.status(400).json({ message: "Only delivered products can be returned" });
         }
             
-        // let refundAmount =  product.quantity * product.price;
-
-        // if (order.paymentMethod === 'razor-pay' && order.paymentStatus === 'completed') {
-        //     const wallet = await Wallet.findOne({ userId: order.user });
-        //     if (!wallet) {
-        //         return res.status(404).json({ message: "Wallet not found" });
-        //     }
-
-        //     wallet.transactions.push({
-        //         orderId: order._id,
-        //         transactionType: 'credit',
-        //         transactionAmount: refundAmount,
-        //         transactionDescription: `Refund for returned product ${product.product.name} in order ${order.orderId}`
-        //     });
-
-        //     await wallet.save();
-
-        //     const admin = await Admin.find();
-        //     const adminId = admin[0]._id;
-        //     let adminWallet = await Wallet.findOne({ userId: adminId });
-        //     if (!adminWallet) {
-        //         return res.status(400).json({ success: false, message: "Admin wallet not found" });
-        //     }
-
-        //     adminWallet.transactions.push({
-        //         orderId: order._id,
-        //         transactionType: "debit",
-        //         transactionAmount: refundAmount,
-        //         transactionDescription: `Refund for returned product in order ${order.orderId}`
-        //     });
-
-        //     await adminWallet.save();
-        // }
-        // await Product.findByIdAndUpdate(
-        //     product.product,
-        //     { $inc: { stock: product.quantity } },
-        //     { new: true }
-        // );
+       
 
         order.products[productIndex].status = "Return Request";
         order.products[productIndex].returnReason = returnReason;
@@ -476,19 +442,6 @@ const orderController = {
             order.orderStatus = 'Returned';
         }
 
-
-
-            // const returnedProducts = order.products.filter(item => item.status === "Delivered")
-            // if (returnedProducts.length === 0) {
-            //     return res.status(400).json({ success: false, message: "No delivered products is in your Order" })
-            // }
-
-
-            // const totalRefundAmount = returnedProducts.reduce((total, item) => {
-            //     return total + (item.quantity * item.price);
-            // }, 0);
-            // returnedProducts.forEach(item => item.status = "Return Request")
-            // const allReturned = order.products.every(item => item.status === "Returned")
 
 
             await order.save()
