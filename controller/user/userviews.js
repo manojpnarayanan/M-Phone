@@ -612,7 +612,7 @@ const userViews = {
                 from: process.env.GMAIL_USER,
                 to: email,
                 subject: "Join our referral Program",
-                text: `Hey! Use my referral code  ${referralCode} and get ₹250 off! Visit:http://localhost:3000/user/signup`
+                text: `Hey! Use my referral code  ${referralCode} and get ₹250 off! Visit:https://m-phone.cloud/user/signup`
             }
             await transporter.sendMail(mailOptions);
             res.status(200).json({ success: true, message: "Invitation sent successfully" })
