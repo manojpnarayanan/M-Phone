@@ -16,329 +16,368 @@
     <!-- Template CSS -->
     <link href="/assets/css/main.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-     <style>
+    <style>
         .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-}
+            width: 100%;
+            overflow-x: auto;
+        }
 
-.table {
-    width: 100%;
-    margin-bottom: 1rem;
-    color: #212529;
-}
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+        }
 
-.table-bordered {
-    border: 1px solid #dee2e6;
-}
+        .table-bordered {
+            border: 1px solid #dee2e6;
+        }
 
-.table-bordered th,
-.table-bordered td {
-    border: 1px solid #dee2e6;
-}
+        .table-bordered th,
+        .table-bordered td {
+            border: 1px solid #dee2e6;
+        }
 
-.table-bordered thead th,
-.table-bordered thead td {
-    border-bottom-width: 2px;
-}
-.product-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-}
-.product-item:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-.product-image {
-    margin-right: 10px;
-}
-.product-details {
-    flex-grow: 1;
-}
-.product-status {
-    margin-top: 5px;
-}
-.status-badge {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-    color: white;
-}
-.status-pending {
-    background-color: #f0ad4e;
-}
-.status-processing {
-    background-color: #5bc0de;
-}
-.status-shipped {
-    background-color: #0275d8;
-}
-.status-delivered {
-    background-color: #5cb85c;
-}
-.status-cancelled {
-    background-color: #d9534f;
-}
-.status-return-request {
-    background-color: #aa66cc;
-}
-.status-returned {
-    background-color: #ff4444;
-}
-.pagination {
-        display: flex;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .pagination .page-item {
-        margin: 0 5px;
-    }
-    .pagination .page-link {
-        color: #007bff;
-        text-decoration: none;
-        padding: 5px 10px;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-    }
-    .pagination .page-item.active .page-link {
-        background-color: #007bff;
-        color: white;
-    }
-    .pagination .page-link:hover {
-        background-color: #f8f9fa;
-    }
-     </style>
+        .table-bordered thead th,
+        .table-bordered thead td {
+            border-bottom-width: 2px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .product-image {
+            margin-right: 10px;
+        }
+
+        .product-details {
+            flex-grow: 1;
+        }
+
+        .product-status {
+            margin-top: 5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .status-pending {
+            background-color: #f0ad4e;
+        }
+
+        .status-processing {
+            background-color: #5bc0de;
+        }
+
+        .status-shipped {
+            background-color: #0275d8;
+        }
+
+        .status-delivered {
+            background-color: #5cb85c;
+        }
+
+        .status-cancelled {
+            background-color: #d9534f;
+        }
+
+        .status-return-request {
+            background-color: #aa66cc;
+        }
+
+        .status-returned {
+            background-color: #ff4444;
+        }
+
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .pagination .page-item {
+            margin: 0 5px;
+        }
+
+        .pagination .page-link {
+            color: #007bff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
 
 </head>
 
 <body>
     <div class="screen-overlay"></div>
     <%- include('./partials/nav') %>
-    <main class="main-wrap">
-        <header class="main-header navbar">
-           
-            <div class="col-nav">
-                <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
-                </ul>
-            </div>
-        </header>
-        <section class="content-main">
-            <div class="content-header">
-                <div>
-                    <h2 class="content-title card-title">Order detail</h2>
+        <main class="main-wrap">
+            <header class="main-header navbar">
+
+                <div class="col-nav">
+                    <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i
+                            class="material-icons md-apps"></i> </button>
+                    </ul>
                 </div>
-                <div class="col-search">
-                    <form class="searchform" action="/admin/dashboard/ordermanage" method="GET">
-                        <div class="input-group">
-                            <input 
-                                type="text" 
-                                name="search" 
-                                class="form-control" 
-                                placeholder="Search orders (name, email, product, city...)" 
-                                value="<%= searchTerm || '' %>"
-                            >
-                            <button class="btn btn-light bg" type="submit">
-                                <i class="material-icons md-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="card">
-                            <span>
-                            </span> <br>
-                        </div>
+            </header>
+            <section class="content-main">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title card-title">Order detail</h2>
                     </div>
+                    <div class="col-search">
+                        <form class="searchform" action="/admin/dashboard/ordermanage" method="GET">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control"
+                                    placeholder="Search orders (name, email, product, city...)"
+                                    value="<%= searchTerm || '' %>">
+                                <button class="btn btn-light bg" type="submit">
+                                    <i class="material-icons md-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="card">
+                    <span>
+                    </span> <br>
+                </div>
+                </div>
                 </header>
-                    </div>
-                    <div class="row">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
+                </div>
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Sl. No</th>
+                                    <th>Customer</th>
+                                    <th>Products</th>
+                                    <th>Shipping Address</th>
+                                    <th>Ordered Date</th>
+                                    <th>Total Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (orders && orders.length> 0) { %>
+                                    <% orders.forEach((order, index)=> { %>
                                         <tr>
-                                            <th>Sl. No</th>
-                                            <th>Customer</th>
-                                            <th>Products</th>
-                                            <th>Shipping Address</th>
-                                            <th>Ordered Date</th>
-                                            <th>Total Amount</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% if (orders && orders.length > 0) { %>
-                                            <% orders.forEach((order, index) => { %>
-                                                <tr>
-                                                    <td><%= index + 1 %></td> <!-- Sl. No -->
-                                                    <td>
-                                                        <%= order.user.name %><br>
-                                                        <%= order.user.email %><br>
+                                            <td>
+                                                <%= index + 1 %>
+                                            </td> <!-- Sl. No -->
+                                            <td>
+                                                <%= order.user.name %><br>
+                                                    <%= order.user.email %><br>
                                                         <%= order.user.phone %>
-                                                    </td>
-                                                    <td>
-                                                        <% order.products.forEach(item => { %>
-                                                            <div class="product-item">
-                                                                <div class="product-image">
-                                                                    <img src="/<%= item.product.image[0] %>" width="40" height="40" class="img-xs" alt="Item">
-                                                                </div>
-                                                                <div class="product-details">
-                                                                    <%= item.product.name %> (Qty: <%= item.quantity %>)
-                                                                </div>
-                                                            </div>
-                                                        <% }) %>
-                                                    </td>
-                                                    <td>
-                                                        <%= order.shippingAddress.housename %><br>
-                                                        <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %><br>
-                                                        <%= order.shippingAddress.pincode %>
-                                                    </td>
-                                                    <td><%= new Date(order.createdAt).toLocaleDateString() %></td> <!-- Ordered Date -->
-                                                    <td><%= order.finalAmount.toFixed(2) %></td>
-                                                    <td>
-                                                        <% order.products.forEach((item, productIndex) => { %>
-                                                            <div class="product-status">
-                                                                <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                                    <small class="text-muted"><%= item.product.name.substring(0, 15) %><%= item.product.name.length > 15 ? '...' : '' %>:</small>
-                                                                </div>
-                                                                <select class="form-select product-status-dropdown" 
-                                                                        data-order-id="<%= order._id %>" 
-                                                                        data-product-id="<%= item.product._id %>"
-                                                                        data-product-index="<%= productIndex %>"
-                                                                        
-                                                                    <option value="Pending" <%= !item.status || item.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                                                    <option value="Processing" <%= item.status === 'Processing' ? 'selected' : '' %>>Processing</option>
-                                                                    <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                                                    <option value="Delivered" <%= item.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                                    <option value="Cancelled" <%= item.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                                                    <option value="Return Request" <%= item.status === 'Return Request' ? 'selected' : '' %>>Return Request</option>
-                                                                    <option value="Returned" <%= item.status === 'Returned' ? 'selected' : '' %>>Returned</option>
-                                                                </select>
-                                                            </div>
-                                                        <% }) %>
-                                                    </td>
-                                                </tr>
-                                            <% }) %>
-                                        <% } else { %>
-                                            <tr>
-                                                <td colspan="7" class="text-center">No orders found.</td>
-                                            </tr>
-                                        <% } %>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="5" class="text-end"><strong>Total Amount of All Orders:</strong></td>
-                                            <td colspan="2"><strong><%= orders.reduce((total, order) => total + order.totalAmount, 0).toFixed(2) %></strong></td>
+                                            </td>
+                                            <td>
+                                                <% order.products.forEach(item=> { %>
+                                                    <div class="product-item">
+                                                        <div class="product-image">
+                                                            <img src="/<%= item.product.image[0] %>" width="40"
+                                                                height="40" class="img-xs" alt="Item">
+                                                        </div>
+                                                        <div class="product-details">
+                                                            <%= item.product.name %> (Qty: <%= item.quantity %>)
+                                                        </div>
+                                                    </div>
+                                                    <% }) %>
+                                            </td>
+                                            <td>
+                                                <%= order.shippingAddress.housename %><br>
+                                                    <%= order.shippingAddress.city %>, <%= order.shippingAddress.state
+                                                            %><br>
+                                                            <%= order.shippingAddress.pincode %>
+                                            </td>
+                                            <td>
+                                                <%= new Date(order.createdAt).toLocaleDateString() %>
+                                            </td> <!-- Ordered Date -->
+                                            <td>₹ <%= order.finalAmount.toFixed(2) %>
+                                            </td>
+                                            <td>
+                                                <% order.products.forEach((item, productIndex)=> { %>
+                                                    <div class="product-status">
+                                                        <div
+                                                            style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                            <small class="text-muted">
+                                                                <%= item.product.name.substring(0, 15) %>
+                                                                    <%= item.product.name.length> 15 ? '...' : '' %>:
+                                                            </small>
+                                                        </div>
+                                                        <select class="form-select product-status-dropdown"
+                                                            data-order-id="<%= order._id %>"
+                                                            data-product-id="<%= item.product._id %>"
+                                                            data-product-index="<%= productIndex %>" <option
+                                                            value="Pending" <%=!item.status || item.status==='Pending'
+                                                            ? 'selected' : '' %>>Pending</option>
+                                                            <option value="Processing" <%=item.status==='Processing'
+                                                                ? 'selected' : '' %>>Processing</option>
+                                                            <option value="Shipped" <%=item.status==='Shipped'
+                                                                ? 'selected' : '' %>>Shipped</option>
+                                                            <option value="Delivered" <%=item.status==='Delivered'
+                                                                ? 'selected' : '' %>>Delivered</option>
+                                                            <option value="Cancelled" <%=item.status==='Cancelled'
+                                                                ? 'selected' : '' %>>Cancelled</option>
+                                                            <option value="Return Request"
+                                                                <%=item.status==='Return Request' ? 'selected' : '' %>
+                                                                >Return Request</option>
+                                                            <option value="Returned" <%=item.status==='Returned'
+                                                                ? 'selected' : '' %>>Returned</option>
+                                                        </select>
+                                                    </div>
+                                                    <% }) %>
+                                            </td>
                                         </tr>
-                                    </tfoot>
-                                    
-                                </table>
-                                 <!-- Pagination Controls -->
-                                 <div class="pagination-area mt-15 mb-50">
-                                    <nav aria-label="Page navigation example">
-                                        <ul class="pagination justify-content-start">
-                                            <% if (currentPage > 1) { %>
-                                                <li class="page-item">
-                                                    <a class="page-link" href="?page=<%= currentPage - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>">
-                                                        <i class="material-icons md-chevron_left"></i>
-                                                    </a>
-                                                </li>
-                                            <% } %>
-                                
-                                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="7" class="text-center">No orders found.</td>
+                                                </tr>
+                                                <% } %>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5" class="text-end"><strong>Total Amount of All Orders:</strong></td>
+                                    <td colspan="2"><strong>
+                                            <%= orders.reduce((total, order)=> total + order.totalAmount, 0).toFixed(2)
+                                                %>
+                                        </strong></td>
+                                </tr>
+                            </tfoot>
+
+                        </table>
+                        <!-- Pagination Controls -->
+                        <div class="pagination-area mt-15 mb-50">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination justify-content-start">
+                                    <% if (currentPage> 1) { %>
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                                href="?page=<%= currentPage - 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>">
+                                                <i class="material-icons md-chevron_left"></i>
+                                            </a>
+                                        </li>
+                                        <% } %>
+
+                                            <% for (let i=1; i <=totalPages; i++) { %>
                                                 <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                                    <a class="page-link" href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>">
+                                                    <a class="page-link"
+                                                        href="?page=<%= i %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>">
                                                         <%= i %>
                                                     </a>
                                                 </li>
-                                            <% } %>
-                                
-                                            <% if (currentPage < totalPages) { %>
-                                                <li class="page-item">
-                                                    <a class="page-link" href="?page=<%= currentPage + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>">
-                                                        <i class="material-icons md-chevron_right"></i>
-                                                    </a>
-                                                </li>
-                                            <% } %>
-                                        </ul>
-                                    </nav>
-                                </div>
-                                
-                                <!-- Add a message when no results are found -->
-                                <% if (orders.length === 0) { %>
-                                    <div class="alert alert-info text-center" role="alert">
-                                        <% if (searchTerm) { %>
-                                            No orders found matching the search term "<%= searchTerm %>".
+                                                <% } %>
+
+                                                    <% if (currentPage < totalPages) { %>
+                                                        <li class="page-item">
+                                                            <a class="page-link"
+                                                                href="?page=<%= currentPage + 1 %><%= searchTerm ? '&search=' + encodeURIComponent(searchTerm) : '' %>">
+                                                                <i class="material-icons md-chevron_right"></i>
+                                                            </a>
+                                                        </li>
+                                                        <% } %>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <!-- Add a message when no results are found -->
+                        <% if (orders.length===0) { %>
+                            <div class="alert alert-info text-center" role="alert">
+                                <% if (searchTerm) { %>
+                                    No orders found matching the search term "<%= searchTerm %>".
                                         <% } else { %>
                                             No orders found.
-                                        <% } %>
-                                    </div>
-                                <% } %>
-                                
-                               
-
-
+                                            <% } %>
                             </div>
+                            <% } %>
+
+
+
+
+                    </div>
+                </div>
+                </div>
+                </div>
+                </div>
+            </section>
+            <footer class="main-footer font-xs">
+                <div class="row pb-30 pt-15">
+                    <div class="col-sm-6">
+                        <script>
+                            document.write(new Date().getFullYear())
+                        </script> ©, Evara - HTML Ecommerce Template .
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-sm-end">
+                            All rights reserved
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <footer class="main-footer font-xs">
-            <div class="row pb-30 pt-15">
-                <div class="col-sm-6">
-                    <script>
-                    document.write(new Date().getFullYear())
-                    </script> ©, Evara - HTML Ecommerce Template .
-                </div>
-                <div class="col-sm-6">
-                    <div class="text-sm-end">
-                        All rights reserved
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </main>
-    <script src="/assets/js/vendors/jquery-3.6.0.min.js"></script>
-    <script src="/assets/js/vendors/bootstrap.bundle.min.js"></script>
-    <script src="/assets/js/vendors/select2.min.js"></script>
-    <script src="/assets/js/vendors/perfect-scrollbar.js"></script>
-    <script src="/assets/js/vendors/jquery.fullscreen.min.js"></script>
-    <!-- Main Script -->
-    <script src="/assets/js/main.js" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+            </footer>
+        </main>
+        <script src="/assets/js/vendors/jquery-3.6.0.min.js"></script>
+        <script src="/assets/js/vendors/bootstrap.bundle.min.js"></script>
+        <script src="/assets/js/vendors/select2.min.js"></script>
+        <script src="/assets/js/vendors/perfect-scrollbar.js"></script>
+        <script src="/assets/js/vendors/jquery.fullscreen.min.js"></script>
+        <!-- Main Script -->
+        <script src="/assets/js/main.js" type="text/javascript"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
         <script>
-  document.addEventListener("DOMContentLoaded",function(){
-    const searchForm=document.querySelector("searchform");
-    const searchInput=document.getElementById("searchInput")
-    searchForm.addEventListener("submit",function(e){
-        e.preventDefault();
-        const searchTerm=searchInput.value.trim();
-        const baseUrl=window.location.pathname;
-        const searchUrl=searchTerm? `${baseUrl}?search=${encodeURIComponent(searchTerm)}`:baseUrl
-        window.location.href=searchUrl;
-    })
-  })
-    
-    
-    async function fetchOrderDetails(orderId) {
-        try {
-            const response = await fetch(`/api/admin/order/${orderId}`);
-            const data = await response.json();
+            document.addEventListener("DOMContentLoaded", function () {
+                const searchForm = document.querySelector("searchform");
+                const searchInput = document.getElementById("searchInput")
+                searchForm.addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    const searchTerm = searchInput.value.trim();
+                    const baseUrl = window.location.pathname;
+                    const searchUrl = searchTerm ? `${baseUrl}?search=${encodeURIComponent(searchTerm)}` : baseUrl
+                    window.location.href = searchUrl;
+                })
+            })
 
-            if (response.ok) {
-                const order = data.order;
 
-                // Render products in the table
-                const productsTable = document.getElementById('productsTable');
-                productsTable.innerHTML = order.products.map(item => `
+            async function fetchOrderDetails(orderId) {
+                try {
+                    const response = await fetch(`/api/admin/order/${orderId}`);
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        const order = data.order;
+
+                        // Render products in the table
+                        const productsTable = document.getElementById('productsTable');
+                        productsTable.innerHTML = order.products.map(item => `
                     <tr>
                         <td>
                             <a class="itemside" href="#">
@@ -354,12 +393,12 @@
                     </tr>
                 `).join('');
 
-                // Update order summary (subtotal, shipping, grand total)
-                const subtotal = order.products.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                const shippingCost = 10.00; // Example shipping cost
-                const grandTotal = subtotal + shippingCost;
+                        // Update order summary (subtotal, shipping, grand total)
+                        const subtotal = order.products.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                        const shippingCost = 10.00; // Example shipping cost
+                        const grandTotal = subtotal + shippingCost;
 
-                productsTable.innerHTML += `
+                        productsTable.innerHTML += `
                     <tr>
                         <td colspan="4">
                             <article class="float-end">
@@ -385,96 +424,95 @@
                         </td>
                     </tr>
                 `;
-            } else {
-                console.error('Error fetching order details:', data.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get('orderId'); 
-    if (orderId) {
-        fetchOrderDetails(orderId);
-    }
-
-
-    
-    
-    const productStatusDropdowns = document.querySelectorAll('.product-status-dropdown');
-
-    productStatusDropdowns.forEach(dropdown => {
-        const currentStatus = dropdown.value;
-    if (currentStatus === 'Cancelled' || currentStatus === 'Returned') {
-        dropdown.disabled = true;
-    }
-        dropdown.addEventListener('change', async (event) => {
-            const orderId = event.target.getAttribute('data-order-id');
-            const productId = event.target.getAttribute('data-product-id');
-            const productIndex = event.target.getAttribute('data-product-index');
-            const newStatus = event.target.value;
-
-            const disallowedStatuses = ['Cancelled', 'Returned'];
-        if (disallowedStatuses.includes(currentStatus)) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Status Cannot Be Changed',
-                text: `Products with status ${currentStatus} cannot be modified.`,
-                confirmButtonText: 'OK',
-            });
-            
-            
-            event.target.value = currentStatus;
-            return;
-        }
-            
-            try {
-                const response = await fetch(`/admin/dashboard/ordermanage/${orderId}/${productId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ 
-                        productStatus: newStatus,
-                        productIndex: productIndex
-                    }),
-                });
-                const result = await response.json();
-                console.log(result);
-
-                if (response.ok) {
-                    
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: 'Product status updated successfully!',
-                        confirmButtonText: 'OK',
-                    });
-                } else {
-                
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Failed!',
-                        text: 'Failed to update product status.',
-                        confirmButtonText: 'OK',
-                    });
+                    } else {
+                        console.error('Error fetching order details:', data.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
                 }
-            } catch (error) {
-                console.error('Error:', error);
-        
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'An error occurred while updating the product status.',
-                    confirmButtonText: 'OK',
-                });
             }
-        });
-    });
-</script>
+
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+            if (orderId) {
+                fetchOrderDetails(orderId);
+            }
+
+
+
+
+            const productStatusDropdowns = document.querySelectorAll('.product-status-dropdown');
+
+            productStatusDropdowns.forEach(dropdown => {
+                const currentStatus = dropdown.value;
+                if (currentStatus === 'Cancelled' || currentStatus === 'Returned') {
+                    dropdown.disabled = true;
+                }
+                dropdown.addEventListener('change', async (event) => {
+                    const orderId = event.target.getAttribute('data-order-id');
+                    const productId = event.target.getAttribute('data-product-id');
+                    const productIndex = event.target.getAttribute('data-product-index');
+                    const newStatus = event.target.value;
+
+                    const disallowedStatuses = ['Cancelled', 'Returned'];
+                    if (disallowedStatuses.includes(currentStatus)) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Status Cannot Be Changed',
+                            text: `Products with status ${currentStatus} cannot be modified.`,
+                            confirmButtonText: 'OK',
+                        });
+
+
+                        event.target.value = currentStatus;
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`/admin/dashboard/ordermanage/${orderId}/${productId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                productStatus: newStatus,
+                                productIndex: productIndex
+                            }),
+                        });
+                        const result = await response.json();
+                        console.log(result);
+
+                        if (response.ok) {
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'Product status updated successfully!',
+                                confirmButtonText: 'OK',
+                            });
+                        } else {
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Failed!',
+                                text: 'Failed to update product status.',
+                                confirmButtonText: 'OK',
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred while updating the product status.',
+                            confirmButtonText: 'OK',
+                        });
+                    }
+                });
+            });
+        </script>
 </body>
 
 </html>
-

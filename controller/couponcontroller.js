@@ -47,6 +47,10 @@ const couponController = {
     createCoupon: async (req, res) => {
         try {
             console.log(req.body)
+            const discountValue = Number(req.body.discountValue);
+            const minOrderAmount = Number(req.body.minOrderAmount);
+            const maxDiscountAmount = Number(req.body.maxDiscountAmount);
+
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
@@ -65,13 +69,51 @@ const couponController = {
                     message: "End date must be after start date"
                 });
             }
-            if(req.body.discountValue<1 ||req.body.discountValue>100 ){
+
+            if (minOrderAmount <= 0) {
                 return res.status(400).json({
                     success: false,
-                    message: "Value should be between 1 and 100"
+                    message: "Minimum order amount must be a positive number"
                 });
             }
-            
+
+            if (req.body.discountType === "percentage") {
+                if (discountValue < 1 || discountValue > 100) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Percentage should be between 1 and 100"
+                    });
+                } else if (maxDiscountAmount <= 0) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Maximum discount amount must be a positive number"
+                    });
+                }
+            } else if (req.body.discountType === "fixed") {
+                if (discountValue <= 0) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Discount value must be a positive number"
+                    });
+                }
+
+                if (discountValue > minOrderAmount) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Fixed discount value cannot exceed minimum order amount"
+                    });
+                }
+            }
+
+            if (maxDiscountAmount > minOrderAmount) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Maximum discount amount cannot exceed minimum order amount"
+                });
+            }
+
+
+
 
 
 
@@ -137,6 +179,9 @@ const couponController = {
     updateEditCoupon: async (req, res) => {
         try {
             const { name, code, discountType, discountValue, minOrderAmount, maxDiscountAmount, validFrom, validUntil, usageLimit, isActive } = req.body
+            console.log(req.body)
+            const DiscountValue = Number(discountValue)
+            const MinOrderAmount = Number(minOrderAmount)
             const couponId = req.params.id
             const coupon = await Coupon.findById(couponId)
             console.log("couponId", couponId)
@@ -144,6 +189,47 @@ const couponController = {
             if (!coupon) {
                 return res.status(400).json({ success: false, message: "Coupon not found" })
             }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const validFromDate = new Date(validFrom);
+            if (validFromDate < today) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Coupon start date must be today or a future date"
+                });
+            }
+            const validUntilDate = new Date(validUntil);
+            if (validUntilDate <= validFromDate) {
+                return res.status(400).json({
+                    success: false,
+                    message: "End date must be after start date"
+                });
+            }
+            if (minOrderAmount <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Minimum order amount must be a positive number"
+                });
+            }
+
+            if (discountType === "percentage") {
+                if (DiscountValue < 1 || DiscountValue > 100) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Percentage should be between 1 and 100"
+                    });
+                }
+            } else if (discountType === "fixed") {
+                if (DiscountValue <= 0) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Discount value must be a positive number"
+                    });
+                }
+            }
+
+
 
             // console.log(req.body)
             coupon.name = name;
@@ -169,6 +255,7 @@ const couponController = {
             });
 
         }
+
     }
 }
 module.exports = couponController

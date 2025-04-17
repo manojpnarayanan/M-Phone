@@ -1,7 +1,7 @@
 const User = require("../model/user")
 const product = require("../model/addproduct")
 const Order = require("../model/order")
-const { generateInvoice } = require("../utils/invoicegenerator"); 
+const { generateInvoice } = require("../utils/invoicegenerator");
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 const path = require('path');
@@ -19,7 +19,7 @@ const ordermanagement = {
             const itemsPerPage = 10;
             const searchTerm = req.query.search || "";
             console.log("searchTerm", searchTerm)
-            let searchQuery = {paymentStatus:"completed"};
+            let searchQuery = { paymentStatus: "completed" };
 
             if (searchTerm) {
                 const matchingUsers = await User.find({
@@ -117,6 +117,7 @@ const ordermanagement = {
     },
 
 
+
     updateProductStatus: async (req, res) => {
         try {
             const orderId = req.params.orderId;
@@ -130,7 +131,6 @@ const ordermanagement = {
                 productIndex
             });
 
-
             const index = parseInt(productIndex, 10);
 
             const order = await Order.findById(orderId).populate("user")
@@ -141,14 +141,12 @@ const ordermanagement = {
                 return res.status(404).json({ message: "Order not found" });
             }
 
-
             if (!order.products || order.products.length <= index) {
                 console.error("Invalid product index:", index, "Total products:", order.products.length);
                 return res.status(400).json({ message: "Invalid product index" });
             }
 
             const currentProduct = order.products[index];
-
 
             if (currentProduct.product._id.toString() !== productId) {
                 console.error("Product ID mismatch", {
@@ -158,14 +156,47 @@ const ordermanagement = {
                 return res.status(400).json({ message: "Product ID mismatch" });
             }
 
-
+            // Handle refunds for Cancelled or Returned status
             if (productStatus === "Cancelled" || productStatus === "Returned") {
+                // Calculate refund amount properly with GST
+                let refundAmount = 0;
+
+                if (order.products.length === 1) {
+                    // If this is the only product, refund the final amount
+                    refundAmount = order.finalAmount;
+                } else {
+                    // Calculate refund with GST for this specific product
+                    refundAmount = currentProduct.quantity * currentProduct.price * 1.18; // Adding 18% GST
+                }
+
+                console.log("Initial refundAmount:", refundAmount);
+
+                // Handle coupon adjustments for online payments
+                if (order.paymentMethod === 'razor-pay' && order.paymentStatus === 'completed') {
+                    if (order.couponApplied && order.couponApplied.code) {
+                        const coupon = await Coupon.findOne({ code: order.couponApplied.code });
+
+                        if (coupon) {
+                            const newTotalAmount = order.totalAmount - refundAmount;
+                            console.log("newTotalAmount:", newTotalAmount);
+
+                            if (newTotalAmount < coupon.minOrderAmount) {
+                                const adjustedRefundAmount = refundAmount - order.couponApplied.discountAmount;
+                                console.log("adjustedRefundAmount:", adjustedRefundAmount);
+
+                                refundAmount = Math.max(adjustedRefundAmount, 0);
+                                console.log("Final refundAmount:", refundAmount);
+                            }
+                        }
+                    }
+                }
+
+                // Process the wallet refund
                 const wallet = await Wallet.findOne({ userId: order.user });
-                console.log("wallet", wallet)
+                console.log("wallet", wallet);
                 if (!wallet) {
                     return res.status(404).json({ success: false, message: "Wallet not found" });
                 }
-                const refundAmount = currentProduct.quantity * currentProduct.price;
 
                 wallet.transactions.push({
                     orderId: order._id,
@@ -176,22 +207,30 @@ const ordermanagement = {
 
                 await wallet.save();
 
-                const admin = await Admin.find()
-                const adminId = admin[0]._id
-                let adminWallet = await Wallet.findOne({ userId: adminId })
+                // Update admin wallet
+                const admin = await Admin.find();
+                const adminId = admin[0]._id;
+                let adminWallet = await Wallet.findOne({ userId: adminId });
                 if (!adminWallet) {
-                    return res.status(400).json({ success: false, message: "Wallet not found" })
+                    return res.status(400).json({ success: false, message: "Wallet not found" });
                 }
+
                 adminWallet.transactions.push({
                     orderId: order._id,
                     transactionType: "debit",
                     transactionAmount: refundAmount,
                     transactionDescription: `Refund for ${productStatus} in order ${order.orderId}`
-                })
-                await adminWallet.save()
+                });
+                await adminWallet.save();
 
+                // Add to cancelled products array
+                order.cancelledProducts.push({
+                    product: currentProduct.product._id,
+                    quantity: currentProduct.quantity,
+                    price: currentProduct.price
+                });
 
-
+                // Update product stock
                 await product.findByIdAndUpdate(
                     currentProduct.product._id,
                     { $inc: { stock: currentProduct.quantity } },
@@ -199,6 +238,7 @@ const ordermanagement = {
                 );
             }
 
+            // Update product status
             currentProduct.status = productStatus;
             const allSameStatus = order.products.every(item => item.status === productStatus);
 
@@ -223,6 +263,9 @@ const ordermanagement = {
             });
         }
     },
+
+
+
 
     downloadInvoice: async (req, res) => {
         try {

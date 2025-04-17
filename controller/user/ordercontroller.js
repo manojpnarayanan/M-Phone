@@ -13,64 +13,114 @@ const Cart = require("../../model/cart")
 
 
 
-
 const generateInvoice = async (order, user, shippingAddress) => {
-    const doc = new PDFDocument({ size: 'A4', margin: 50 });
-    const invoicePath = path.join(__dirname, "../../public/invoices", `invoice_${order.orderId}.pdf`);
-    console.log("Invoice Path:", invoicePath);
+    try {
+        console.log("Starting invoice generation for order:", order.orderId);
+        console.log("Products in order:", JSON.stringify(order.products, null, 2));
 
+        // Create PDF document
+        const doc = new PDFDocument({ size: 'A4', margin: 50 });
+        const invoicePath = path.join(__dirname, "../../public/invoices", `invoice_${order.orderId}.pdf`);
 
-    const dir = path.dirname(invoicePath);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
+        // Create directory if it doesn't exist
+        const dir = path.dirname(invoicePath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        // Setup write stream
+        const writeStream = fs.createWriteStream(invoicePath);
+        doc.pipe(writeStream);
+
+        // Start adding content to PDF
+        doc.fontSize(20).text('Invoice', { align: 'center' });
+        doc.moveDown();
+
+        // Add order details
+        doc.fontSize(14).text(`Order ID: ${order.orderId}`);
+        doc.text(`Invoice Date: ${new Date().toLocaleDateString()}`);
+        doc.text(`User: ${user.name}`);
+        doc.text(`Email: ${user.email}`);
+        doc.moveDown();
+
+        // Add shipping address
+        doc.fontSize(14).text('Shipping Address:', { underline: true });
+        doc.text(`${shippingAddress.housename}, ${shippingAddress.city}, ${shippingAddress.state}, ${shippingAddress.pincode}, ${shippingAddress.country}`);
+        doc.moveDown();
+
+        // Add product details header
+        doc.fontSize(14).text('Products:', { underline: true });
+
+        // First ensure we have actual product entries
+        if (!order.products || order.products.length === 0) {
+            doc.text('No products in this order');
+        } else {
+            // CRITICAL FIX: Need to ensure we wait for all product data to load before closing the PDF
+            const productIds = order.products.map(item => item.product);
+            console.log("Product IDs:", productIds);
+
+            // Use the find() method instead of findById() for each product
+            const products = await Product.find({ _id: { $in: productIds } });
+            console.log(`Found ${products.length} products in database`);
+
+            // Create a map of product IDs to product objects for quick lookup
+            const productMap = {};
+            products.forEach(product => {
+                productMap[product._id.toString()] = product;
+            });
+
+            // Now add all products to the PDF using our map
+            let added = 0;
+            for (let i = 0; i < order.products.length; i++) {
+                const item = order.products[i];
+                const productId = item.product.toString();
+                const product = productMap[productId];
+
+                if (product) {
+                    doc.text(`${i + 1}. ${product.name} - ${item.quantity} x $${item.price.toFixed(2)}`);
+                    console.log(`Added product to invoice: ${product.name}`);
+                    added++;
+                } else {
+                    doc.text(`${i + 1}. Unknown Product (ID: ${productId}) - ${item.quantity} x $${item.price.toFixed(2)}`);
+                    console.log(`Product not found in database: ${productId}`);
+                }
+            }
+            console.log(`Added ${added} products to the invoice`);
+        }
+
+        doc.moveDown();
+
+        // Add payment details
+        doc.fontSize(14).text('Payment Details:', { underline: true });
+        doc.text(`Payment Method: ${order.paymentMethod}`);
+        doc.text(`Total Amount: $${order.totalAmount.toFixed(2)}`);
+        doc.text(`Discount: $${order.discount.toFixed(2)}`);
+        doc.text(`Final Amount: $${order.finalAmount.toFixed(2)}`);
+        doc.moveDown();
+
+        // Add footer
+        doc.fontSize(12).text('Thank you for shopping with us!', { align: 'center' });
+
+        // Return a promise that resolves when PDF is completely written
+        return new Promise((resolve, reject) => {
+            writeStream.on('finish', () => {
+                console.log("Invoice creation completed successfully:", invoicePath);
+                resolve(invoicePath);
+            });
+
+            writeStream.on('error', (error) => {
+                console.error("Error writing invoice to file:", error);
+                reject(error);
+            });
+
+            // End the document to finalize PDF
+            doc.end();
+        });
+    } catch (error) {
+        console.error("Critical error generating invoice:", error);
+        throw error;
     }
-
-    const writeStream = fs.createWriteStream(invoicePath);
-    doc.pipe(writeStream);
-
-
-    doc.fontSize(20).text('Invoice', { align: 'center' });
-    doc.moveDown();
-
-
-    doc.fontSize(14).text(`Order ID: ${order.orderId}`);
-    doc.text(`Invoice Date: ${new Date().toLocaleDateString()}`);
-    doc.text(`User: ${user.name}`);
-    doc.text(`Email: ${user.email}`);
-    doc.moveDown();
-
-
-    doc.fontSize(14).text('Shipping Address:', { underline: true });
-    doc.text(`${shippingAddress.housename}, ${shippingAddress.city}, ${shippingAddress.state}, ${shippingAddress.pincode}, ${shippingAddress.country}`);
-    doc.moveDown();
-
-
-    doc.fontSize(14).text('Products:', { underline: true });
-    order.products.forEach(async (item, index) => {
-        const product = await Product.findById(item.product);
-        doc.text(`${index + 1}. ${product.name} - ${item.quantity} x $${item.price.toFixed(2)}`);
-    });
-    doc.moveDown();
-
-
-    doc.fontSize(14).text('Payment Details:', { underline: true });
-    doc.text(`Payment Method: ${order.paymentMethod}`);
-    doc.text(`Total Amount: $${order.totalAmount.toFixed(2)}`);
-    doc.text(`Discount: $${order.discount.toFixed(2)}`);
-    doc.text(`Final Amount: $${order.finalAmount.toFixed(2)}`);
-    doc.moveDown();
-
-
-    doc.fontSize(12).text('Thank you for shopping with us!', { align: 'center' });
-    doc.end();
-
-    return new Promise((resolve, reject) => {
-        writeStream.on('finish', () => resolve(invoicePath));
-        writeStream.on('error', reject);
-    });
 };
-
-
 
 
 const orderController = {
@@ -104,8 +154,8 @@ const orderController = {
                 if (product.stock < item.quantity) {
                     return res.status(400).json({ success: false, message: `Insufficient stock for product: ${product.name}, Only ${product.stock} left` });
                 }
-                if(! product.isActive){
-                    return res.status(400).json({success:false, message:"Product is blocked by admin"})
+                if (!product.isActive) {
+                    return res.status(400).json({ success: false, message: "Product is blocked by admin" })
                 }
 
             }
@@ -180,10 +230,12 @@ const orderController = {
 
             const user = await User.findById(userId);
             const address = await Address.findById(shippingAddress);
+            const completeOrder = await Order.findById(newOrder._id);
 
-            const invoicePath = await generateInvoice(newOrder, user, address);
-            newOrder.invoice = `/invoices/invoice_${newOrder.orderId}.pdf`;
-            await newOrder.save();
+
+            const invoicePath = await generateInvoice(completeOrder, user, address);
+            completeOrder.invoice = `/invoices/invoice_${completeOrder.orderId}.pdf`;
+            await completeOrder.save();
 
 
             res.status(200).json({
@@ -213,8 +265,18 @@ const orderController = {
             }
 
             const product = order.products[productIndex];
+            const cancelQuantity = quantity || product.quantity
+            let refundAmount = 0;
 
-            let refundAmount = (quantity || product.quantity) * product.price
+            if (order.products.length === 1) {
+                refundAmount = order.finalAmount;
+            } else {
+
+                refundAmount = cancelQuantity * product.price * 1.18;
+            }
+            // console.log("Initial refundAmount:", refundAmount);
+
+
 
             if (order.paymentMethod === 'cash_on_delivery' && order.paymentStatus === 'pending') {
 
@@ -253,10 +315,14 @@ const orderController = {
 
                     if (coupon) {
                         const newTotalAmount = order.totalAmount - refundAmount
+                        console.log("newTotalAmount :2", newTotalAmount)
                         if (newTotalAmount < coupon.minOrderAmount) {
                             const adjustedRefundAmount = refundAmount - order.couponApplied.discountAmount
+                            console.log("adjustedRefundAmount :3", adjustedRefundAmount)
+
 
                             refundAmount = Math.max(adjustedRefundAmount, 0)
+                            console.log("refundAmount:4", refundAmount)
                         }
 
                     }
@@ -409,10 +475,10 @@ const orderController = {
 
     returnOrder: async (req, res) => {
         try {
-            const {orderId , productId}=req.params
-            const {returnReason}=req.body
+            const { orderId, productId } = req.params
+            const { returnReason } = req.body
 
-            console.log("return orderid :", orderId,productId);
+            console.log("return orderid :", orderId, productId);
             const order = await Order.findById(orderId)
 
             if (!order) {
@@ -421,26 +487,26 @@ const orderController = {
 
 
             const productIndex = order.products.findIndex(item => item.product.toString() === productId);
-        if (productIndex === -1) {
-            return res.status(404).json({ message: "Product not found in the order" });
-        }
+            if (productIndex === -1) {
+                return res.status(404).json({ message: "Product not found in the order" });
+            }
 
-        const product = order.products[productIndex];
-            
-        if (product.status !== 'Delivered') {
-            return res.status(400).json({ message: "Only delivered products can be returned" });
-        }
-            
-       
+            const product = order.products[productIndex];
 
-        order.products[productIndex].status = "Return Request";
-        order.products[productIndex].returnReason = returnReason;
-       
-       
-        const allReturned = order.products.every(item => item.status === "Returned" || item.quantity === 0);
-        if (allReturned) {
-            order.orderStatus = 'Returned';
-        }
+            if (product.status !== 'Delivered') {
+                return res.status(400).json({ message: "Only delivered products can be returned" });
+            }
+
+
+
+            order.products[productIndex].status = "Return Request";
+            order.products[productIndex].returnReason = returnReason;
+
+
+            const allReturned = order.products.every(item => item.status === "Returned" || item.quantity === 0);
+            if (allReturned) {
+                order.orderStatus = 'Returned';
+            }
 
 
 

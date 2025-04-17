@@ -1021,22 +1021,24 @@
                                     </div>
                                   </div>
                                   <div class="order-header-right">
-                                    <% let statusClass='' ; switch(order.orderStatus.toLowerCase()) { case 'delivered' :
-                                      statusClass='status-delivered' ; break; case 'processing' : case 'shipped' :
-                                      statusClass='status-processing' ; break; case 'cancelled' :
+                                    <% let statusClass='' ; switch(order.orderStatus.toLowerCase()) { case 'delivered'
+                                      :statusClass='status-delivered' ; break; case 'processing' : case 'shipped'
+                                      :statusClass='status-processing' ; break; case 'cancelled'
+                                      :statusClass='status-cancelled' ; break; case 'failed' :
                                       statusClass='status-cancelled' ; break; default: statusClass='status-pending' ; }
                                       %>
                                       <div class="order-status <%= statusClass %>">
                                         <%= order.orderStatus %>
                                       </div>
-                                      <div class="order-total">$<%= order.finalAmount.toFixed(2) %>
+                                      <div class="order-total">₹<%= order.finalAmount.toFixed(2) %>
                                       </div>
                                   </div>
                                 </div>
 
                                 <div class="order-body">
                                   <% if (order.orderStatus.toLowerCase() !=='cancelled' &&
-                                    order.orderStatus.toLowerCase() !=='returned' ) { %>
+                                    order.orderStatus.toLowerCase() !=='failed' && order.orderStatus.toLowerCase()
+                                    !=='returned' ) { %>
                                     <div class="order-progress">
                                       <div class="progress-track">
                                         <% const steps=[ { id: 'ordered' , label: 'Ordered' , icon: 'fa-shopping-cart'
@@ -1062,27 +1064,37 @@
                                       </div>
                                     </div>
                                     <% } %>
+                                      <!-- Retry button for failed orders -->
+                                      <% if (order.orderStatus.toLowerCase()==='failed' ) { %>
+                                        <div class="retry-payment-container">
+                                          <button onclick="retryPayment('<%= order._id %>')"
+                                            class="btn btn-primary retry-btn">
+                                            <i class="fas fa-redo"></i> Retry Payment
+                                          </button>
+                                        </div>
+                                        <% } %>
 
-                                      <div class="product-list">
-                                        <% order.products.forEach(item=> { %>
-                                          <div class="product-item" data-product-id="<%= item.product._id %>">
-                                            <div class="product-image">
-                                              <% if (item.product && item.product.image) { %>
-                                                <img src="/<%= item.product.image[0] %>" alt="<%= item.product.name %>">
-                                                <% } else { %>
-                                                  <i class="fas fa-box" style="font-size: 24px; color: #ccc;"></i>
-                                                  <% } %>
-                                            </div>
+                                          <div class="product-list">
+                                            <% order.products.forEach(item=> { %>
+                                              <div class="product-item" data-product-id="<%= item.product._id %>">
+                                                <div class="product-image">
+                                                  <% if (item.product && item.product.image) { %>
+                                                    <img src="/<%= item.product.image[0] %>"
+                                                      alt="<%= item.product.name %>">
+                                                    <% } else { %>
+                                                      <i class="fas fa-box" style="font-size: 24px; color: #ccc;"></i>
+                                                      <% } %>
+                                                </div>
 
-                                            <div class="product-details">
-                                              <div class="product-name">
-                                                <%= item.product.name %>
-                                              </div>
-                                              <div class="product-meta">
-                                                <span>Qty: <%= item.quantity %></span>
-                                                <p class="product-status">
-                                                  Status:
-                                                  <span class="badge <%= item.product.status === 'Pending' ? 'badge-pending' : 
+                                                <div class="product-details">
+                                                  <div class="product-name">
+                                                    <%= item.product.name %>
+                                                  </div>
+                                                  <div class="product-meta">
+                                                    <span>Qty: <%= item.quantity %></span>
+                                                    <p class="product-status">
+                                                      Status:
+                                                      <span class="badge <%= item.product.status === 'Pending' ? 'badge-pending' : 
                                                                         item.product.status === 'Processing' ? 'badge-processing' :
                                                                         item.product.status === 'Paid' ? 'badge-paid' : 
  
@@ -1090,118 +1102,119 @@
                                                                         item.product.status === 'Delivered' ? 'badge-delivered' : 
                                                                         item.product.status === 'Cancelled' ? 'badge-cancelled' : 
                                                                         item.product.status === 'Return Requested' ? 'badge-return-requested' : 
+                                                                        item.product.status === 'Failed' ? 'badge-cancelled' :
                                                                         'badge-returned' %>">
-                                                    <%= item.status %>
-                                                  </span>
-                                                </p>
-                                                <% if (item.product.color) { %>
-                                                  <span>Color: <%= item.product.color %></span>
-                                                  <% } %>
-                                                    <% if (item.product.size) { %>
-                                                      <span>Size: <%= item.product.size %></span>
+                                                        <%= item.status %>
+                                                      </span>
+                                                    </p>
+                                                    <% if (item.product.color) { %>
+                                                      <span>Color: <%= item.product.color %></span>
                                                       <% } %>
-                                              </div>
-                                              <div class="product-price">$<%= item.price.toFixed(2) %>
-                                              </div>
-
-                                              <!-- Conditional buttons based on product status -->
-                                              <div class="product-actions">
-                                                <% if (item.status.toLowerCase()==='delivered' ) { %>
-                                                  <div class="delivered-actions">
-                                                    <a href="/user/myprofile/write-review/<%= order._id %>">
-                                                      <button onclick="writeReview('<%= item.product._id %>')"
-                                                        class="btn btn-primary btn-sm mt-2 mr-2">
-                                                        Write Review
-                                                      </button> </a>
-
-                                                    <button
-                                                      onclick="returnOrder('<%= order._id %>', '<%= item.product._id %>')"
-                                                      class="btn btn-warning btn-sm mt-2 mr-2">
-                                                      Return Order
-                                                    </button>
-                                                    <button onclick="downloadInvoice('<%= order._id %>')"
-                                                      class="btn btn-success btn-sm mt-2">
-                                                      Download Invoice
-                                                    </button>
+                                                        <% if (item.product.size) { %>
+                                                          <span>Size: <%= item.product.size %></span>
+                                                          <% } %>
                                                   </div>
-                                                  <% } %>
+                                                  <div class="product-price">₹<%= item.price.toFixed(2) %>
+                                                  </div>
 
-                                                    <!-- Existing Cancel Button -->
-                                                    <% if (item.status.toLowerCase() !=='delivered' &&
-                                                      order.orderStatus.toLowerCase() !=='cancelled' &&
-                                                      order.orderStatus.toLowerCase() !=='delivered' &&
-                                                      order.orderStatus.toLowerCase() !=='failed' &&
-                                                      item.status.toLowerCase() !=='cancelled' &&
-                                                      item.status.toLowerCase() !=='returned' &&
-                                                      item.status.toLowerCase() !=='return request' &&
-                                                      order.orderStatus.toLowerCase() !=='returned' ) { %>
-                                                      <button
-                                                        onclick="cancelProduct('<%= order._id %>', '<%= item.product._id %>', <%= item.quantity %>)"
-                                                        class="btn btn-danger btn-sm mt-2">
-                                                        Cancel This Item
-                                                      </button>
+                                                  <!-- Conditional buttons based on product status -->
+                                                  <div class="product-actions">
+                                                    <% if (item.status.toLowerCase()==='delivered' ) { %>
+                                                      <div class="delivered-actions">
+                                                        <a href="/user/myprofile/write-review/<%= order._id %>">
+                                                          <button onclick="writeReview('<%= item.product._id %>')"
+                                                            class="btn btn-primary btn-sm mt-2 mr-2">
+                                                            Write Review
+                                                          </button> </a>
+
+                                                        <button
+                                                          onclick="returnOrder('<%= order._id %>', '<%= item.product._id %>')"
+                                                          class="btn btn-warning btn-sm mt-2 mr-2">
+                                                          Return Order
+                                                        </button>
+                                                        <button onclick="downloadInvoice('<%= order._id %>')"
+                                                          class="btn btn-success btn-sm mt-2">
+                                                          Download Invoice
+                                                        </button>
+                                                      </div>
                                                       <% } %>
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <% }); %>
-                                      </div>
 
-                                      <div class="address-payment">
-                                        <div class="address-box">
-                                          <div class="box-title">Shipping Address</div>
-                                          <div class="address-details">
-                                            <%= order.shippingAddress.housename %>,<br>
-                                              <%= order.shippingAddress.city %>,<br>
-                                                <%= order.shippingAddress.state %> - <%= order.shippingAddress.pincode
-                                                    %>
-                                          </div>
-                                        </div>
-
-                                        <div class="payment-box">
-                                          <div class="box-title">Payment Information</div>
-                                          <div class="payment-details">
-                                            <div>Payment Method: <%= order.paymentMethod || 'Not specified' %>
-                                            </div>
-                                            <% if (order.paymentId) { %>
-                                              <div>Payment ID: <%= order.paymentId %>
-                                              </div>
-                                              <% } %>
-                                                <div>Payment Status: <%= order.paymentStatus || 'Not specified' %>
+                                                        <!-- Existing Cancel Button -->
+                                                        <% if (item.status.toLowerCase() !=='delivered' &&
+                                                          order.orderStatus.toLowerCase() !=='cancelled' &&
+                                                          order.orderStatus.toLowerCase() !=='delivered' &&
+                                                          order.orderStatus.toLowerCase() !=='failed' &&
+                                                          item.status.toLowerCase() !=='cancelled' &&
+                                                          item.status.toLowerCase() !=='returned' &&
+                                                          item.status.toLowerCase() !=='return request' &&
+                                                          order.orderStatus.toLowerCase() !=='returned' ) { %>
+                                                          <button
+                                                            onclick="cancelProduct('<%= order._id %>', '<%= item.product._id %>', <%= item.quantity %>)"
+                                                            class="btn btn-danger btn-sm mt-2">
+                                                            Cancel This Item
+                                                          </button>
+                                                          <% } %>
+                                                  </div>
                                                 </div>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div class="order-summary">
-                                        <div class="summary-row">
-                                          <span>Subtotal</span>
-                                          <span>$<%= (order.finalAmount - (order.shippingFee || 0) - (order.tax ||
-                                              0)).toFixed(2) %></span>
-                                        </div>
-                                        <% if (order.shippingFee) { %>
-                                          <div class="summary-row">
-                                            <span>Shipping Fee</span>
-                                            <span>$<%= order.shippingFee.toFixed(2) %></span>
-                                          </div>
-                                          <% } %>
-                                            <% if (order.tax) { %>
-                                              <div class="summary-row">
-                                                <span>Tax</span>
-                                                <span>$<%= order.tax.toFixed(2) %></span>
                                               </div>
-                                              <% } %>
-                                                <% if (order.discount) { %>
-                                                  <div class="summary-row">
-                                                    <span>Discount</span>
-                                                    <span>-$<%= order.discount.toFixed(2) %></span>
+                                              <% }); %>
+                                          </div>
+
+                                          <div class="address-payment">
+                                            <div class="address-box">
+                                              <div class="box-title">Shipping Address</div>
+                                              <div class="address-details">
+                                                <%= order.shippingAddress.housename %>,<br>
+                                                  <%= order.shippingAddress.city %>,<br>
+                                                    <%= order.shippingAddress.state %> - <%=
+                                                        order.shippingAddress.pincode %>
+                                              </div>
+                                            </div>
+
+                                            <div class="payment-box">
+                                              <div class="box-title">Payment Information</div>
+                                              <div class="payment-details">
+                                                <div>Payment Method: <%= order.paymentMethod || 'Not specified' %>
+                                                </div>
+                                                <% if (order.paymentId) { %>
+                                                  <div>Payment ID: <%= order.paymentId %>
                                                   </div>
                                                   <% } %>
-                                                    <div class="summary-row total">
-                                                      <span>Total</span>
-                                                      <span>$<%= order.finalAmount.toFixed(2) %></span>
+                                                    <div>Payment Status: <%= order.paymentStatus || 'Not specified' %>
                                                     </div>
-                                      </div>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          <div class="order-summary">
+                                            <div class="summary-row">
+                                              <span>Subtotal</span>
+                                              <span>₹<%= (order.finalAmount - (order.shippingFee || 0) - (order.tax ||
+                                                  0)).toFixed(2) %></span>
+                                            </div>
+                                            <% if (order.shippingFee) { %>
+                                              <div class="summary-row">
+                                                <span>Shipping Fee</span>
+                                                <span>₹<%= order.shippingFee.toFixed(2) %></span>
+                                              </div>
+                                              <% } %>
+                                                <% if (order.tax) { %>
+                                                  <div class="summary-row">
+                                                    <span>Tax</span>
+                                                    <span>₹<%= order.tax.toFixed(2) %></span>
+                                                  </div>
+                                                  <% } %>
+                                                    <% if (order.discount) { %>
+                                                      <div class="summary-row">
+                                                        <span>Discount</span>
+                                                        <span>-₹<%= order.discount.toFixed(2) %></span>
+                                                      </div>
+                                                      <% } %>
+                                                        <div class="summary-row total">
+                                                          <span>Total</span>
+                                                          <span>₹<%= order.finalAmount.toFixed(2) %></span>
+                                                        </div>
+                                          </div>
 
 
                                 </div>

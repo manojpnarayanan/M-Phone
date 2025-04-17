@@ -32,7 +32,7 @@
 
         /* Header Styles */
         .header {
-            background-color:black;
+            background-color: black;
             padding: 10px 0;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -436,7 +436,7 @@
 
 <body>
     <!-- Header -->
-    <header class="header" >
+    <header class="header">
         <div class="container">
             <div class="header-content">
                 <a href="#" class="logo">M Store</a>
@@ -478,7 +478,8 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Delivery Address</h3>
-                        <a href="/user/myprofile/addaddress/<%= user._id%>" class="btn btn-outlined">+ Add New Address</a>
+                        <a href="/user/myprofile/addaddress/<%= user._id%>" class="btn btn-outlined">+ Add New
+                            Address</a>
                     </div>
                     <div class="card-body">
                         <% if (addresses && addresses.length> 0) { %>
@@ -497,7 +498,7 @@
                                                                 Type: <%= address.addresstype %>
                                         </p>
                                     </label>
-                                   
+
                                 </div>
                                 <% }) %>
                                     <% } else { %>
@@ -552,16 +553,22 @@
                             <label for="cod">Cash on Delivery</label>
                         </div>
                         <div class="payment-option">
-                            <input type="radio" name="paymentMethod" id="rzp" value="razor-pay"
-                                class="payment-radio" checked>
-                            <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" class="razorpay-logo">
+                            <input type="radio" name="paymentMethod" id="rzp" value="razor-pay" class="payment-radio"
+                                checked>
+                            <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay"
+                                class="razorpay-logo">
                             <label for="rzp">Razorpay</label>
                         </div>
-                        
-                        <button id="payButton" onclick="processPayment()" class="btn btn-primary btn-block" style="margin-top: 20px;">Pay
-                            ₹<span id="finalPayAmount"><%= (totalPrice - totalDiscount - (couponDiscount || 0) + deliveryCharges + gst).toFixed(2) %></span></button>
-                        
-                        <button id="retryPayment" onclick="retryPayment()" class="btn btn-secondary btn-block retry-payment">
+
+                        <button id="payButton" onclick="processPayment()" class="btn btn-primary btn-block"
+                            style="margin-top: 20px;">Pay
+                            ₹<span id="finalPayAmount">
+                                <%= (totalPrice - totalDiscount - (couponDiscount || 0) + deliveryCharges +
+                                    gst).toFixed(2) %>
+                            </span></button>
+
+                        <button id="retryPayment" onclick="retryPayment()"
+                            class="btn btn-secondary btn-block retry-payment">
                             Retry Payment
                         </button>
                     </div>
@@ -579,88 +586,105 @@
                         <div class="price-summary">
                             <div class="price-row">
                                 <div class="price-label">Price (<%= totalItems %> items)</div>
-                                <div class="price-value" id="totalPrice">₹<%= totalPrice %></div>
+                                <div class="price-value" id="totalPrice">₹<%= totalPrice %>
+                                </div>
                             </div>
                             <div class="price-row">
                                 <div class="price-label">Discount</div>
-                                <div class="price-value" style="color: #388e3c;" id="totalDiscount">-₹<%= totalDiscount %></div>
+                                <div class="price-value" style="color: #388e3c;" id="totalDiscount">-₹<%= totalDiscount
+                                        %>
+                                </div>
                             </div>
-                            <div id="couponDiscountRow" class="price-row" style="<%= couponDiscount && couponDiscount > 0 ? '' : 'display: none;' %>">
-                                <div class="price-label">Coupon Discount <span id="appliedCouponCode"><% if (appliedCouponCode) { %>(<%= appliedCouponCode %>)<% } %></span></div>
-                                <div class="price-value" style="color: #388e3c;" id="couponDiscount">-₹<%= couponDiscount ? couponDiscount.toFixed(2) : '0.00' %></div>
+                            <div id="couponDiscountRow" class="price-row"
+                                style="<%= couponDiscount && couponDiscount > 0 ? '' : 'display: none;' %>">
+                                <div class="price-label">Coupon Discount <span id="appliedCouponCode">
+                                        <% if (appliedCouponCode) { %>(<%= appliedCouponCode %>)<% } %>
+                                    </span></div>
+                                <div class="price-value" style="color: #388e3c;" id="couponDiscount">-₹<%=
+                                        couponDiscount ? couponDiscount.toFixed(2) : '0.00' %>
+                                </div>
                             </div>
                             <div class="price-row">
                                 <div class="price-label">Delivery Charges</div>
                                 <div class="price-value" style="color: #388e3c;" id="deliveryCharges">
-                                    <% if (totalPrice > 50000) { %>
+                                    <% if (totalPrice> 50000) { %>
                                         FREE
-                                    <% } else { %>
-                                        ₹100
-                                    <% } %>
+                                        <% } else { %>
+                                            ₹100
+                                            <% } %>
                                 </div>
                             </div>
                             <div class="price-row">
                                 <div class="price-label">GST (18%)</div>
-                                <div class="price-value" id="gst">₹<%= gst.toFixed(2) %></div>
+                                <div class="price-value" id="gst">₹<%= gst.toFixed(2) %>
+                                </div>
                             </div>
                             <div class="price-row total-row">
                                 <div class="price-label">Total Amount</div>
-                                <div class="price-value" id="totalAmount">₹<%= (totalPrice - totalDiscount - (couponDiscount || 0) + deliveryCharges + gst).toFixed(2) %></div>
+                                <div class="price-value" id="totalAmount">₹<%= (totalPrice - totalDiscount -
+                                        (couponDiscount || 0) + deliveryCharges + gst).toFixed(2) %>
+                                </div>
                             </div>
                         </div>
 
                         <div id="savingsMessage" style="color: #388e3c; margin-top: 10px; font-weight: 500;">
-                            You will save ₹<span id="totalSavings"><%= (totalDiscount + (couponDiscount || 0)).toFixed(2) %></span> on this order
+                            You will save ₹<span id="totalSavings">
+                                <%= (totalDiscount + (couponDiscount || 0)).toFixed(2) %>
+                            </span> on this order
                         </div>
                     </div>
                 </div>
 
-            
+
                 <!-- Promo Code Section -->
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Promo Code</h3>
-    </div>
-    <div class="card-body">
-        <div class="coupons-list">
-            <% if (coupons && coupons.length > 0) { %>
-                <% coupons.forEach(coupon => { %>
-                    <div class="coupon <%= coupon.code === appliedCouponCode ? 'applied' : '' %>" 
-                         data-code="<%= coupon.code %>" 
-                         data-id="<%= coupon._id %>" 
-                         data-discount-type="<%= coupon.discountType %>" 
-                         data-discount-value="<%= coupon.discountValue %>" 
-                         data-min-order="<%= coupon.minOrderAmount || 0 %>"
-                         data-max-discount="<%= coupon.maxDiscountAmount || 0 %>">
-                        <div>
-                            <div class="coupon-code"><%= coupon.code %></div>
-                            <div>
-                                <% if (coupon.discountType === 'percentage') { %>
-                                    <%= coupon.discountValue %>% off
-                                    <% if (coupon.maxDiscountAmount) { %>
-                                        up to ₹<%= coupon.maxDiscountAmount %>
-                                    <% } %>
-                                <% } else { %>
-                                    ₹<%= coupon.discountValue %> off
-                                <% } %>
-                                <% if (coupon.minOrderAmount > 0) { %>
-                                    (Min. order: ₹<%= coupon.minOrderAmount %>)
-                                <% } %>
-                            </div>
-                        </div>
-                        <% if (coupon.code === appliedCouponCode) { %>
-                            <button onclick="removeCoupon('<%= coupon._id %>', '<%= user._id %>')" class="btn btn-danger">Remove</button>
-                        <% } else { %>
-                            <button onclick="applyCoupon('<%= coupon._id %>', '<%= user._id %>')" class="btn btn-outlined">Apply</button>
-                        <% } %>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Promo Code</h3>
                     </div>
-                <% }); %>
-            <% } else { %>
-                <div class="no-coupons">No active coupons available</div>
-            <% } %>
-        </div>
-    </div>
-</div>
+                    <div class="card-body">
+                        <div class="coupons-list">
+                            <% if (coupons && coupons.length> 0) { %>
+                                <% coupons.forEach(coupon=> { %>
+                                    <div class="coupon <%= coupon.code === appliedCouponCode ? 'applied' : '' %>"
+                                        data-code="<%= coupon.code %>" data-id="<%= coupon._id %>"
+                                        data-discount-type="<%= coupon.discountType %>"
+                                        data-discount-value="<%= coupon.discountValue %>"
+                                        data-min-order="<%= coupon.minOrderAmount || 0 %>"
+                                        data-max-discount="<%= coupon.maxDiscountAmount || 0 %>">
+                                        <div>
+                                            <div class="coupon-code">
+                                                <%= coupon.code %>
+                                            </div>
+                                            <div>
+                                                <% if (coupon.discountType==='percentage' ) { %>
+                                                    <%= coupon.discountValue %>% off
+                                                        <% if (coupon.maxDiscountAmount) { %>
+                                                            up to ₹<%= coupon.maxDiscountAmount %>
+                                                                <% } %>
+                                                                    <% } else { %>
+                                                                        ₹<%= coupon.discountValue %> off
+                                                                            <% } %>
+                                                                                <% if (coupon.minOrderAmount> 0) { %>
+                                                                                    (Min. order: ₹<%=
+                                                                                        coupon.minOrderAmount %>)
+                                                                                        <% } %>
+                                            </div>
+                                        </div>
+                                        <% if (coupon.code===appliedCouponCode) { %>
+                                            <button onclick="removeCoupon('<%= coupon._id %>', '<%= user._id %>')"
+                                                class="btn btn-danger">Remove</button>
+                                            <% } else { %>
+                                                <button onclick="applyCoupon('<%= coupon._id %>', '<%= user._id %>')"
+                                                    class="btn btn-outlined">Apply</button>
+                                                <% } %>
+                                    </div>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <div class="no-coupons">No active coupons available</div>
+                                            <% } %>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -674,19 +698,19 @@
     const originalValues = {
         totalPrice: <%= totalPrice %>,
         totalDiscount: <%= totalDiscount %>,
-        couponDiscount: <%= couponDiscount || 0 %>,
-        deliveryCharges: <%= deliveryCharges %>,
-        gst: <%= gst %>
+            couponDiscount: <%= couponDiscount || 0 %>,
+                deliveryCharges: <%= deliveryCharges %>,
+                    gst: <%= gst %>
     };
 
-    
+
     let lastOrderData = null;
     let razorpayOrderId = null;
 
-    
+
     async function processPayment() {
         try {
-            
+
             const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
             if (!selectedPaymentMethod) {
                 Swal.fire({
@@ -694,10 +718,10 @@
                     title: 'Error',
                     text: 'Please select a payment method.'
                 });
-                return; 
+                return;
             }
-            
-            
+
+
             const selectedAddress = document.querySelector('input[name="address"]:checked');
             if (!selectedAddress) {
                 Swal.fire({
@@ -707,17 +731,17 @@
                 });
                 return;
             }
-            
-            
+
+
             const selectedCoupon = document.querySelector('.coupon.applied');
-const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '';
+            const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '';
 
             const currentTotalAmount = parseFloat(document.getElementById('totalAmount').textContent.replace('₹', ''));
-            const couponDiscount = document.getElementById('couponDiscountRow').style.display !== 'none' 
+            const couponDiscount = document.getElementById('couponDiscountRow').style.display !== 'none'
                 ? parseFloat(document.getElementById('couponDiscount').textContent.replace('-₹', ''))
                 : 0;
-            
-            
+
+
             const orderData = {
                 userId: "<%= user._id %>",
                 shippingAddress: selectedAddress.value,
@@ -741,18 +765,18 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 }
             };
 
-        
+
             lastOrderData = orderData;
 
-            
+
             if (selectedPaymentMethod.value === 'cash_on_delivery') {
                 placeOrder();
                 return;
             }
 
-            
+
             if (selectedPaymentMethod.value === 'razor-pay') {
-                
+
                 Swal.fire({
                     title: 'Initializing payment...',
                     didOpen: () => {
@@ -762,14 +786,14 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     showConfirmButton: false
                 });
 
-            
+
                 const response = await fetch('/user/myprofile/create-razorpay-order', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        amount: currentTotalAmount * 100, 
+                        amount: currentTotalAmount * 100,
                         currency: 'INR',
                         receipt: 'order_' + Date.now(),
                         orderData: orderData
@@ -777,7 +801,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 });
 
                 const result = await response.json();
-                
+
                 if (!response.ok) {
                     Swal.fire({
                         icon: 'error',
@@ -787,22 +811,22 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     return;
                 }
 
-            
+
                 Swal.close();
 
-                
+
                 razorpayOrderId = result.orderId;
 
-                
+
                 const options = {
-                    key: '<%= process.env.KEY_ID %>', 
-                    amount: currentTotalAmount * 100, 
+                    key: '<%= process.env.KEY_ID %>',
+                    amount: currentTotalAmount * 100,
                     currency: 'INR',
                     name: 'M Store',
                     description: 'Purchase from M Store',
                     order_id: result.orderId,
                     handler: async function (response) {
-                
+
                         Swal.fire({
                             title: 'Verifying payment...',
                             didOpen: () => {
@@ -813,7 +837,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                         });
 
                         try {
-                            
+
                             const verifyResponse = await fetch('/user/myprofile/verify-razorpay-payment', {
                                 method: 'POST',
                                 headers: {
@@ -828,61 +852,61 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                             });
 
                             const verifyResult = await verifyResponse.json();
-                            console.log("verifyResult",verifyResult)
+                            console.log("verifyResult", verifyResult)
 
                             if (verifyResponse.ok) {
-                                
+
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Payment Successful!',
                                     text: 'Your order has been placed successfully.',
                                     confirmButtonText: 'OK'
                                 }).then(() => {
-                                
+
                                     window.location.href = `/user/myprofile/order-confirmed/${verifyResult.orderId}`;
                                 });
                             } else {
                                 Swal.fire({
-                icon: 'error',
-                title: 'Payment Verification Failed',
-                text: 'Taking you to retry page...',
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
-                window.location.href = `/user/myprofile/failed-payment/${verifyResult.orderId}`;
-            });
-                               
+                                    icon: 'error',
+                                    title: 'Payment Verification Failed',
+                                    text: 'Taking you to retry page...',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = `/user/myprofile/failed-payment/${verifyResult.orderId}`;
+                                });
+
                             }
                         } catch (error) {
                             console.error("Error verifying payment:", error);
-                        
-        fetch('/user/myprofile/create-failed-order', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(orderData)
-        })
-        .then(response => response.json())
-        .then(result => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Taking you to retry page...',
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
-                window.location.href = `/user/myprofile/failed-payment/${result.orderId}`;
-            });
-        })
-        .catch(err => {
-            console.error("Error creating failed order:", err);
-            
-            window.location.href = "/user/myprofile/cart";
-        });
-    }
-},
-                  
+
+                            fetch('/user/myprofile/create-failed-order', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(orderData)
+                            })
+                                .then(response => response.json())
+                                .then(result => {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Taking you to retry page...',
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        window.location.href = `/user/myprofile/failed-payment/${result.orderId}`;
+                                    });
+                                })
+                                .catch(err => {
+                                    console.error("Error creating failed order:", err);
+
+                                    window.location.href = "/user/myprofile/cart";
+                                });
+                        }
+                    },
+
                     prefill: {
                         name: '<%= user.name %>',
                         email: '<%= user.email %>',
@@ -892,37 +916,37 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                         color: '#2874f0'
                     },
                     modal: {
-                        ondismiss: function() {
+                        ondismiss: function () {
                             if (!orderData) {
-            console.error("Order data is undefined.");
-            window.location.href = "/user/myprofile/cart";
-            return;
-        }
+                                console.error("Order data is undefined.");
+                                window.location.href = "/user/myprofile/cart";
+                                return;
+                            }
                             // Show retry button when payment modal is dismissed
                             // document.getElementById('retryPayment').style.display = 'block';
                             // window.location.href="/user/myprofile/failed-paymentpage"
                             fetch('/user/myprofile/create-failed-order', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(orderData)
-        })
-        .then(response => response.json())
-        .then(result => {
-            window.location.href = `/user/myprofile/failed-payment/${result.orderId}`;
-        })
-        .catch(err => {
-            console.error("Error creating failed order:", err);
-        
-            window.location.href = "/user/myprofile/cart";
-        });
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(orderData)
+                            })
+                                .then(response => response.json())
+                                .then(result => {
+                                    window.location.href = `/user/myprofile/failed-payment/${result.orderId}`;
+                                })
+                                .catch(err => {
+                                    console.error("Error creating failed order:", err);
+
+                                    window.location.href = "/user/myprofile/cart";
+                                });
 
                         }
                     }
                 };
 
-                
+
                 const razorpayInstance = new Razorpay(options);
                 razorpayInstance.open();
             }
@@ -933,15 +957,15 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 title: 'Error',
                 text: 'An unexpected error occurred. Please try again.'
             });
-            
-            
+
+
             document.getElementById('retryPayment').style.display = 'block';
             // window.location.href="/user/myprofile/failed-paymentpage"
 
         }
     }
 
-    
+
     function retryPayment() {
         if (lastOrderData) {
             processPayment();
@@ -957,7 +981,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
 
     async function placeOrder() {
         try {
-            
+
             const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
             if (!selectedPaymentMethod) {
                 Swal.fire({
@@ -965,9 +989,9 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     title: 'Error',
                     text: 'Please select a payment method.'
                 });
-                return; 
+                return;
             }
-            
+
             const selectedAddress = document.querySelector('input[name="address"]:checked');
             if (!selectedAddress) {
                 Swal.fire({
@@ -975,19 +999,19 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                     title: 'Error',
                     text: 'Please select a delivery address.'
                 });
-                return; 
+                return;
             }
-            
-            
+
+
             const selectedCoupon = document.querySelector('.coupon.applied');
-const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '';
+            const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '';
 
             const currentTotalAmount = parseFloat(document.getElementById('totalAmount').textContent.replace('₹', ''));
-            const couponDiscount = document.getElementById('couponDiscountRow').style.display !== 'none' 
+            const couponDiscount = document.getElementById('couponDiscountRow').style.display !== 'none'
                 ? parseFloat(document.getElementById('couponDiscount').textContent.replace('-₹', ''))
                 : 0;
-            
-        
+
+
             const orderData = {
                 userId: "<%= user._id %>",
                 shippingAddress: selectedAddress.value,
@@ -1006,12 +1030,12 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 ],
                 paymentMethod: selectedPaymentMethod.value,
                 couponApplied: {
-                    code:couponCode,
+                    code: couponCode,
                     discountAmount: couponDiscount
                 }
             };
 
-            
+
             const response = await fetch('/user/myprofile/order-placed', {
                 method: 'POST',
                 headers: {
@@ -1020,23 +1044,23 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 body: JSON.stringify(orderData)
             });
 
-    
+
             const result = await response.json();
             console.log(result);
 
             if (response.ok) {
-                
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Order Placed!',
                     text: 'Your order has been successfully placed.',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    
+
                     window.location.href = `/user/myprofile/order-confirmed/${result.orderId}`;
                 });
             } else {
-        
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -1045,7 +1069,7 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
             }
         } catch (error) {
             console.error("Error placing order:", error);
-            
+
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -1053,68 +1077,68 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
             });
         }
     }
-          
+
     async function applyCoupon(couponId, userId) {
-    try {
-    
-        console.log("Applying coupon:", couponId, "for user:", userId);
-        
-        Swal.fire({
-            title: 'Applying coupon...',
-            didOpen: () => {
-                Swal.showLoading();
-            
-            },
-            allowOutsideClick: false,
-            showConfirmButton: false
-        });
-        
-        const response = await fetch(`/user/myprofile/checkout/${userId}/coupon-applied`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({couponId, userId})
-        });
+        try {
 
-        // console.log("Response status:", response.status);
-        const result = await response.json();
-        // console.log("Response data:", result);
+            console.log("Applying coupon:", couponId, "for user:", userId);
 
-        if (response.ok) {
-            
-            const couponElement = document.querySelector(`.coupon[data-id="${couponId}"]`);
-            const couponCode = couponElement.getAttribute('data-code');
-            
-            
-            updateUIWithCoupon(couponId, couponCode, result.discountAmount);
-            
             Swal.fire({
-                icon: 'success',
-                title: 'Coupon Applied!',
-                text: result.message,
-                // timer: 2000
+                title: 'Applying coupon...',
+                didOpen: () => {
+                    Swal.showLoading();
+
+                },
+                allowOutsideClick: false,
+                showConfirmButton: false
             });
-        } else {
+
+            const response = await fetch(`/user/myprofile/checkout/${userId}/coupon-applied`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ couponId, userId })
+            });
+
+            // console.log("Response status:", response.status);
+            const result = await response.json();
+            // console.log("Response data:", result);
+
+            if (response.ok) {
+
+                const couponElement = document.querySelector(`.coupon[data-id="${couponId}"]`);
+                const couponCode = couponElement.getAttribute('data-code');
+
+
+                updateUIWithCoupon(couponId, couponCode, result.discountAmount);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Applied!',
+                    text: result.message,
+                    // timer: 2000
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: result.message || 'Failed to apply coupon. Please try again.'
+                });
+            }
+        } catch (error) {
+            console.error("Error applying coupon:", error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: result.message || 'Failed to apply coupon. Please try again.'
+                text: 'An unexpected error occurred. Please try again.'
             });
         }
-    } catch (error) {
-        console.error("Error applying coupon:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An unexpected error occurred. Please try again.'
-        });
     }
-}
 
     async function removeCoupon(couponId, userId) {
         try {
-    
+
             Swal.fire({
                 title: 'Removing coupon...',
                 didOpen: () => {
@@ -1123,23 +1147,23 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
                 allowOutsideClick: false,
                 showConfirmButton: false
             });
-            
-        
+
+
             const response = await fetch(`/user/myprofile/checkout/${userId}/remove-coupon`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({couponId, userId})
+                body: JSON.stringify({ couponId, userId })
             });
 
-            
+
             const result = await response.json();
 
             if (response.ok) {
-            
+
                 resetCouponUI();
-                
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Coupon Removed',
@@ -1155,10 +1179,10 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
             }
         } catch (error) {
             console.error("Error removing coupon:", error);
-            
-        
+
+
             resetCouponUI();
-            
+
             Swal.fire({
                 icon: 'success',
                 title: 'Coupon Removed',
@@ -1170,54 +1194,54 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
 
 
     function updateUIWithCoupon(couponId, couponCode, discountAmount) {
-    
-    document.querySelectorAll('.coupon').forEach(coupon => {
-        const currentCouponId = coupon.getAttribute('data-id');
-        const buttonElement = coupon.querySelector('button');
-        
-        if (currentCouponId === couponId) {
-        
-            coupon.classList.add('applied');
-            buttonElement.className = 'btn btn-danger';
-            buttonElement.textContent = 'Remove';
-            buttonElement.onclick = function() { 
-                removeCoupon(couponId, '<%= user._id %>'); 
-            };
-        } else {
-            
-            coupon.classList.remove('applied');
-            buttonElement.className = 'btn btn-outlined';
-            buttonElement.textContent = 'Apply';
-            buttonElement.onclick = function() { 
-                applyCoupon(currentCouponId, '<%= user._id %>'); 
-            };
-        }
-    });
-    
 
-    const couponDiscountAmount = parseFloat(discountAmount) || 0;
-    
-    
-    document.getElementById('couponDiscountRow').style.display = '';
-    document.getElementById('appliedCouponCode').textContent = `(${couponCode})`;
-    document.getElementById('couponDiscount').textContent = `-₹${couponDiscountAmount.toFixed(2)}`;
-    
-    
-    const totalPrice = parseFloat(document.getElementById('totalPrice').textContent.replace('₹', ''));
-    const totalDiscount = parseFloat(document.getElementById('totalDiscount').textContent.replace('-₹', ''));
-    const deliveryCharges = document.getElementById('deliveryCharges').textContent.includes('FREE') ? 0 : 100;
-    const gst = parseFloat(document.getElementById('gst').textContent.replace('₹', ''));
-    
-    const newTotalAmount = totalPrice - totalDiscount - couponDiscountAmount + deliveryCharges + gst;
-    document.getElementById('totalAmount').textContent = `₹${newTotalAmount.toFixed(2)}`;
-    
-    
-    document.getElementById('finalPayAmount').textContent = newTotalAmount.toFixed(2);
-    
+        document.querySelectorAll('.coupon').forEach(coupon => {
+            const currentCouponId = coupon.getAttribute('data-id');
+            const buttonElement = coupon.querySelector('button');
 
-    const totalSavings = totalDiscount + couponDiscountAmount;
-    document.getElementById('totalSavings').textContent = totalSavings.toFixed(2);
-}
+            if (currentCouponId === couponId) {
+
+                coupon.classList.add('applied');
+                buttonElement.className = 'btn btn-danger';
+                buttonElement.textContent = 'Remove';
+                buttonElement.onclick = function () {
+                    removeCoupon(couponId, '<%= user._id %>');
+                };
+            } else {
+
+                coupon.classList.remove('applied');
+                buttonElement.className = 'btn btn-outlined';
+                buttonElement.textContent = 'Apply';
+                buttonElement.onclick = function () {
+                    applyCoupon(currentCouponId, '<%= user._id %>');
+                };
+            }
+        });
+
+
+        const couponDiscountAmount = parseFloat(discountAmount) || 0;
+
+
+        document.getElementById('couponDiscountRow').style.display = '';
+        document.getElementById('appliedCouponCode').textContent = `(${couponCode})`;
+        document.getElementById('couponDiscount').textContent = `-₹${couponDiscountAmount.toFixed(2)}`;
+
+
+        const totalPrice = parseFloat(document.getElementById('totalPrice').textContent.replace('₹', ''));
+        const totalDiscount = parseFloat(document.getElementById('totalDiscount').textContent.replace('-₹', ''));
+        const deliveryCharges = document.getElementById('deliveryCharges').textContent.includes('FREE') ? 0 : 100;
+        const gst = parseFloat(document.getElementById('gst').textContent.replace('₹', ''));
+
+        const newTotalAmount = totalPrice - totalDiscount - couponDiscountAmount + deliveryCharges + gst;
+        document.getElementById('totalAmount').textContent = `₹${newTotalAmount.toFixed(2)}`;
+
+
+        document.getElementById('finalPayAmount').textContent = newTotalAmount.toFixed(2);
+
+
+        const totalSavings = totalDiscount + couponDiscountAmount;
+        document.getElementById('totalSavings').textContent = totalSavings.toFixed(2);
+    }
 
 
     function resetCouponUI() {
@@ -1226,33 +1250,32 @@ const couponCode = selectedCoupon ? selectedCoupon.getAttribute('data-code') : '
             coupon.classList.remove('applied');
             const buttonElement = coupon.querySelector('button');
             const couponId = coupon.getAttribute('data-id');
-            
+
             buttonElement.className = 'btn btn-outlined';
             buttonElement.textContent = 'Apply';
-            buttonElement.onclick = function() { 
-                applyCoupon(couponId, '<%= user._id %>'); 
+            buttonElement.onclick = function () {
+                applyCoupon(couponId, '<%= user._id %>');
             };
         });
-        
-    
+
+
         document.getElementById('couponDiscountRow').style.display = 'none';
         document.getElementById('appliedCouponCode').textContent = '';
         document.getElementById('couponDiscount').textContent = '-₹0.00';
-        
-    
+
+
         const totalPrice = originalValues.totalPrice;
         const totalDiscount = originalValues.totalDiscount;
         const deliveryCharges = originalValues.deliveryCharges;
         const gst = originalValues.gst;
-        
+
         const newTotalAmount = totalPrice - totalDiscount + deliveryCharges + gst;
         document.getElementById('totalAmount').textContent = `₹${newTotalAmount.toFixed(2)}`;
-        
-    
+
+
         document.getElementById('finalPayAmount').textContent = newTotalAmount.toFixed(2);
-        
-    
+
+
         document.getElementById('totalSavings').textContent = totalDiscount.toFixed(2);
     }
 </script>
-

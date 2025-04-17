@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose")
 const Category = require("../model/createcategory")
+const Product = require("../model/addproduct")
 
 
 
@@ -49,7 +50,7 @@ const productupdates = {
     editCategory: async (req, res) => {
         try {
             const category = await Category.findById(req.params.id);
-            const categories = await Category.find(); // Fetch all categories for dropdown
+            const categories = await Category.find();
 
             if (!category) {
                 return res.status(404).send("Category not found");
@@ -63,8 +64,18 @@ const productupdates = {
     },
     updateCategory: async (req, res) => {
         try {
-            const { name, slug, parent, description } = req.body;
-            console.log(req.body)
+            let { name, slug, parent, description } = req.body;
+            // console.log(req.body)
+            if (!name || name.trim().length < 3) {
+
+                return res.status(400).json({ success: false, message: "Category name must be at least 3 characters long." })
+            }
+            name = name.trim();
+            const existingCategoryByName = await Category.findOne({ name: { $regex: new RegExp("^" + name + "$", "i") } });
+            if (existingCategoryByName) {
+                return res.status(400).json({ success: false, message: "Category name already exists." })
+            }
+
             const updatedCategory = await Category.findByIdAndUpdate(req.params.id, {
                 name,
                 slug,

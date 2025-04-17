@@ -19,40 +19,40 @@
     <style>
         /* Global Container */
         .card-body {
-    background-color: #f9fafb;
-    padding: 2rem;
-    border-radius: 16px;
-    max-width: 100%;
-    margin: 2rem auto;
-    overflow-x: hidden;
-    /* Remove the left margin that's causing the gap */
-    margin-left: 0; 
-}
+            background-color: #f9fafb;
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 100%;
+            margin: 2rem auto;
+            overflow-x: hidden;
+            /* Remove the left margin that's causing the gap */
+            margin-left: 0;
+        }
 
         /* Ensure content doesn't overlap with sidebar */
         @media (min-width: 768px) {
-    .card-body {
-        /* Instead of a fixed margin, use width and max-width */
-        width: calc(100% - 20px);
-        max-width: 100%;
-        margin-left: 10px;
-        margin-right: 10px;
-    }
-}
+            .card-body {
+                /* Instead of a fixed margin, use width and max-width */
+                width: calc(100% - 20px);
+                max-width: 100%;
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+        }
 
         /* Header Section */
         .d-flex.justify-content-between {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
         h4 {
             font-size: 1.75rem;
@@ -135,7 +135,8 @@
             position: relative;
         }
 
-        .form-select, .form-control {
+        .form-select,
+        .form-control {
             border: 1px solid #e5e7eb;
             padding: 0.625rem 0.75rem;
             border-radius: 8px;
@@ -144,7 +145,8 @@
             transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
 
-        .form-select:focus, .form-control:focus {
+        .form-select:focus,
+        .form-control:focus {
             border-color: #a5b4fc;
             outline: none;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
@@ -213,15 +215,37 @@
         }
 
         /* Custom Colors */
-        .bg-primary-light { background-color: #eff6ff; }
-        .bg-success-light { background-color: #ecfdf5; }
-        .bg-warning-light { background-color: #fffbeb; }
-        .bg-info-light { background-color: #f0f9ff; }
+        .bg-primary-light {
+            background-color: #eff6ff;
+        }
 
-        .text-primary { color: #4f46e5; }
-        .text-success { color: #10b981; }
-        .text-warning { color: #f59e0b; }
-        .text-info { color: #0ea5e9; }
+        .bg-success-light {
+            background-color: #ecfdf5;
+        }
+
+        .bg-warning-light {
+            background-color: #fffbeb;
+        }
+
+        .bg-info-light {
+            background-color: #f0f9ff;
+        }
+
+        .text-primary {
+            color: #4f46e5;
+        }
+
+        .text-success {
+            color: #10b981;
+        }
+
+        .text-warning {
+            color: #f59e0b;
+        }
+
+        .text-info {
+            color: #0ea5e9;
+        }
 
         /* Table Styles */
         .table-responsive {
@@ -413,11 +437,12 @@
             }
         }
     </style>
+
 <body>
     <div class="screen-overlay"></div>
     <%- include('./partials/nav') %>
-    <main class="main-wrap">
-        <!-- <header class="main-header navbar">
+        <main class="main-wrap">
+            <!-- <header class="main-header navbar">
             <div class="col-search">
                 <form class="searchform">
                     <div class="input-group">
@@ -436,348 +461,486 @@
                 <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside"> <i class="material-icons md-apps"></i> </button>
             </div>
         </header> -->
-        <section class="content-main">
-            <div class="content-header">
-                <div>
-                    <h2 class="content-title card-title">Sales Report</h2>
-                    <p>Generate and download detailed sales reports</p>
+            <section class="content-main">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title card-title">Sales Report</h2>
+                        <p>Generate and download detailed sales reports</p>
+                    </div>
                 </div>
-            </div>
-            <div class="card">
-                <div class="card-body">
-                    <!-- Header section with export buttons -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h4>Sales Report</h4>
-                        <div class="export-buttons">
-                            <button id="exportPdf" class="btn btn-primary">
-                                <i class="material-icons md-file_download"></i> Export PDF
-                            </button>
-                            <button id="exportExcel" class="btn btn-success">
-                                <i class="material-icons md-file_download"></i> Export Excel
-                            </button>
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Header section with export buttons -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4>Sales Report</h4>
+                            <div class="export-buttons">
+                                <button id="exportPdf" class="btn btn-primary">
+                                    <i class="material-icons md-file_download"></i> Export PDF
+                                </button>
+                                <button id="exportExcel" class="btn btn-success">
+                                    <i class="material-icons md-file_download"></i> Export Excel
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Date Filter Section -->
-                    <div class="filter-section mb-4">
-                        <form id="filterForm" action="/admin/dashboard/sales-report" method="GET">
-                            <div class="filter-container">
-                                <div class="date-range-select">
-                                    <select class="form-select" name="dateRange" id="dateRangeSelect">
-                                        <option value="">Select Date Range</option>
-                                        <option value="today" <%= query.dateRange === 'today' ? 'selected' : '' %>>Today</option>
-                                        <option value="week" <%= query.dateRange === 'week' ? 'selected' : '' %>>This Week</option>
-                                        <option value="month" <%= query.dateRange === 'month' ? 'selected' : '' %>>This Month</option>
-                                        <option value="year" <%= query.dateRange === 'year' ? 'selected' : '' %>>This Year</option>
-                                    </select>
-                                </div>
-                                <div class="date-inputs">
-                                    <div class="input-group">
-                                        <input type="date" id="startDate" name="startDate" class="form-control" value="<%= query.startDate || '' %>" placeholder="Start Date">
-                                    </div>
-                                    <div class="input-group">
-                                        <input type="date" id="endDate" name="endDate" class="form-control" value="<%= query.endDate || '' %>" placeholder="End Date">
-                                    </div>
-                                    <a href="#deliveredproducts">
-                                    <button type="submit" id="filterButton" class="btn btn-primary">Filter</button>
-                                </a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                        <!-- Date Filter Section -->
+                        <div class="filter-section mb-4">
+                            <form id="filterForm" action="/admin/dashboard/sales-report" method="GET">
+                                <div class="filter-container">
+                                    <div class="date-range-select">
+                                        <select class="form-select" name="dateRange" id="dateRangeSelect">
+                                            <option value="">Select Date Range</option>
+                                            <option value="today" <%=query.dateRange==='today' ? 'selected' : '' %>
+                                                >Today</option>
+                                            <option value="week" <%=query.dateRange==='week' ? 'selected' : '' %>>This
+                                                Week</option>
+                                            <option value="month" <%=query.dateRange==='month' ? 'selected' : '' %>>This
+                                                Month</option>
+                                            <option value="year" <%=query.dateRange==='year' ? 'selected' : '' %>>This
+                                                Year</option>
+                                            <option value="custom" <%=query.dateRange==='custom' ? 'selected' : '' %>
+                                                >Custom Range</option>
 
-                    <!-- Summary Cards -->
-                    <div class="summary-cards">
-                        <div class="summary-card">
-                            <div class="card-content">
-                                <div class="icon-container bg-primary-light">
-                                    <i class="material-icons md-monetization_on text-primary"></i>
+                                        </select>
+                                    </div>
+                                    <div class="date-inputs">
+                                        <div class="input-group">
+                                            <input type="date" id="startDate" name="startDate" class="form-control"
+                                                value="<%= query.startDate || '' %>" placeholder="Start Date">
+                                        </div>
+                                        <div class="input-group">
+                                            <input type="date" id="endDate" name="endDate" class="form-control"
+                                                value="<%= query.endDate || '' %>" placeholder="End Date">
+                                        </div>
+                                        <a href="#deliveredproducts">
+                                            <button type="submit" id="filterButton"
+                                                class="btn btn-primary">Filter</button>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="card-details">
-                                    <h6>Total Sales</h6>
-                                    <span class="amount">₹<%= typeof totalSales !== 'undefined' ? totalSales.toLocaleString() : '0' %></span>
+                            </form>
+                        </div>
+
+                        <!-- Summary Cards -->
+                        <div class="summary-cards">
+                            <div class="summary-card">
+                                <div class="card-content">
+                                    <div class="icon-container bg-primary-light">
+                                        <i class="material-icons md-monetization_on text-primary"></i>
+                                    </div>
+                                    <div class="card-details">
+                                        <h6>Total Sales</h6>
+                                        <span class="amount">₹<%= typeof totalSales !=='undefined' ?
+                                                totalSales.toLocaleString() : '0' %></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="card-content">
+                                    <div class="icon-container bg-success-light">
+                                        <i class="material-icons md-shopping_cart text-success"></i>
+                                    </div>
+                                    <div class="card-details">
+                                        <h6>Total Orders</h6>
+                                        <span class="amount">
+                                            <%= typeof totalOrders !=='undefined' ? totalOrders.toLocaleString() : '0'
+                                                %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="card-content">
+                                    <div class="icon-container bg-warning-light">
+                                        <i class="material-icons md-person text-warning"></i>
+                                    </div>
+                                    <div class="card-details">
+                                        <h6>Total Customers</h6>
+                                        <span class="amount">
+                                            <%= typeof totalCustomers !=='undefined' ? totalCustomers.toLocaleString()
+                                                : '0' %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="summary-card">
+                                <div class="card-content">
+                                    <div class="icon-container bg-info-light">
+                                        <i class="material-icons md-trending_up text-info"></i>
+                                    </div>
+                                    <div class="card-details">
+                                        <h6>Average Order Value</h6>
+                                        <span class="amount">₹<%= typeof avgOrderValue !=='undefined' ?
+                                                avgOrderValue.toLocaleString() : '0' %></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="summary-card">
-                            <div class="card-content">
-                                <div class="icon-container bg-success-light">
-                                    <i class="material-icons md-shopping_cart text-success"></i>
-                                </div>
-                                <div class="card-details">
-                                    <h6>Total Orders</h6>
-                                    <span class="amount"><%= typeof totalOrders !== 'undefined' ? totalOrders.toLocaleString() : '0' %></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="card-content">
-                                <div class="icon-container bg-warning-light">
-                                    <i class="material-icons md-person text-warning"></i>
-                                </div>
-                                <div class="card-details">
-                                    <h6>Total Customers</h6>
-                                    <span class="amount"><%= typeof totalCustomers !== 'undefined' ? totalCustomers.toLocaleString() : '0' %></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="card-content">
-                                <div class="icon-container bg-info-light">
-                                    <i class="material-icons md-trending_up text-info"></i>
-                                </div>
-                                <div class="card-details">
-                                    <h6>Average Order Value</h6>
-                                    <span class="amount">₹<%= typeof avgOrderValue !== 'undefined' ? avgOrderValue.toLocaleString() : '0' %></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Delivered Orders Table -->
-                    <div class="table-responsive" id="deliveredproducts">
-                        <h5 class="mb-3">Delivered Orders</h5>
-                        <% if (typeof orders !== 'undefined' && orders.length > 0) { %>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>ORDER ID</th>
-                                        <th>CUSTOMER</th>
-                                        <th>PRODUCTS</th>
-                                        <th>TOTAL AMOUNT</th>
-                                        <th>DATE</th>
-                                        <th>STATUS</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% orders.forEach(order => { %>
-                                        <% const deliveredProducts = order.products.filter(product => product.status === 'Delivered'); %>
-                                        <% if (deliveredProducts.length > 0) { %>
-                                            <tr>
-                                                <td>#<%= order.orderID || order._id %></td>
-                                                <td><%= order.name || (order.user && order.user.name) || 'N/A' %></td>
-                                                <td>
-                                                    <ul>
-                                                        <% deliveredProducts.slice(0, 2).forEach(item => { %>
-                                                            <li><%= item.product.name || item.productName || 'Product' %> x<%= item.quantity %></li>
+                        <!-- Delivered Orders Table -->
+                        <div class="table-responsive" id="deliveredproducts">
+                            <h5 class="mb-3">Delivered Orders</h5>
+                            <% if (typeof orders !=='undefined' && orders.length> 0) { %>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ORDER ID</th>
+                                            <th>CUSTOMER</th>
+                                            <th>PRODUCTS</th>
+                                            <th>TOTAL AMOUNT</th>
+                                            <th>DATE</th>
+                                            <th>STATUS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% orders.forEach(order=> { %>
+                                            <% const deliveredProducts=order.products.filter(product=> product.status
+                                                === 'Delivered'); %>
+                                                <% if (deliveredProducts.length> 0) { %>
+                                                    <tr>
+                                                        <td>#<%= order.orderID || order._id %>
+                                                        </td>
+                                                        <td>
+                                                            <%= order.name || (order.user && order.user.name) || 'N/A'
+                                                                %>
+                                                        </td>
+                                                        <td>
+                                                            <ul>
+                                                                <% deliveredProducts.slice(0, 2).forEach(item=> { %>
+                                                                    <li>
+                                                                        <%= item.product.name || item.productName
+                                                                            || 'Product' %> x<%= item.quantity %>
+                                                                    </li>
+                                                                    <% }) %>
+                                                                        <% if (deliveredProducts.length> 2) { %>
+                                                                            <li>+ <%= deliveredProducts.length - 2 %>
+                                                                                    more item(s)</li>
+                                                                            <% } %>
+                                                            </ul>
+                                                        </td>
+                                                        <td>₹<%= order.finalAmount ? order.finalAmount.toLocaleString()
+                                                                : '0' %>
+                                                        </td>
+                                                        <td>
+                                                            <%= new Date(order.orderDate ||
+                                                                order.createdAt).toLocaleDateString() %>
+                                                        </td>
+                                                        <td><span class="badge bg-success">Delivered</span></td>
+                                                    </tr>
+                                                    <% } %>
                                                         <% }) %>
-                                                        <% if (deliveredProducts.length > 2) { %>
-                                                            <li>+ <%= deliveredProducts.length - 2 %> more item(s)</li>
-                                                        <% } %>
-                                                    </ul>
-                                                </td>
-                                                <td>₹<%= order.finalAmount ? order.finalAmount.toLocaleString() : '0' %></td>
-                                                <td><%= new Date(order.orderDate || order.createdAt).toLocaleDateString() %></td>
-                                                <td><span class="badge bg-success">Delivered</span></td>
-                                            </tr>
-                                        <% } %>
-                                    <% }) %>
-                                </tbody>
-                            </table>
-                        <% } else { %>
-                            <div class="text-center">
-                                <p>No delivered orders found for the selected period.</p>
-                            </div>
-                        <% } %>
+                                    </tbody>
+                                </table>
+                                <% } else { %>
+                                    <div class="text-center">
+                                        <p>No delivered orders found for the selected period.</p>
+                                    </div>
+                                    <% } %>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            </section>
+        </main>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-document.getElementById('exportPdf').addEventListener('click', async () => {
-    const period = document.getElementById('dateRangeSelect').value;
-    const startDate = document.getElementById('startDate').value;
-    
-    if (!period || !startDate) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Missing Information',
-            text: 'Please select a date range or specific date.',
-        });
-        return;
-    }
-    
-    try {
-        // Use startDate as the 'date' parameter your backend expects
-        const checkUrl = `/admin/dashboard/sales-report/download-invoice?period=${period}&date=${startDate}&format=pdf`;
-        const response = await fetch(checkUrl);
-        
-        if (!response.ok) {
-            const data = await response.json();
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message || 'Failed to generate report',
+        <script>
+            document.getElementById('exportPdf').addEventListener('click', async () => {
+                const period = document.getElementById('dateRangeSelect').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                if (!period) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Information',
+                        text: 'Please select a date range.',
+                    });
+                    return;
+                }
+
+                if (period === 'custom' && (!startDate || !endDate)) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Date Range',
+                        text: 'For custom range, both start date and end date are required.',
+                    });
+                    return;
+                }
+                if (period !== 'custom' && !startDate) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Information',
+                        text: 'Please select a date.',
+                    });
+                    return;
+                }
+
+
+                if (!period || !startDate) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Information',
+                        text: 'Please select a date range or specific date.',
+                    });
+                    return;
+                }
+
+                try {
+
+                    // Build query parameters based on period type
+                    const queryParams = new URLSearchParams({
+                        period: period,
+                        format: 'pdf'
+                    });
+                    if (period === 'custom') {
+                        queryParams.append('startDate', startDate);
+                        queryParams.append('endDate', endDate);
+                    } else {
+                        queryParams.append('date', startDate);
+                    }
+                    // Use startDate as the 'date' parameter your backend expects
+
+
+                    // const checkUrl = `/admin/dashboard/sales-report/download-invoice?period=${period}&date=${startDate}&endDate=${endDate}&format=pdf`;
+                    const checkUrl = `/admin/dashboard/sales-report/download-invoice?${queryParams.toString()}`;
+
+                    const response = await fetch(checkUrl);
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to generate report',
+                        });
+                    } else {
+                        window.location.href = checkUrl;
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An unexpected error occurred.',
+                    });
+                }
             });
-        } else {
-            window.location.href = checkUrl;
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An unexpected error occurred.',
-        });
-    }
-});
 
-document.getElementById('exportExcel').addEventListener('click', async () => {
-    const period = document.getElementById('dateRangeSelect').value;
-    const startDate = document.getElementById('startDate').value;
-    
-    if (!period || !startDate) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Missing Information',
-            text: 'Please select a date range or specific date.',
-        });
-        return;
-    }
-    
-    try {
-        // Same approach for Excel export
-        const checkUrl = `/admin/dashboard/sales-report/download-invoice?period=${period}&date=${startDate}&format=excel`;
-        const response = await fetch(checkUrl);
-        
-        if (!response.ok) {
-            const data = await response.json();
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message || 'Failed to generate report',
+            document.getElementById('exportExcel').addEventListener('click', async () => {
+                const period = document.getElementById('dateRangeSelect').value;
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                if (!period) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Information',
+                        text: 'Please select a date range.',
+                    });
+                    return;
+                }
+
+                if (period === 'custom' && (!startDate || !endDate)) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Date Range',
+                        text: 'For custom range, both start date and end date are required.',
+                    });
+                    return;
+                }
+
+
+                if (!period || !startDate) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Information',
+                        text: 'Please select a date range or specific date.',
+                    });
+                    return;
+                }
+
+                try {
+
+                    // Build query parameters based on period type
+                    const queryParams = new URLSearchParams({
+                        period: period,
+                        format: 'excel'
+                    });
+
+                    if (period === 'custom') {
+                        queryParams.append('startDate', startDate);
+                        queryParams.append('endDate', endDate);
+                    } else {
+                        queryParams.append('date', startDate);
+                    }
+                    // Same approach for Excel export
+                    // const checkUrl = `/admin/dashboard/sales-report/download-invoice?period=${period}&date=${startDate}&endDate=${endDate}&format=excel`;
+                    const checkUrl = `/admin/dashboard/sales-report/download-invoice?${queryParams.toString()}`;
+                    const response = await fetch(checkUrl);
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to generate report',
+                        });
+                    } else {
+                        window.location.href = checkUrl;
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An unexpected error occurred.',
+                    });
+                }
             });
-        } else {
-            window.location.href = checkUrl;
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An unexpected error occurred.',
-        });
-    }
-});
 
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Get references to form elements
-    const dateRangeSelect = document.getElementById('dateRangeSelect');
-    const startDateInput = document.getElementById('startDate');
-    const endDateInput = document.getElementById('endDate');
-    const filterForm = document.getElementById('filterForm');
-    
-    
-    function updateDateInputs(range) {
-        const today = new Date();
-        let start = new Date();
-        let end = new Date();
-        
-        switch(range) {
-            case 'today':
-                // Set both start and end to today
-                break;
-            case 'week':
-                // Set start to beginning of current week (Sunday)
-                start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
-    // Set end to today
-    end = new Date(today);
-                break;
-            case 'month':
-                // Set start to first day of current month
-                start.setDate(1);
-                break;
-            case 'year':
-                // Set start to first day of current year
-                start = new Date(today.getFullYear(), 0, 1);
-                break;
-            default:
-                // If custom or no selection, don't modify dates
-                return;
-        }
-        
-        // Format dates as YYYY-MM-DD for the input fields
-        startDateInput.value = start.toISOString().split('T')[0];
-        endDateInput.value = end.toISOString().split('T')[0];
-    }
-    
-    // Update date inputs when date range selection changes
-    dateRangeSelect.addEventListener('change', function() {
-        updateDateInputs(this.value);
-    });
-    
-    // When custom dates are entered, switch date range to empty (custom)
-    startDateInput.addEventListener('change', function() {
-        if (dateRangeSelect.value !== '') {
-            dateRangeSelect.value = '';
-        }
-    });
-    
-    endDateInput.addEventListener('change', function() {
-        if (dateRangeSelect.value !== '') {
-            dateRangeSelect.value = '';
-        }
-    });
-    
-    // Initialize dates based on current selection (if any)
-    if (dateRangeSelect.value) {
-        updateDateInputs(dateRangeSelect.value);
-    }
-    
-    // Handle form submission
-    filterForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Validate date inputs
-        if (!startDateInput.value) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Missing Date',
-                text: 'Please select a start date for the report.'
-            });
-            return false;
-        }
-        
-        // If only start date is provided but not end date, set end date to today
-        if (startDateInput.value && !endDateInput.value) {
-            endDateInput.value = new Date().toISOString().split('T')[0];
-        }
-        
-        // Validate date range
-        if (startDateInput.value && endDateInput.value) {
-            const start = new Date(startDateInput.value);
-            const end = new Date(endDateInput.value);
-            
-            if (start > end) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Date Range',
-                    text: 'Start date cannot be after end date.'
+            document.addEventListener('DOMContentLoaded', function () {
+                // Get references to form elements
+                const dateRangeSelect = document.getElementById('dateRangeSelect');
+                const startDateInput = document.getElementById('startDate');
+                const endDateInput = document.getElementById('endDate');
+                const filterForm = document.getElementById('filterForm');
+
+
+                function updateDateInputs(range) {
+                    const today = new Date();
+                    let start = new Date();
+                    let end = new Date();
+
+                    switch (range) {
+                        case 'today':
+                            // Set both start and end to today
+                            break;
+                        case 'week':
+                            // Set start to beginning of current week (Sunday)
+                            start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
+                            // Set end to today
+                            end = new Date(today);
+                            break;
+                        case 'month':
+                            // Set start to first day of current month
+                            start.setDate(1);
+                            break;
+                        case 'year':
+                            // Set start to first day of current year
+                            start = new Date(today.getFullYear(), 0, 1);
+                            break;
+                        case 'custom':
+                            return;
+
+                        default:
+                            startDateInput.value = '';
+                            endDateInput.value = '';
+                            return;
+                    }
+
+                    // Format dates as YYYY-MM-DD for the input fields
+                    // startDateInput.value = start.toISOString().split('T')[0];
+                    // endDateInput.value = end.toISOString().split('T')[0];
+                    startDateInput.value = formatDate(start);
+                    endDateInput.value = formatDate(end);
+                }
+                function formatDate(date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+
+
+                // Update date inputs when date range selection changes
+                dateRangeSelect.addEventListener('change', function () {
+                    updateDateInputs(this.value);
                 });
-                return false;
-            }
-        }
-        
-        this.submit();
-    });
-    
-    
-    document.getElementById('filterButton').addEventListener('click', function() {
-        setTimeout(() => {
-            const element = document.getElementById('deliveredproducts');
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 100);
-    });
-});
+
+                // When custom dates are entered, switch date range to empty (custom)
+                // startDateInput.addEventListener('change', function() {
+                //     if (dateRangeSelect.value !== '') {
+                //         dateRangeSelect.value = '';
+                //     }
+                // });
+
+                // endDateInput.addEventListener('change', function() {
+                //     if (dateRangeSelect.value !== '') {
+                //         dateRangeSelect.value = '';
+                //     }
+                // });
+
+                startDateInput.addEventListener('change', function () {
+                    if (dateRangeSelect.value !== 'custom' && startDateInput.value) {
+                        dateRangeSelect.value = 'custom';
+                    }
+                });
+
+                endDateInput.addEventListener('change', function () {
+                    if (dateRangeSelect.value !== 'custom' && endDateInput.value) {
+                        dateRangeSelect.value = 'custom';
+                    }
+                });
+
+                // Initialize dates based on current selection (if any)
+                if (dateRangeSelect.value) {
+                    updateDateInputs(dateRangeSelect.value);
+                }
+
+                // Handle form submission
+                filterForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    // Validate date inputs
+                    if (!startDateInput.value) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Missing Date',
+                            text: 'Please select a start date for the report.'
+                        });
+                        return false;
+                    }
+
+                    // If only start date is provided but not end date, set end date to today
+                    if (startDateInput.value && !endDateInput.value) {
+                        // endDateInput.value = new Date().toISOString().split('T')[0];
+                        endDateInput.value = formatDate(new Date());
+
+                    }
+
+                    // Validate date range
+                    if (startDateInput.value && endDateInput.value) {
+                        const start = new Date(startDateInput.value);
+                        const end = new Date(endDateInput.value);
+
+                        if (start > end) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Invalid Date Range',
+                                text: 'Start date cannot be after end date.'
+                            });
+                            return false;
+                        }
+                    }
+
+                    this.submit();
+                });
+
+
+                document.getElementById('filterButton').addEventListener('click', function () {
+                    setTimeout(() => {
+                        const element = document.getElementById('deliveredproducts');
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }, 100);
+                });
+            });
 
 
 
-</script>
+        </script>
 </body>
+
 </html>

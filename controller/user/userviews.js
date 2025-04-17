@@ -14,44 +14,39 @@ const nodemailer = require("nodemailer")
 
 
 const userViews = {
-    loadLandingpage:async(req,res)=>{
-        try{
+    loadLandingpage: async (req, res) => {
+        try {
+            const products = await Product.find({ isActive: true })
+                .sort({ createdAt: -1 })
+                .limit(8)
 
-            
-            const products=await Product.find({isActive:true})
-            .sort({createdAt:-1})
-            .limit(8)
-          
-            const user=null;
+            const user = null;
             const searchQuery = req.query.search || '';
 
-            const categories=await Category.find({isActive:true})
-            res.render("user/landingpage",{
+            const categories = await Category.find({ isActive: true })
+            res.render("user/landingpage", {
                 products,
                 categories,
                 user,
                 searchQuery
             })
-            
-            
 
-
-        }catch(error){
+        } catch (error) {
             console.log(error)
             res.status(500).send({ message: "Something went wrong" });
 
         }
     },
-    loadLandingHomePage:async (req,res)=>{
-        const products=await Product.find({isActive:true})
-        .sort({createdAt:-1})
-        .limit(8)
-      
-        const user=null;
+    loadLandingHomePage: async (req, res) => {
+        const products = await Product.find({ isActive: true })
+            .sort({ createdAt: -1 })
+            .limit(8)
+
+        const user = null;
         const searchQuery = req.query.search || '';
 
-        const categories=await Category.find({isActive:true})
-        res.render("user/landingpage",{
+        const categories = await Category.find({ isActive: true })
+        res.render("user/landingpage", {
             products,
             categories,
             user,
@@ -60,66 +55,66 @@ const userViews = {
 
 
     },
-    loadlandingShop:async (req,res)=>{
-            try {
-              
-              const page = parseInt(req.query.page) || 1;
-              const limit = 8; 
-              const skip = (page - 1) * limit;
-              
-              
-              const search = req.query.search || '';
-              const category = req.query.category || 'all';
-              const brand = req.query.brand || 'all';
-              const priceRange = parseInt(req.query.price) || 0;
-              const sort = req.query.sort || 'price_low_to_high';
-              
-              
-              let filter = {};
-              
-              
-              if (search) {
+    loadlandingShop: async (req, res) => {
+        try {
+
+            const page = parseInt(req.query.page) || 1;
+            const limit = 8;
+            const skip = (page - 1) * limit;
+
+
+            const search = req.query.search || '';
+            const category = req.query.category || 'all';
+            const brand = req.query.brand || 'all';
+            const priceRange = parseInt(req.query.price) || 0;
+            const sort = req.query.sort || 'price_low_to_high';
+
+
+            let filter = {};
+
+
+            if (search) {
                 filter.$or = [
-                  { name: { $regex: search, $options: 'i' } },
-                  { description: { $regex: search, $options: 'i' } }
+                    { name: { $regex: search, $options: 'i' } },
+                    { description: { $regex: search, $options: 'i' } }
                 ];
-              }
-              
-              
-              if (category !== 'all') {
+            }
+
+
+            if (category !== 'all') {
                 filter.category = category;
-              }
-              
-            
-              if (brand !== 'all') {
+            }
+
+
+            if (brand !== 'all') {
                 filter.brand = brand;
-              }
-              
-              
-              if (priceRange > 0) {
+            }
+
+
+            if (priceRange > 0) {
                 filter.price = { $lte: priceRange };
-              }
-              
-            
-              let sortOption = {};
-              if (sort === 'price_low_to_high') {
+            }
+
+
+            let sortOption = {};
+            if (sort === 'price_low_to_high') {
                 sortOption = { price: 1 };
-              } else if (sort === 'price_high_to_low') {
+            } else if (sort === 'price_high_to_low') {
                 sortOption = { price: -1 };
-              }
-              
-              
-              const products = await Product.find(filter)
+            }
+
+
+            const products = await Product.find(filter)
                 .sort(sortOption)
                 .skip(skip)
                 .limit(limit);
-              
-        
-              const totalProducts = await Product.countDocuments(filter);
-              const totalPages = Math.ceil(totalProducts / limit);
-              
-              
-              res.render('user/landingshop', {
+
+
+            const totalProducts = await Product.countDocuments(filter);
+            const totalPages = Math.ceil(totalProducts / limit);
+
+
+            res.render('user/landingshop', {
                 products,
                 currentPage: page,
                 totalPages,
@@ -129,70 +124,70 @@ const userViews = {
                 price: priceRange,
                 sort,
                 title: 'M Store - Shop'
-              });
-              
-            } catch (error) {
-              console.error('Error fetching products:', error);
-              res.status(500).render('error', { 
+            });
+
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            res.status(500).render('error', {
                 message: 'Error loading the shop page',
                 error: { status: 500, stack: error.stack }
-              });
-            }
+            });
+        }
 
     },
-    landingProductdetails:async(req,res)=>{
+    landingProductdetails: async (req, res) => {
         try {
             const productId = req.params.id;
             const product = await Product.findById(productId);
-            
+
             if (!product) {
-              return res.status(404).render('error', { 
-                message: 'Product not found',
-                user: req.session.user || {}
-              });
+                return res.status(404).render('error', {
+                    message: 'Product not found',
+                    user: req.session.user || {}
+                });
             }
-        
-            
+
+
             const reviews = await Review.find({ product: productId }).populate('user', 'name');
-            
-            
+
+
             const highestDiscount = product.discount || 0;
-            
-        
+
+
             const relatedProducts = await Product.find({
-              category: product.category,
-              _id: { $ne: productId } 
+                category: product.category,
+                _id: { $ne: productId }
             }).limit(5);
-            
-            
+
+
             let cartItemCount = 0;
             if (req.session.user) {
-              const cart = await Cart.findOne({ user: req.session.user._id });
-              if (cart) {
-                cartItemCount = cart.items.length;
-              }
+                const cart = await Cart.findOne({ user: req.session.user._id });
+                if (cart) {
+                    cartItemCount = cart.items.length;
+                }
             }
-            
-            
+
+
             const isLoggedIn = req.session.user ? true : false;
-            
+
             res.render('user/landingproductdetail', {
-              product,
-              reviews,
-              relatedProducts,
-              highestDiscount,
-              user: req.session.user || {},
-              cartItemCount,
-              isLoggedIn
+                product,
+                reviews,
+                relatedProducts,
+                highestDiscount,
+                user: req.session.user || {},
+                cartItemCount,
+                isLoggedIn
             });
-          } catch (error) {
+        } catch (error) {
             console.error('Error fetching product details:', error);
-            res.status(500).render('error', { 
-              message: 'Server error while loading product details',
-              user: req.session.user || {}
+            res.status(500).render('error', {
+                message: 'Server error while loading product details',
+                user: req.session.user || {}
             });
-          }
-    
+        }
+
     },
     productDetails: async (req, res) => {
         try {
@@ -337,6 +332,7 @@ const userViews = {
                 await wallet.save();
             }
 
+
             const users = await User.findById(userId).populate({
                 path: 'referralDetails.userId',
                 select: 'name email createdAt'
@@ -395,7 +391,7 @@ const userViews = {
                 return res.status(401).json({ message: "User not found" });
             }
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
-            console.log("add to cart",decoded)
+            console.log("add to cart", decoded)
             const userId = decoded.id
             // console.log(userId)
             const productId = req.params.id
@@ -465,7 +461,7 @@ const userViews = {
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
             // const productId=req.params.id
 
-            console.log("product",decoded)
+            console.log("product", decoded)
             const user = await User.findById(decoded.id)
 
             if (!user) {

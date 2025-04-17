@@ -18,11 +18,11 @@ const Admin = require("../../model/admin")
 
 env.config()
 
+
 const generateInvoice = async (order, user, shippingAddress) => {
     const doc = new PDFDocument({ size: 'A4', margin: 50 });
     const invoicePath = path.join(__dirname, "../../public/invoices", `invoice_${order.orderId}.pdf`);
     console.log("Invoice Path:", invoicePath);
-
 
     const dir = path.dirname(invoicePath);
     if (!fs.existsSync(dir)) {
@@ -43,36 +43,53 @@ const generateInvoice = async (order, user, shippingAddress) => {
     doc.text(`Email: ${user.email}`);
     doc.moveDown();
 
-
     doc.fontSize(14).text('Shipping Address:', { underline: true });
     doc.text(`${shippingAddress.housename}, ${shippingAddress.city}, ${shippingAddress.state}, ${shippingAddress.pincode}, ${shippingAddress.country}`);
     doc.moveDown();
 
-
     doc.fontSize(14).text('Products:', { underline: true });
-    order.products.forEach(async (item, index) => {
-        const product = await Product.findById(item.product);
-        doc.text(`${index + 1}. ${product.name} - ${item.quantity} x $${item.price.toFixed(2)}`);
-    });
-    doc.moveDown();
 
+    // KEY FIX: Wait for all product data before finalizing the PDF
+    // First, fetch all products
+    const productPromises = order.products.map(item =>
+        Product.findById(item.product)
+    );
+
+    // Wait for all product lookups to complete
+    const products = await Promise.all(productPromises);
+
+    // Now add each product to the PDF
+    for (let i = 0; i < order.products.length; i++) {
+        const item = order.products[i];
+        const product = products[i];
+
+        if (product) {
+            doc.text(`${i + 1}. ${product.name} - ${item.quantity} x ₹${item.price.toFixed(2)}`);
+        } else {
+            doc.text(`${i + 1}. Unknown Product - ${item.quantity} x ₹${item.price.toFixed(2)}`);
+        }
+    }
+    doc.moveDown();
 
     doc.fontSize(14).text('Payment Details:', { underline: true });
     doc.text(`Payment Method: ${order.paymentMethod}`);
-    doc.text(`Total Amount: $${order.totalAmount.toFixed(2)}`);
-    doc.text(`Discount: $${order.discount.toFixed(2)}`);
-    doc.text(`Final Amount: $${order.finalAmount.toFixed(2)}`);
+    doc.text(`Total Amount: ₹${order.totalAmount.toFixed(2)}`);
+    doc.text(`Discount: ₹${order.discount.toFixed(2)}`);
+    doc.text(`Final Amount: ₹${order.finalAmount.toFixed(2)}`);
     doc.moveDown();
 
-
     doc.fontSize(12).text('Thank you for shopping with us!', { align: 'center' });
+
+    // Finalize the PDF document
     doc.end();
 
+    // Return a promise that resolves when the PDF is fully written
     return new Promise((resolve, reject) => {
         writeStream.on('finish', () => resolve(invoicePath));
         writeStream.on('error', reject);
     });
 };
+
 
 const updateProductQuantities = async (products) => {
     try {
@@ -121,7 +138,7 @@ const razorpayController = {
     razorpayOrder: async (req, res) => {
         try {
             const { amount, email, currency, receipt, orderData } = req.body
-            console.log("req.body",req.body)
+            console.log("req.body", req.body)
 
             if (!amount || !currency || !receipt) {
                 return res.status(400).json({ success: false, message: "Missing required fields" })
@@ -135,17 +152,17 @@ const razorpayController = {
                 return res.status(400).json({ success: false, message: "Cart is empty" })
             }
 
-            for (const item of cart.products){
-                const product=await Product.findById(item.product)
+            for (const item of cart.products) {
+                const product = await Product.findById(item.product)
                 // console.log(product)
-                if(!product){
-                    return res.status(404).json({success:false, message:"Product not found"})
+                if (!product) {
+                    return res.status(404).json({ success: false, message: "Product not found" })
                 }
-                if(product.stock<item.quantity){
-                    return res.status(400).json({success:false, message:"Insufficient stock"})
+                if (product.stock < item.quantity) {
+                    return res.status(400).json({ success: false, message: "Insufficient stock" })
                 }
-                if(!product.isActive){
-                    return res.status(400).json({success:false, message:"Product is blocked "})
+                if (!product.isActive) {
+                    return res.status(400).json({ success: false, message: "Product is blocked " })
                 }
             }
 
