@@ -1065,14 +1065,14 @@
                                     </div>
                                     <% } %>
                                       <!-- Retry button for failed orders -->
-                                      <% if (order.orderStatus.toLowerCase()==='failed' ) { %>
+                                      <!-- <% if (order.orderStatus.toLowerCase()==='failed' ) { %>
                                         <div class="retry-payment-container">
                                           <button onclick="retryPayment('<%= order._id %>')"
                                             class="btn btn-primary retry-btn">
                                             <i class="fas fa-redo"></i> Retry Payment
                                           </button>
                                         </div>
-                                        <% } %>
+                                        <% } %> -->
 
                                           <div class="product-list">
                                             <% order.products.forEach(item=> { %>
@@ -1189,8 +1189,7 @@
                                           <div class="order-summary">
                                             <div class="summary-row">
                                               <span>Subtotal</span>
-                                              <span>₹<%= (order.finalAmount - (order.shippingFee || 0) - (order.tax ||
-                                                  0)).toFixed(2) %></span>
+                                              <span>₹<%= (order.totalAmount + order.totalAmount *0.18 + (order.shippingFee || 0) ).toFixed(2) %></span>
                                             </div>
                                             <% if (order.shippingFee) { %>
                                               <div class="summary-row">
@@ -1204,9 +1203,14 @@
                                                     <span>₹<%= order.tax.toFixed(2) %></span>
                                                   </div>
                                                   <% } %>
+                                                  <% if (order.couponApplied && order.couponApplied.code) { %>
+                                                    <div class="summary-row">
+                                                        <span>Coupon Applied</span>
+                                                        <span><%= order.couponApplied.code %> (-₹<%= order.couponApplied.discountAmount.toFixed(2) %>)</span>                                                    </div>
+                                                <% } %>
                                                     <% if (order.discount) { %>
                                                       <div class="summary-row">
-                                                        <span>Discount</span>
+                                                        <span>Product Discount</span>
                                                         <span>-₹<%= order.discount.toFixed(2) %></span>
                                                       </div>
                                                       <% } %>
@@ -1306,7 +1310,7 @@
                                 <h6 class="product-name">
                                   <%= product.name %>
                                 </h6>
-                                <p class="product-price"><strong>Price:</strong> $<%= product.price %>
+                                <p class="product-price"><strong>Price:</strong> ₹ <%= product.price %>
                                 </p>
                                 <p class="product-description"><strong>Description:</strong>
                                   <%= product.description %>

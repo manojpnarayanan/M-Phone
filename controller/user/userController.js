@@ -57,6 +57,10 @@ const userController = {
                 .limit(8)
                 .sort({ createdAt: -1 })
 
+                const newArrivals=await Product.find({isActive:true})
+                .sort({createdAt:-1})
+                .limit(5)
+
             const cart = await Cart.findOne({ user: decoded.id })
 
             const cartItemCount = cart ? cart.products.length : 0
@@ -72,6 +76,7 @@ const userController = {
 
             res.render("user/home", {
                 user,
+                newArrivals,
                 products: productWithDiscount,
                 cartItemCount,
                 searchQuery: req.query.search || ""

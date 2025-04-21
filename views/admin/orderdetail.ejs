@@ -454,17 +454,23 @@ body {
                                     <table class="amounts-table">
                                         <tr>
                                             <td class="amount-label">Subtotal</td>
-                                            <td class="amount-value">₹<%= order.subtotal.toLocaleString() %></td>
+                                            <td class="amount-value">₹<%= (order.totalAmount+(order.totalAmount * 0.18)).toLocaleString() %></td>
                                         </tr>
                                         <% if (order.discount > 0) { %>
                                         <tr>
-                                            <td class="amount-label">Discount</td>
+                                            <td class="amount-label">Product Discount</td>
                                             <td class="amount-value text-success">-₹<%= order.discount.toLocaleString() %></td>
                                         </tr>
                                         <% } %>
+                                        <% if (order.couponApplied && order.couponApplied.code) { %>
+                                            <tr>
+                                                <td class="amount-label">Coupon Applied (<%= order.couponApplied.code %>)</td>
+                                                <td class="amount-value text-success">-₹<%= order.couponApplied.discountAmount.toLocaleString() %></td>
+                                            </tr>
+                                            <% } %>
                                         <tr class="total-row">
                                             <td class="amount-label pt-3">Total</td>
-                                            <td class="amount-value pt-3">₹<%= order.total.toLocaleString() %></td>
+                                            <td class="amount-value pt-3">₹<%= order.finalAmount.toLocaleString() %></td>
                                         </tr>
                                     </table>
                                 </div>

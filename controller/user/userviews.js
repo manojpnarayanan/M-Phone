@@ -331,6 +331,7 @@ const userViews = {
                 })
                 await wallet.save();
             }
+            wallet.transactions.sort((a,b)=>b.transactionDate-a.transactionDate)
 
 
             const users = await User.findById(userId).populate({

@@ -55,8 +55,11 @@ const checkoutcontroller = {
 
             }
 
-            const activeCoupon = await Coupon.find(regularCouponQuery).sort({ createdAt: -1 })
+            let activeCoupon = await Coupon.find(regularCouponQuery).sort({ createdAt: -1 })
             // console.log("activeCoupon",activeCoupon)
+            activeCoupon=activeCoupon.filter((coupon)=>{
+                return !coupon.usersUsed.includes(userId)
+            })
 
             if (cart.products.length === 0) {
                 req.flash("error", 'Cart is empty')
