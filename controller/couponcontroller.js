@@ -185,6 +185,8 @@ const couponController = {
             const couponId = req.params.id
             const coupon = await Coupon.findById(couponId)
             console.log("couponId", couponId)
+            console.log("validFrom", validFrom)
+
             // console.log("coupon",coupon)
             if (!coupon) {
                 return res.status(400).json({ success: false, message: "Coupon not found" })
@@ -192,15 +194,16 @@ const couponController = {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            const validFromDate = new Date(validFrom);
-            if (validFromDate < today) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Coupon start date must be today or a future date"
-                });
-            }
+            const existingValidFrom = new Date(coupon.validFrom);
+        const newValidFrom = new Date(validFrom);
+        if (existingValidFrom.getTime() !== newValidFrom.getTime()) {
+            return res.status(400).json({
+                success: false,
+                message: "Start date cannot be changed once set"
+            });
+        }
             const validUntilDate = new Date(validUntil);
-            if (validUntilDate <= validFromDate) {
+            if (validUntilDate <= newValidFrom) {
                 return res.status(400).json({
                     success: false,
                     message: "End date must be after start date"
@@ -238,7 +241,7 @@ const couponController = {
             coupon.discountValue = discountValue;
             coupon.minOrderAmount = minOrderAmount;
             coupon.maxDiscountAmount = maxDiscountAmount;
-            coupon.validFrom = validFrom;
+            // coupon.validFrom = validFrom;
             coupon.validUntil = validUntil;
             coupon.usageLimit = usageLimit || 0;
             coupon.isActive = isActive;
