@@ -10,6 +10,7 @@ const Wallet = require("../../model/wallet")
 const Review = require("../../model/review")
 const Referral = require("../../model/referral")
 const nodemailer = require("nodemailer")
+const statusCode = require("../../utils/statuscode")
 
 
 
@@ -33,7 +34,7 @@ const userViews = {
 
         } catch (error) {
             console.log(error)
-            res.status(500).send({ message: "Something went wrong" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send({ message: "Something went wrong" });
 
         }
     },
@@ -128,7 +129,7 @@ const userViews = {
 
         } catch (error) {
             console.error('Error fetching products:', error);
-            res.status(500).render('error', {
+            res.status(statusCode.INTERNAL_SERVER_ERROR).render('error', {
                 message: 'Error loading the shop page',
                 error: { status: 500, stack: error.stack }
             });
@@ -141,7 +142,7 @@ const userViews = {
             const product = await Product.findById(productId);
 
             if (!product) {
-                return res.status(404).render('error', {
+                return res.status(statusCode.NOT_FOUND).render('error', {
                     message: 'Product not found',
                     user: req.session.user || {}
                 });
@@ -182,7 +183,7 @@ const userViews = {
             });
         } catch (error) {
             console.error('Error fetching product details:', error);
-            res.status(500).render('error', {
+            res.status(statusCode.INTERNAL_SERVER_ERROR).render('error', {
                 message: 'Server error while loading product details',
                 user: req.session.user || {}
             });
@@ -202,7 +203,7 @@ const userViews = {
                 .populate("category")
             // console.log(product)
             if (!product) {
-                return res.status(404).send("Product not found")
+                return res.status(statusCode.NOT_FOUND).send("Product not found")
             }
             const reviews = await Review.find({ product: productId })
                 .populate("user", "name")
@@ -230,7 +231,7 @@ const userViews = {
 
         } catch (error) {
             console.log(error)
-            res.status(500).send("server error")
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send("server error")
         }
     },
     loadShoppingPage: async (req, res) => {
@@ -331,7 +332,7 @@ const userViews = {
                 })
                 await wallet.save();
             }
-            wallet.transactions.sort((a,b)=>b.transactionDate-a.transactionDate)
+            wallet.transactions.sort((a, b) => b.transactionDate - a.transactionDate)
 
 
             const users = await User.findById(userId).populate({
@@ -382,7 +383,7 @@ const userViews = {
 
         } catch (error) {
             console.log(error)
-            res.status(500)
+            res.status(statusCode.INTERNAL_SERVER_ERROR)
         }
     },
     addToCart: async (req, res) => {
@@ -400,12 +401,12 @@ const userViews = {
             const user = await User.findById(userId)
             // console.log(user)
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "User not found" });
             }
             const product = await Product.findById(productId)
             // console.log("product.stock",product.stock)
             if (!product) {
-                res.status(404).json({ message: "Product not found" });
+                res.status(statusCode.NOT_FOUND).json({ message: "Product not found" });
             }
             let cart = await Cart.findOne({ user: userId })
             // console.log("cart:",cart)
@@ -424,14 +425,14 @@ const userViews = {
                 if (existingProduct) {
                     const newQuantity = existingProduct.quantity + 1;
                     if (newQuantity > 5) {
-                        return res.status(400).json({
+                        return res.status(statusCode.BAD_REQUEST).json({
                             success: false,
                             message: "Maximum items per product is limited to 5"
                         });
                     }
 
                     if (newQuantity > product.stock) {
-                        return res.status(400).json({
+                        return res.status(statusCode.BAD_REQUEST).json({
                             success: false,
                             message: `Only ${product.stock} units available in stock`
                         });
@@ -447,10 +448,10 @@ const userViews = {
             }
             await cart.save();
 
-            res.status(200).json({ success: true, message: "Product added successfully" })
+            res.status(statusCode.OK).json({ success: true, message: "Product added successfully" })
         } catch (error) {
             console.log(error)
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
         }
     },
     loadAddToCart: async (req, res) => {
@@ -466,7 +467,7 @@ const userViews = {
             const user = await User.findById(decoded.id)
 
             if (!user) {
-                return res.status(400).json({ message: "User not found" });
+                return res.status(statusCode.BAD_REQUEST).json({ message: "User not found" });
             }
 
             if (user.isActive == false) {
@@ -505,7 +506,7 @@ const userViews = {
             res.render("user/addtocart", { user, cartItems, totalItems, totalPrice });
         } catch (error) {
             console.error(error);
-            res.status(500).send(" load add to cart Internal Server Error");
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send(" load add to cart Internal Server Error");
         }
 
     },
@@ -527,29 +528,29 @@ const userViews = {
 
             const product = await Product.findById(productId);
             if (!product) {
-                return res.status(404).json({ success: false, message: "Product not found" });
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found" });
             }
 
 
             const cart = await Cart.findOne({ user: userId });
             if (!cart) {
-                return res.status(404).json({ success: false, message: "Cart not found" });
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Cart not found" });
             }
 
 
             const cartProduct = cart.products.find(item => item.product.toString() === productId);
             if (!cartProduct) {
-                return res.status(404).json({ success: false, message: "Product not found in cart" });
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found in cart" });
             }
 
 
             if (quantity > product.stock) {
-                return res.status(200).json({ success: false, message: `Only ${product.stock} units left in stock` });
+                return res.status(statusCode.OK).json({ success: false, message: `Only ${product.stock} units left in stock` });
             }
 
 
             if (quantity > 5) {
-                return res.status(200).json({ success: false, message: "You can add only 5 units of this product" });
+                return res.status(statusCode.OK).json({ success: false, message: "You can add only 5 units of this product" });
             }
 
 
@@ -559,7 +560,7 @@ const userViews = {
             res.json({ success: true });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ success: false, message: "Internal Server Error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
         }
     },
 
@@ -578,7 +579,7 @@ const userViews = {
                 { new: true }
             );
             if (!cart) {
-                return res.status(404).json({ message: "Cart not found" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "Cart not found" });
             }
 
             return res.json({ success: true, message: "Item removed successfully" })
@@ -588,7 +589,7 @@ const userViews = {
             console.log(error)
             console.error(error);
 
-            return res.status(500).json({ success: false, message: "Internal server error" });
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
         }
     },
     sendInvite: async (req, res) => {
@@ -596,7 +597,7 @@ const userViews = {
             const { email, referralCode } = req.body
             console.log(email, referralCode)
             if (!email) {
-                return res.status(400).json({ success: false, message: "email not found" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "email not found" })
             }
             let transporter = nodemailer.createTransport({
                 service: "gmail",
@@ -612,7 +613,7 @@ const userViews = {
                 text: `Hey! Use my referral code  ${referralCode} and get ₹250 off! Visit:https://m-phone.cloud/user/signup`
             }
             await transporter.sendMail(mailOptions);
-            res.status(200).json({ success: true, message: "Invitation sent successfully" })
+            res.status(statusCode.OK).json({ success: true, message: "Invitation sent successfully" })
 
         } catch (error) {
             console.log(error)

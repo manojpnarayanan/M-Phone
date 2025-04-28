@@ -3,6 +3,7 @@ const User = require("../../model/user")
 const jwt = require("jsonwebtoken")
 const Wishlist = require("../../model/wishlist")
 const Cart = require("../../model/cart")
+const statusCode=require("../../utils/statuscode")
 
 const wishlistcontroller = {
   loadWishlist: async (req, res) => {
@@ -13,19 +14,19 @@ const wishlistcontroller = {
       const userId = decoded.id
       const wishlist = await Wishlist.findOne({ user: userId }).populate("wishlist");
       if (!wishlist) {
-        return res.status(200).json({
+        return res.status(statusCode.OK).json({
           success: true,
           wishlist: [],
         });
       }
 
-      res.status(200).json({
+      res.status(statusCode.OK).json({
         success: true,
         wishlist: wishlist.wishlist,
       });
     } catch (error) {
       console.log(error)
-      res.status(500).json({
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Internal Server Error",
       });
@@ -59,7 +60,7 @@ const wishlistcontroller = {
         wishlist.wishlist.push(productId);
       }
       await wishlist.save()
-      res.status(200).json({
+      res.status(statusCode.OK).json({
         success: true,
         message: isInWishlist
           ? "Product removed from wishlist"
@@ -67,7 +68,7 @@ const wishlistcontroller = {
       });
     } catch (error) {
       console.log(error)
-      res.status(500).json({
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Internal Server Error",
       });
@@ -85,7 +86,7 @@ const wishlistcontroller = {
       const wishlist = await Wishlist.findOne({ user: userId });
 
       if (!wishlist) {
-        return res.status(404).json({
+        return res.status(statusCode.NOT_FOUND).json({
           success: false,
           message: 'Wishlist not found',
         });
@@ -96,7 +97,7 @@ const wishlistcontroller = {
       );
       await wishlist.save();
 
-      res.status(200).json({
+      res.status(statusCode.OK).json({
         success: true,
         message: 'Product removed from wishlist',
       })
@@ -115,7 +116,7 @@ const wishlistcontroller = {
       const product = await Product.findById(productId)
 
       if (!product) {
-        res.status(404).json({ message: "Product not found" });
+        res.status(statusCode.NOT_FOUND).json({ message: "Product not found" });
       }
       let cart = await Cart.findOne({ user: userId })
       if (!cart) {
@@ -142,14 +143,14 @@ const wishlistcontroller = {
         { user: userId },
         { $pull: { wishlist: productId } }
       );
-      res.status(200).json({
+      res.status(statusCode.OK).json({
         success: true,
         message: "Product added to cart from wishlist",
       });
 
     } catch (error) {
       console.error(error);
-      res.status(500).json({
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Failed to add product to cart: " + error.message,
       });

@@ -1,6 +1,7 @@
 const { default: mongoose } = require("mongoose")
 const Category = require("../model/createcategory")
 const Product = require("../model/addproduct")
+const statusCode = require("../utils/statuscode")
 
 
 
@@ -59,7 +60,7 @@ const productupdates = {
             res.render("admin/admin-edit-category", { category, categories });
         } catch (err) {
             console.error(err);
-            res.status(500).send("Server Error");
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send("Server Error");
         }
     },
     updateCategory: async (req, res) => {
@@ -68,12 +69,12 @@ const productupdates = {
             // console.log(req.body)
             if (!name || name.trim().length < 3) {
 
-                return res.status(400).json({ success: false, message: "Category name must be at least 3 characters long." })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Category name must be at least 3 characters long." })
             }
             name = name.trim();
             const existingCategoryByName = await Category.findOne({ name: { $regex: new RegExp("^" + name + "$", "i") } });
             if (existingCategoryByName) {
-                return res.status(400).json({ success: false, message: "Category name already exists." })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Category name already exists." })
             }
 
             const updatedCategory = await Category.findByIdAndUpdate(req.params.id, {
@@ -86,13 +87,13 @@ const productupdates = {
             )
 
             if (!updatedCategory) {
-                return res.status(404).json({ success: false, message: "Category not found" })
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Category not found" })
             }
 
-            res.status(200).json({ success: true, message: "Category updated successfully" })
+            res.status(statusCode.OK).json({ success: true, message: "Category updated successfully" })
         } catch (error) {
             console.log(error)
-            res.status(500).json({ success: false, message: "Failed to update Category" })
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to update Category" })
         }
     },
     blockCategory: async (req, res) => {
@@ -102,7 +103,7 @@ const productupdates = {
             const categories = await Category.findById(categoryId)
 
             if (!categories) {
-                res.status(400).send("Category not Found")
+                res.status(statusCode.BAD_REQUEST).send("Category not Found")
             }
             categories.isActive = !categories.isActive
             await categories.save()
@@ -143,7 +144,7 @@ const productupdates = {
             });
         } catch (error) {
             console.log(error);
-            res.status(500).send("Error fetching categories");
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send("Error fetching categories");
         }
     },
     addOffer: async (req, res) => {
@@ -154,7 +155,7 @@ const productupdates = {
             // console.log(offerPercentage)
             const category = await Category.findById(categoryId)
             if (!category) {
-                return res.status(400).json({ success: false, message: "Category not found" })
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Category not found" })
             }
             category.discount = offerPercentage
             await category.save();
@@ -165,7 +166,7 @@ const productupdates = {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ success: false, message: "Internal server error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
 
         }
     },
@@ -175,7 +176,7 @@ const productupdates = {
 
             const category = await Category.findById(categoryId)
             if (!category) {
-                return res.status(400).json({ success: false, message: "Category not found" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Category not found" })
             }
             category.discount = 0
             await category.save();

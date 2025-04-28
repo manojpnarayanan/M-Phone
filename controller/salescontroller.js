@@ -5,6 +5,7 @@ const PDFDocument = require('pdfkit');
 const path = require('path');
 const User = require("../model/user")
 const ExcelJS = require('exceljs');
+const statusCode = require("../utils/statuscode")
 
 
 const generateInvoiceController = {
@@ -106,7 +107,7 @@ const generateInvoiceController = {
             });
         } catch (error) {
             console.log("Error in loadsalesreport:", error);
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
         }
     },
 
@@ -116,7 +117,7 @@ const generateInvoiceController = {
             console.log("downloadInvoice request parameters:", req.query);
             
             if (!period) {
-                return res.status(400).json({ status: "error", message: "Period is required" });
+                return res.status(statusCode.BAD_REQUEST).json({ status: "error", message: "Period is required" });
             }
             
             let queryStartDate, queryEndDate;
@@ -181,7 +182,7 @@ const generateInvoiceController = {
             console.log(`Found ${orders.length} orders matching criteria`);
             
             if (!orders || orders.length === 0) {
-                return res.status(404).json({ status: "error", message: "No orders found for the selected period" });
+                return res.status(statusCode.NOT_FOUND).json({ status: "error", message: "No orders found for the selected period" });
             }
             
             // For period display in the report, use the applicable date/period
@@ -195,7 +196,7 @@ const generateInvoiceController = {
             }
         } catch (error) {
             console.log("Error in downloadInvoice:", error);
-            res.status(500).json({ status: "error", message: "Internal Server Error" });
+            res.status(statusCode>statusCode.INTERNAL_SERVER_ERROR).json({ status: "error", message: "Internal Server Error" });
         }
     },
 
@@ -358,7 +359,7 @@ const generateInvoiceController = {
             doc.end();
         } catch (error) {
             console.error("Error generating PDF:", error);
-            res.status(500).json({ status: "error", message: "Failed to generate PDF" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ status: "error", message: "Failed to generate PDF" });
         }
     },
 
@@ -511,7 +512,7 @@ const generateInvoiceController = {
             res.end();
         } catch (error) {
             console.error("Error generating Excel:", error);
-            res.status(500).json({ status: "error", message: "Failed to generate Excel report" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ status: "error", message: "Failed to generate Excel report" });
         }
     }
 };

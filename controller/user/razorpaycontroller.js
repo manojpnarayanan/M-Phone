@@ -15,6 +15,7 @@ const path = require('path');
 const Coupon = require("../../model/coupon");
 const Wallet = require('../../model/wallet');
 const Admin = require("../../model/admin")
+const statusCode = require("../../utils/statuscode")
 
 env.config()
 
@@ -141,7 +142,7 @@ const razorpayController = {
             console.log("req.body", req.body)
 
             if (!amount || !currency || !receipt) {
-                return res.status(400).json({ success: false, message: "Missing required fields" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Missing required fields" })
             }
             const token = req.cookies.token
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
@@ -149,20 +150,20 @@ const razorpayController = {
             const cart = await Cart.findOne({ user: decoded.id })
 
             if (!cart || cart.products.length === 0) {
-                return res.status(400).json({ success: false, message: "Cart is empty" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Cart is empty" })
             }
 
             for (const item of cart.products) {
                 const product = await Product.findById(item.product)
                 // console.log(product)
                 if (!product) {
-                    return res.status(404).json({ success: false, message: "Product not found" })
+                    return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found" })
                 }
                 if (product.stock < item.quantity) {
-                    return res.status(400).json({ success: false, message: "Insufficient stock" })
+                    return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Insufficient stock" })
                 }
                 if (!product.isActive) {
-                    return res.status(400).json({ success: false, message: "Product is blocked " })
+                    return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product is blocked " })
                 }
             }
 
@@ -174,7 +175,7 @@ const razorpayController = {
             }
             const razorpayOrder = await razorpay.orders.create(options);
 
-            return res.status(200).json({
+            return res.status(statusCode.OK).json({
                 success: true,
                 orderId: razorpayOrder.id,
                 message: 'Razorpay order created successfully'
@@ -184,7 +185,7 @@ const razorpayController = {
         } catch (error) {
             console.log(error)
             console.error("Error creating Razorpay order:", error);
-            return res.status(500).json({
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: 'Failed to create payment order. Please try again.',
                 error: error.message
@@ -222,7 +223,7 @@ const razorpayController = {
 
         } catch (error) {
             console.error('Error creating failed order:', error);
-            res.status(500).json({
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: 'Failed to create order record'
             });
@@ -245,7 +246,7 @@ const razorpayController = {
             //   console.log("reached razorpay verify")
 
             if (generatedSignature !== razorpay_signature) {
-                return res.status(400).json({
+                return res.status(statusCode.BAD_REQUEST).json({
                     success: false,
                     message: 'Invalid payment signature. Possible payment tampering detected.'
                 });
@@ -262,7 +263,7 @@ const razorpayController = {
                 console.log("adminWallet", adminWallet)
 
                 if (!adminWallet) {
-                    return res.status(400).json({ success: false, message: "Wallet not found" })
+                    return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Wallet not found" })
                 }
                 adminWallet.transactions.push({
                     orderId: order._id,
@@ -277,7 +278,7 @@ const razorpayController = {
             if (orderId) {
                 const order = await Order.findById(orderId);
                 if (!order) {
-                    return res.status(404).json({ success: false, message: 'Order not found' });
+                    return res.status(statusCode.NOT_FOUND).json({ success: false, message: 'Order not found' });
 
                 }
                 order.paymentStatus = 'completed';
@@ -322,7 +323,7 @@ const razorpayController = {
                 const payment = await razorpay.payments.fetch(razorpay_payment_id);
 
                 if (payment.status !== 'captured') {
-                    return res.status(400).json({
+                    return res.status(statusCode.BAD_REQUEST).json({
                         success: false,
                         message: 'Payment not captured. Status: ' + payment.status
                     });
@@ -373,7 +374,7 @@ const razorpayController = {
 
 
                 await Cart.deleteMany({ user: orderData.userId });
-                return res.status(200).json({
+                return res.status(statusCode.OK).json({
                     success: true,
                     message: 'Payment verified and order placed successfully',
                     orderId: savedOrder._id
@@ -384,7 +385,7 @@ const razorpayController = {
 
         } catch (error) {
             console.log(error)
-            return res.status(500).json({
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: 'Failed to verify payment. Please contact support.',
                 error: error.message
@@ -400,7 +401,7 @@ const razorpayController = {
 
             const order = await Order.findById(orderId).populate('products.product');
             if (!order) {
-                return res.status(404).render('error', { message: 'Order not found' });
+                return res.status(statusCode.NOT_FOUND).render('error', { message: 'Order not found' });
             }
 
 
@@ -413,7 +414,7 @@ const razorpayController = {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ message: 'An error occurred while loading the page' });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: 'An error occurred while loading the page' });
 
         }
     },
@@ -426,7 +427,7 @@ const razorpayController = {
             const order = await Order.findById(orderId);
             // console.log("order",order)
             if (!order) {
-                return res.status(404).json({ success: false, message: 'Order not found' });
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: 'Order not found' });
             }
 
             // Create a new Razorpay order
@@ -450,7 +451,7 @@ const razorpayController = {
 
         } catch (error) {
             console.error('Error creating Razorpay order for retry:', error);
-            res.status(500).json({
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: 'An error occurred while processing your request'
             });

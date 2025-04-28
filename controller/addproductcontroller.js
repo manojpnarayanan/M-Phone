@@ -5,6 +5,7 @@ const path = require("path");
 const sharp = require("sharp");
 const Brands = require("../model/brandschema")
 const Category = require("../model/createcategory")
+const statusCode=require("../utils/statuscode")
 
 const addproducts = {
   addProduct: async (req, res) => {
@@ -12,12 +13,12 @@ const addproducts = {
       const { name, description, price, stock, isActive, brand, croppedImages, category, discount, availability, deliveryTime, tags } = req.body
       // console.log(req.body)
       if (!croppedImages) {
-        return res.status(400).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
       }
 
       const croppedImagesArray = JSON.parse(croppedImages);
       if (croppedImagesArray.length < 3) {
-        return res.status(400).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
       }
       let imagePaths = [];
       const uploadDir = "public/uploads/product-images/";
@@ -25,7 +26,7 @@ const addproducts = {
       for (let i = 0; i < croppedImagesArray.length; i++) {
         const base64Data = croppedImagesArray[i].replace(/^data:image\/\w+;base64,/, "");
         if (!base64Data || base64Data.trim() === "") {
-          return res.status(400).json({ success: false, message: "Invalid image files Add only jpg/png" });
+          return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Invalid image files Add only jpg/png" });
         }
 
         const imageName = `image-${Date.now()}-${i}.jpg`;
@@ -56,7 +57,7 @@ const addproducts = {
 
     } catch (error) {
       console.log(error)
-      res.status(400).json({ success: false, message: "Product adding Failed" });
+      res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed" });
     }
   },
 
@@ -85,7 +86,7 @@ const addproducts = {
       })
     } catch (error) {
       console.log(error)
-      res.status(500).send("error fectching products")
+      res.status(statusCode.INTERNAL_SERVER_ERROR).send("error fectching products")
     }
   },
   blockProduct: async (req, res) => {
@@ -93,19 +94,19 @@ const addproducts = {
       const blockProduct = await Product.findById(req.params.id)
       // console.log(blockProduct)
       if (!blockProduct) {
-        return res.status(404).json({ message: "Product not Found" })
+        return res.status(statusCode.NOT_FOUND).json({ message: "Product not Found" })
       }
       blockProduct.isActive = !blockProduct.isActive;
       await blockProduct.save();
 
-      res.status(200).json({
+      res.status(statusCode.OK).json({
         message: `Product ${blockProduct.isActive ? "unblocked" : "blocked"} successfully`,
         isActive: blockProduct.isActive
       })
 
     } catch (error) {
       console.log(error)
-      res.status(500).json({ message: "Internal server error" })
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" })
     }
   },
   editProduct: async (req, res) => {
@@ -113,7 +114,7 @@ const addproducts = {
     const Brand = await Brands.find()
     const category = await Category.find()
     if (!product) {
-      return res.status(400).send("Product not found")
+      return res.status(statusCode.BAD_REQUEST).send("Product not found")
     }
     res.render("admin/editproducts", { Brand, category, product })
   },
@@ -129,12 +130,12 @@ const addproducts = {
 
       const product = await Product.findById(req.params.id);
       if (!product) {
-        return res.status(404).send("Product not found");
+        return res.status(statusCode.NOT_FOUND).send("Product not found");
       }
       const categoryDoc = await Category.findOne({ parent: category })
 
       if (!categoryDoc) {
-        return res.status(400).send("Category not found");
+        return res.status(statusCode.BAD_REQUEST).send("Category not found");
       }
 
       product.name = name;
@@ -186,7 +187,7 @@ const addproducts = {
 
 
       if (finalImages.length < 3) {
-        return res.status(400).send("A product must have at least 3 images");
+        return res.status(statusCode.BAD_REQUEST).send("A product must have at least 3 images");
       }
 
 
@@ -208,7 +209,7 @@ const addproducts = {
       res.redirect("/admin/dashboard/productlist");
     } catch (error) {
       console.error("Error updating product:", error);
-      res.status(500).send("Error updating product");
+      res.status(statusCode.INTERNAL_SERVER_ERROR).send("Error updating product");
     }
   },
   loadAddProductForm: async (req, res) => {
@@ -228,16 +229,16 @@ const addproducts = {
 
       const product = await Product.findById(productId)
       if (!product) {
-        return res.status(404).json({ success: false, message: "Product not found" })
+        return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found" })
       }
       product.discount = offerPercentage
       await product.save()
-      res.status(200).json({ success: true, message: "Offer added successfully" })
+      res.status(statusCode.OK).json({ success: true, message: "Offer added successfully" })
 
 
     } catch (error) {
       console.log(error)
-      res.status(500).json({ success: false, message: "Failed to add offer" })
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to add offer" })
 
     }
   },
@@ -246,14 +247,14 @@ const addproducts = {
       const productId = req.params.id
       const product = await Product.findById(productId)
       if (!product) {
-        return res.status(404).json({ success: false, message: "Product not found" })
+        return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found" })
       }
       product.discount = 0
       await product.save()
-      res.status(200).json({ success: true, message: "Offer removed successfully" })
+      res.status(statusCode.OK).json({ success: true, message: "Offer removed successfully" })
     } catch (error) {
       console.log(error)
-      res.status(500).json({ success: false, message: "Failed to remove offer" })
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to remove offer" })
 
     }
 

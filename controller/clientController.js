@@ -1,5 +1,6 @@
 const User = require("../model/user");
 const mongoosepaginate = require("mongoose-paginate-v2")
+const statusCode= require("../utils/statuscode")
 const client = {
     loadUserList: async (req, res) => {
         try {
@@ -24,7 +25,7 @@ const client = {
             })
         } catch (error) {
             console.log(error)
-            res.status(500).send("error fetching Details")
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send("error fetching Details")
         }
     },
 
@@ -34,7 +35,7 @@ const client = {
             const user = await User.findById(userId);
 
             if (!user) {
-                return res.status(404).json({ success: false, message: "User not found" });
+                return res.status(statusCode,statusCode.NOT_FOUND).json({ success: false, message: "User not found" });
             }
 
             user.isActive = !user.isActive;
@@ -44,7 +45,7 @@ const client = {
             return res.json({ success: true, newStatus });
         } catch (error) {
             console.error("Error:", error);
-            return res.status(500).json({ success: false, message: "Internal Server Error" });
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
         }
     }
 };

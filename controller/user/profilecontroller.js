@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const multer = require("multer")
 const path = require("path")
 const bcryptjs = require("bcryptjs")
+const statusCode = require("../../utils/statuscode")
 
 const profilecontroller = {
   loadAddressPage: async (req, res) => {
@@ -23,7 +24,7 @@ const profilecontroller = {
 
     } catch (error) {
       console.log(error)
-      res.status(500).json({ message: "Internal server error" });
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
     }
 
   },
@@ -33,12 +34,12 @@ const profilecontroller = {
       const { name, mobilenumber, housename, city, pincode, state, country, addresstype } = req.body
       if (!name || !mobilenumber || !housename || !city || !pincode || !state || !country || !addresstype) {
 
-        return res.status(400).json({ message: "All fields are required" });
+        return res.status(statusCode.BAD_REQUEST).json({ message: "All fields are required" });
       }
       const userId = req.params.id
       // console.log("userid",userId)
       if (!mongoose.isValidObjectId(userId)) {
-        return res.status(400).json({ message: "Invalid user ID" });
+        return res.status(statusCode.BAD_REQUEST).json({ message: "Invalid user ID" });
       }
       // console.log(req.user)
       const token = req.cookies.token
@@ -51,15 +52,15 @@ const profilecontroller = {
       }
       const nameRegex = /^[A-Za-z\s\-]+$/;
       if (!nameRegex.test(name)) {
-        return res.status(400).json({ message: "Name should only contain letters, spaces, and hyphens" });
+        return res.status(statusCode.BAD_REQUEST).json({ message: "Name should only contain letters, spaces, and hyphens" });
       }
       const pincodeRegex = /^\d{6}$/;
       if (!pincodeRegex.test(pincode)) {
-        return res.status(400).json({ message: "Pincode must be exactly 6 digits" });
+        return res.status(statusCode.BAD_REQUEST).json({ message: "Pincode must be exactly 6 digits" });
       }
-      const phoneRegex = /^\d{10}$/; 
+      const phoneRegex = /^\d{10}$/;
       if (!phoneRegex.test(mobilenumber)) {
-        return res.status(400).json({ message: "Phone number must be exactly 10 digits" });
+        return res.status(statusCode.BAD_REQUEST).json({ message: "Phone number must be exactly 10 digits" });
       }
 
       const address = new Address({
@@ -76,10 +77,10 @@ const profilecontroller = {
       // console.log(address)
       await address.save()
 
-      res.status(200).json({ message: "Address saved successfully" });
+      res.status(statusCode.OK).json({ message: "Address saved successfully" });
     } catch (error) {
       console.log(error)
-      res.status(500).json({ message: "Internal server error" });
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
     }
   },
   loadEditAddress: async (req, res) => {
@@ -115,10 +116,10 @@ const profilecontroller = {
       // console.log("address of user:",updateAddress)
 
 
-      res.status(200).json({ message: 'Address updated successfully' });
+      res.status(statusCode.OK).json({ message: 'Address updated successfully' });
     } catch (error) {
       console.log(error)
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
     }
   },
   deleteAddress: async (req, res) => {
@@ -128,13 +129,13 @@ const profilecontroller = {
       const deletedAddress = await Address.findByIdAndDelete(addressId);
 
       if (!deletedAddress) {
-        return res.status(404).json({ message: 'Address not found' });
+        return res.status(statusCode.NOT_FOUND).json({ message: 'Address not found' });
       }
 
-      res.status(200).json({ message: 'Address deleted successfully' });
+      res.status(statusCode.OK).json({ message: 'Address deleted successfully' });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
     }
   },
   userProfileUpdate: async (req, res) => {
@@ -158,7 +159,7 @@ const profilecontroller = {
       res.redirect(`/user/myprofile/${decoded.id}`)
 
     } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
+      res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: error.message });
 
 
     }

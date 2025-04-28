@@ -1,5 +1,6 @@
 const path = require("path")
 const Brands = require("../model/brandschema")
+const statusCode=require("../utils/statuscode")
 
 
 const brandscontroller = {
@@ -12,7 +13,7 @@ const brandscontroller = {
             // console.log(brandImage)
 
             if (!brandName || !brandImage) {
-                return res.status(400).send("Brand name and Image required")
+                return res.status(statusCode.BAD_REQUEST).send("Brand name and Image required")
             }
             const newBrand = new Brands({
                 name: brandName,
@@ -48,7 +49,7 @@ const brandscontroller = {
             })
         } catch (error) {
             console.error("Error in getBrands:", error);
-            res.status(500).send("Server error")
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send("Server error")
         }
     }
 

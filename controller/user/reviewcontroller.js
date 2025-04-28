@@ -3,6 +3,7 @@ const Product = require("../../model/addproduct")
 const jwt = require("jsonwebtoken")
 const Order = require("../../model/order")
 const Review = require("../../model/review")
+const statusCode = require("../../utils/statuscode")
 
 
 const reviewController = {
@@ -13,18 +14,18 @@ const reviewController = {
             const order = await Order.findById(orderId)
                 .populate("products.product")
             if (!order) {
-                return res.status(404).send('Order not found');
+                return res.status(statusCode.NOT_FOUND).send('Order not found');
             }
 
             const products = order.products;
             if (!products || products.length === 0) {
-                return res.status(404).send('No products found in this order');
+                return res.status(statusCode.NOT_FOUND).send('No products found in this order');
             }
             // console.log("Products in order:", products);
 
             const productInOrder = order.products[0];
             if (!productInOrder) {
-                return res.status(404).send('No products found in this order');
+                return res.status(statusCode.NOT_FOUND).send('No products found in this order');
             }
             const productId = productInOrder.product._id;
             // console.log("loadproductpage,productId", productId)
@@ -48,7 +49,7 @@ const reviewController = {
             const { productId, rating, comment } = req.body
             // console.log("req.body", req.body)
             if (!productId || !rating || !comment) {
-                return res.status(400).json({ success: false, message: 'All fields are required' });
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: 'All fields are required' });
             }
             const token = req.cookies.token
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
@@ -67,7 +68,7 @@ const reviewController = {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ success: false, message: 'Failed to submit review.' });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to submit review.' });
 
         }
 

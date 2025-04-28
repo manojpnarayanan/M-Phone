@@ -4,6 +4,7 @@ const Address = require("../../model/address")
 const Product = require("../../model/addproduct")
 const Cart = require("../../model/cart")
 const Coupon = require("../../model/coupon")
+const statusCode = require("../../utils/statuscode")
 
 
 const checkoutcontroller = {
@@ -20,7 +21,7 @@ const checkoutcontroller = {
             })
             // console.log(cart)
             if (!cart) {
-                return res.status(404).send("Cart not found");
+                return res.status(statusCode.NOT_FOUND).send("Cart not found");
             }
             let totalPrice = 0;
             let totalDiscount = 0;
@@ -57,7 +58,7 @@ const checkoutcontroller = {
 
             let activeCoupon = await Coupon.find(regularCouponQuery).sort({ createdAt: -1 })
             // console.log("activeCoupon",activeCoupon)
-            activeCoupon=activeCoupon.filter((coupon)=>{
+            activeCoupon = activeCoupon.filter((coupon) => {
                 return !coupon.usersUsed.includes(userId)
             })
 
@@ -83,7 +84,7 @@ const checkoutcontroller = {
             })
         } catch (error) {
             console.log(error)
-            res.status(500).send("Internal Server Error");
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error");
         }
 
 
@@ -94,32 +95,32 @@ const checkoutcontroller = {
             // console.log(couponId,userId)
 
             if (!couponId || !userId) {
-                return res.status(500).json({ success: false, message: "Missing required Parameters" })
+                return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Missing required Parameters" })
             }
             // console.log("1")
 
             const coupon = await Coupon.findById(couponId)
 
             if (!coupon) {
-                return res.status(500).json({ success: false, message: "Coupon not found" })
+                return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Coupon not found" })
             }
             if (!coupon.isActive) {
-                return res.status(400).json({ success: false, message: "This coupon is no longer active" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "This coupon is no longer active" })
             }
             const now = new Date()
             if (now < coupon.validFrom || now > coupon.validUntil) {
-                return res.status(400).json({ success: false, message: "coupon is expired" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "coupon is expired" })
             }
             // console.log("2")
             if (coupon.usersUsed && coupon.usersUsed.includes(userId)) {
-                return res.status(400).json({ success: false, message: "coupon usage limited to one per User" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "coupon usage limited to one per User" })
             }
             const cart = await Cart.findOne({ user: userId })
                 .populate("products.product")
             // console.log("reached")
 
             if (!cart) {
-                return res.status(400).json({ success: false, message: "Cart not found" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Cart not found" })
             }
             // console.log("reached")
             let cartTotal = 0;
@@ -134,7 +135,7 @@ const checkoutcontroller = {
             if (cartTotal < coupon.minOrderAmount) {
                 // console.log("Cart total:", cartTotal);
                 // console.log("Minimum order amount:", coupon.minOrderAmount);
-                return res.status(400).json({
+                return res.status(statusCode.BAD_REQUEST).json({
                     success: false,
                     message: `Minimum order amount of ₹${coupon.minOrderAmount} required for this coupon`
                 });
@@ -164,7 +165,7 @@ const checkoutcontroller = {
             await cart.save();
             // console.log("5")
 
-            return res.status(200).json({
+            return res.status(statusCode.OK).json({
                 success: true,
                 message: `Coupon applied successfully! You saved ₹${discountAmount}`,
                 discountAmount
@@ -173,7 +174,7 @@ const checkoutcontroller = {
 
         } catch (error) {
             console.log(error)
-            return res.status(500).json({ success: false, message: 'Internal server error' });
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
 
         }
 

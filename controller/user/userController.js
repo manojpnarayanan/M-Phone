@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken")
 const nodemailer = require('nodemailer');
 const Product = require("../../model/addproduct")
 const Cart = require("../../model/cart")
+const statusCode = require("../../utils/statuscode")
 
 const userController = {
     login: async (req, res) => {
@@ -44,7 +45,7 @@ const userController = {
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
             const user = await User.findById(decoded.id)
-            let query = {isActive:true}
+            let query = { isActive: true }
             if (req.query.search) {
                 query = {
                     $or: [
@@ -57,8 +58,8 @@ const userController = {
                 .limit(8)
                 .sort({ createdAt: -1 })
 
-                const newArrivals=await Product.find({isActive:true})
-                .sort({createdAt:-1})
+            const newArrivals = await Product.find({ isActive: true })
+                .sort({ createdAt: -1 })
                 .limit(5)
 
             const cart = await Cart.findOne({ user: decoded.id })
@@ -85,7 +86,7 @@ const userController = {
 
         } catch (error) {
             console.log(error)
-            res.status(500).send("Error fetching Data")
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send("Error fetching Data")
         }
     },
     forgotPassword: async (req, res) => {
@@ -95,7 +96,7 @@ const userController = {
             const user = await User.findOne({ email: email })
             //    console.log(user)
             if (!user) {
-                return res.status(404).json({ message: "User not found" })
+                return res.status(statusCode.NOT_FOUND).json({ message: "User not found" })
             }
             const otp = Math.floor(100000 + Math.random() * 900000)
             console.log("forgot password OTP:", otp)
@@ -134,23 +135,23 @@ const userController = {
             console.log(req.body)
 
             if (!email || !otp || !newPassword || !confirmPassword) {
-                return res.status(500).json({ message: "All field required" })
+                return res.status(statusCode.BAD_REQUEST).json({ message: "All field required" })
             }
             if (newPassword !== confirmPassword) {
-                return res.status(400).json({ message: "Password do not match" })
+                return res.status(statusCode.NOT_FOUND).json({ message: "Password do not match" })
             }
             const user = await User.findOne({ email: req.body.email })
             console.log(user)
 
-            if(!user){
-                return res.status(400).json({message:"user not found"})
+            if (!user) {
+                return res.status(statusCode.NOT_FOUND).json({ message: "user not found" })
             }
 
             if (user.otp !== otp) {
-                return res.status(400).json({ message: "Invalid OTp" })
+                return res.status(statusCode.NOT_FOUND).json({ message: "Invalid OTp" })
             }
             if (user.otpExpiry < new Date()) {
-                return res.status(400).json({ message: "OTP Expired" })
+                return res.status(statusCode.BAD_REQUEST).json({ message: "OTP Expired" })
             }
             const hashedpassword = await bcryptjs.hash(newPassword, 10)
             user.password = hashedpassword;

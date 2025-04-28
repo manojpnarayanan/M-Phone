@@ -2,6 +2,7 @@ const order = require("../model/order")
 const Wallet = require("../model/wallet")
 const jwt = require("jsonwebtoken")
 const Order = require("../model/order")
+const statusCode = require("../utils/statuscode")
 
 
 const walletController = {
@@ -143,7 +144,7 @@ const walletController = {
             console.log("Error in loadWallet:", error);
 
             if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-                return res.status(500).json({
+                return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
                     success: false,
                     error: 'An error occurred while loading wallet data'
                 });
@@ -165,7 +166,7 @@ const walletController = {
                 .lean();
 
             if (!order) {
-                return res.status(400).json({ success: false, message: "Order not found" })
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Order not found" })
             }
             const subtotal = order.products ?
                 order.products.reduce((total, item) => {
@@ -194,7 +195,7 @@ const walletController = {
 
         } catch {
             console.log(error)
-            res.status(500).json({
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: "Internal server error",
                 error: error.message

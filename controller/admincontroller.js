@@ -6,6 +6,7 @@ const moment = require("moment")
 const Product = require("../model/addproduct")
 const Order = require("../model/order")
 const Category = require("../model/createcategory")
+const statusCode=require("../utils/statuscode")
 
 const admincontroller = {
     login: async (req, res) => {
@@ -13,11 +14,11 @@ const admincontroller = {
         try {
             const admin = await Admin.findOne({ email })
             if (!admin) {
-                return res.status(400).json({ message: "Admin not found" })
+                return res.status(statusCode.BAD_REQUEST).json({ message: "Admin not found" })
             }
             const ismatch = await bcrypt.compare(password, admin.password)
             if (!ismatch) {
-                return res.status(400).json({ message: "Invalid credentials" })
+                return res.status(statusCode.BAD_REQUEST).json({ message: "Invalid credentials" })
             }
             const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, { expiresIn: "1d" })
             console.log(token);
@@ -28,11 +29,11 @@ const admincontroller = {
                 maxAge: 3600000
             })
             // return res.redirect("/admin/dashboard")
-            return res.status(200).json({ message: "Login successful" })
+            return res.status(statusCode.OK).json({ message: "Login successful" })
 
         } catch (error) {
             console.error(error)
-            res.status(500).json({ message: "Server error during login" })
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Server error during login" })
         }
     },
     loadDashboard: async (req, res) => {
@@ -90,7 +91,7 @@ const admincontroller = {
             })
         } catch (error) {
             console.error('Dashboard loading error:', error)
-            res.status(500).render('error', {
+            res.status(statusCode.INTERNAL_SERVER_ERROR).render('error', {
                 message: 'Error loading dashboard',
                 error: process.env.NODE_ENV === 'development' ? error : {}
             })

@@ -1,4 +1,5 @@
 const Coupon = require("../model/coupon")
+const statusCode=require("../utils/statuscode")
 
 
 const couponController = {
@@ -56,7 +57,7 @@ const couponController = {
 
             const validFromDate = new Date(req.body.validFrom);
             if (validFromDate < today) {
-                return res.status(400).json({
+                return res.status(statusCode.BAD_REQUEST).json({
                     success: false,
                     message: "Coupon start date must be today or a future date"
                 });
@@ -64,14 +65,14 @@ const couponController = {
 
             const validUntilDate = new Date(req.body.validUntil);
             if (validUntilDate <= validFromDate) {
-                return res.status(400).json({
+                return res.status(statusCode.BAD_REQUEST).json({
                     success: false,
                     message: "End date must be after start date"
                 });
             }
 
             if (minOrderAmount <= 0) {
-                return res.status(400).json({
+                return res.status(statusCode.BAD_REQUEST).json({
                     success: false,
                     message: "Minimum order amount must be a positive number"
                 });
@@ -79,26 +80,26 @@ const couponController = {
 
             if (req.body.discountType === "percentage") {
                 if (discountValue < 1 || discountValue > 100) {
-                    return res.status(400).json({
+                    return res.status(statusCode.BAD_REQUEST).json({
                         success: false,
                         message: "Percentage should be between 1 and 100"
                     });
                 } else if (maxDiscountAmount <= 0) {
-                    return res.status(400).json({
+                    return res.status(statusCode.BAD_REQUEST).json({
                         success: false,
                         message: "Maximum discount amount must be a positive number"
                     });
                 }
             } else if (req.body.discountType === "fixed") {
                 if (discountValue <= 0) {
-                    return res.status(400).json({
+                    return res.status(statusCode.BAD_REQUEST).json({
                         success: false,
                         message: "Discount value must be a positive number"
                     });
                 }
 
                 if (discountValue > minOrderAmount) {
-                    return res.status(400).json({
+                    return res.status(statusCode.BAD_REQUEST).json({
                         success: false,
                         message: "Fixed discount value cannot exceed minimum order amount"
                     });
@@ -106,7 +107,7 @@ const couponController = {
             }
 
             if (maxDiscountAmount > minOrderAmount) {
-                return res.status(400).json({
+                return res.status(statusCode.BAD_REQUEST).json({
                     success: false,
                     message: "Maximum discount amount cannot exceed minimum order amount"
                 });
@@ -130,11 +131,11 @@ const couponController = {
             })
             console.log(coupon)
             await coupon.save()
-            res.status(200).json({ success: true, message: "coupon added suceesfully" })
+            res.status(statusCode.OK).json({ success: true, message: "coupon added suceesfully" })
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ success: false, message: "Failed to add coupon" })
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to add coupon" })
         }
     },
     loadeditcoupon: async (req, res) => {
@@ -154,18 +155,18 @@ const couponController = {
             const couponId = req.params.id
 
             if (!couponId) {
-                return res.status(400).json({ success: false, message: "coupon required" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "coupon required" })
             }
             const coupon = await Coupon.findById(couponId)
 
             if (!coupon) {
-                return res.status(400).json({ success: false, message: "Coupon not found" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Coupon not found" })
             }
             coupon.isActive = !coupon.isActive;
 
             await coupon.save()
 
-            return res.status(200).json({
+            return res.status(statusCode.OK).json({
                 success: true,
                 message: `Coupon ${coupon.isActive ? 'activated' : 'deactivated'} successfully`,
                 isActive: coupon.isActive
@@ -173,7 +174,7 @@ const couponController = {
 
         } catch (error) {
             console.log(error)
-            return res.status(500).json({ success: false, message: 'Internal server error' });
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal server error' });
         }
     },
     updateEditCoupon: async (req, res) => {
@@ -189,7 +190,7 @@ const couponController = {
 
             // console.log("coupon",coupon)
             if (!coupon) {
-                return res.status(400).json({ success: false, message: "Coupon not found" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Coupon not found" })
             }
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -197,20 +198,20 @@ const couponController = {
             const existingValidFrom = new Date(coupon.validFrom);
         const newValidFrom = new Date(validFrom);
         if (existingValidFrom.getTime() !== newValidFrom.getTime()) {
-            return res.status(400).json({
+            return res.status(statusCode.BAD_REQUEST).json({
                 success: false,
                 message: "Start date cannot be changed once set"
             });
         }
             const validUntilDate = new Date(validUntil);
             if (validUntilDate <= newValidFrom) {
-                return res.status(400).json({
+                return res.status(statusCode.BAD_REQUEST).json({
                     success: false,
                     message: "End date must be after start date"
                 });
             }
             if (minOrderAmount <= 0) {
-                return res.status(400).json({
+                return res.status(statusCode.BAD_REQUEST).json({
                     success: false,
                     message: "Minimum order amount must be a positive number"
                 });
@@ -218,14 +219,14 @@ const couponController = {
 
             if (discountType === "percentage") {
                 if (DiscountValue < 1 || DiscountValue > 100) {
-                    return res.status(400).json({
+                    return res.status(statusCode.BAD_REQUEST).json({
                         success: false,
                         message: "Percentage should be between 1 and 100"
                     });
                 }
             } else if (discountType === "fixed") {
                 if (DiscountValue <= 0) {
-                    return res.status(400).json({
+                    return res.status(statusCode.BAD_REQUEST).json({
                         success: false,
                         message: "Discount value must be a positive number"
                     });
@@ -246,12 +247,12 @@ const couponController = {
             coupon.usageLimit = usageLimit || 0;
             coupon.isActive = isActive;
             await coupon.save();
-            res.status(200).json({ success: true, messsage: "Coupon updated successfully" })
+            res.status(statusCode.OK).json({ success: true, messsage: "Coupon updated successfully" })
 
 
         } catch (error) {
             console.log(error)
-            return res.status(500).json({
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({
                 success: false,
                 message: "An error occurred while updating the coupon",
                 error: error.message

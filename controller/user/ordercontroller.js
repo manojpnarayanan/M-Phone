@@ -10,6 +10,7 @@ const path = require('path');
 const Coupon = require("../../model/coupon")
 const Admin = require("../../model/admin")
 const Cart = require("../../model/cart")
+const statusCode = require("../../utils/statuscode")
 
 
 
@@ -133,29 +134,29 @@ const orderController = {
 
             if (paymentMethod === "cash_on_delivery") {
                 if (totalAmount >= 1000) {
-                    return res.status(400).json({ success: false, message: "orders below RS:1000 is eligible for COD" })
+                    return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "orders below RS:1000 is eligible for COD" })
                 }
             }
             const cart = await Cart.findOne({ user: userId })
             if (!cart || cart.products.length === 0) {
-                return res.status(400).json({ success: false, message: "Cart is empty" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Cart is empty" })
             }
 
             if (!products || products.length === 0) {
-                return res.status(400).json({ success: false, message: "Cart is empty" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Cart is empty" })
             }
 
 
             for (const item of products) {
                 const product = await Product.findById(item.product);
                 if (!product) {
-                    return res.status(404).json({ success: false, message: `Product not found: ${item.product}` });
+                    return res.status(statusCode.NOT_FOUND).json({ success: false, message: `Product not found: ${item.product}` });
                 }
                 if (product.stock < item.quantity) {
-                    return res.status(400).json({ success: false, message: `Insufficient stock for product: ${product.name}, Only ${product.stock} left` });
+                    return res.status(statusCode.BAD_REQUEST).json({ success: false, message: `Insufficient stock for product: ${product.name}, Only ${product.stock} left` });
                 }
                 if (!product.isActive) {
-                    return res.status(400).json({ success: false, message: "Product is blocked by admin" })
+                    return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product is blocked by admin" })
                 }
 
             }
@@ -208,7 +209,7 @@ const orderController = {
             console.log("admin", admin)
             if (!admin) {
                 console.log("No admin found");
-                return res.status(500).json({ success: false, message: 'Admin not found' });
+                return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Admin not found' });
             }
             const adminId = admin[0]._id
             console.log(adminId)
@@ -238,14 +239,14 @@ const orderController = {
             await completeOrder.save();
 
 
-            res.status(200).json({
+            res.status(statusCode.OK).json({
                 success: true,
                 orderId: newOrder._id,
                 message: 'Order placed successfully'
             });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error' });
         }
     },
     cancelIndividualProduct: async (req, res) => {
@@ -255,13 +256,13 @@ const orderController = {
 
             const order = await Order.findById(orderId);
             if (!order) {
-                return res.status(404).json({ message: "Order not found" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "Order not found" });
             }
 
 
             const productIndex = order.products.findIndex(item => item.product.toString() === productId);
             if (productIndex === -1) {
-                return res.status(404).json({ message: "Product not found in the order" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "Product not found in the order" });
             }
 
             const product = order.products[productIndex];
@@ -306,7 +307,7 @@ const orderController = {
 
                 await order.save();
 
-                return res.status(200).json({ message: "Product cancelled successfully" });
+                return res.status(statusCode.OK).json({ message: "Product cancelled successfully" });
             }
 
             if (order.paymentMethod === 'razor-pay' && order.paymentStatus === 'completed') {
@@ -332,7 +333,7 @@ const orderController = {
             const wallet = await Wallet.findOne({ userId: order.user })
             // console.log(wallet)
             if (!wallet) {
-                return res.status(404).json({ message: "Wallet not found" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "Wallet not found" });
             }
 
             wallet.transactions.push({
@@ -348,7 +349,7 @@ const orderController = {
             const adminId = admin[0]._id;
             let adminWallet = await Wallet.findOne({ userId: adminId })
             if (!adminWallet) {
-                return res.status(400).json({ success: false, message: "Wallet not found" })
+                return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Wallet not found" })
             }
             adminWallet.transactions.push({
                 orderId: order._id,
@@ -389,10 +390,10 @@ const orderController = {
 
             await order.save();
 
-            res.status(200).json({ message: "Product cancelled successfully" });
+            res.status(statusCode.OK).json({ message: "Product cancelled successfully" });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
         }
     },
 
@@ -415,7 +416,7 @@ const orderController = {
             res.render("user/orderconfirmation", { order });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ success: false, message: 'Internal Server Error' });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Internal Server Error' });
         }
     },
 
@@ -428,7 +429,7 @@ const orderController = {
             // console.log("order",order)
 
             if (!order) {
-                return res.status(404).json({ message: "Order not found" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "Order not found" });
             }
 
             if (order.paymentMethod === 'razor-pay' && order.paymentStatus === 'completed' || order.paymentMethod === 'cash_on_delivery' && order.paymentStatus === "completed") {
@@ -441,7 +442,7 @@ const orderController = {
 
                 const wallet = await Wallet.findOne({ userId: order.user });
                 if (!wallet) {
-                    return res.status(404).json({ message: "Wallet not found" });
+                    return res.status(statusCode.NOT_FOUND).json({ message: "Wallet not found" });
                 }
 
                 wallet.transactions.push({
@@ -466,10 +467,10 @@ const orderController = {
             }
 
             // console.log("order details", order)
-            res.status(200).json({ message: "Order cancelled successfully" });
+            res.status(statusCode.OK).json({ message: "Order cancelled successfully" });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
         }
     },
 
@@ -482,19 +483,19 @@ const orderController = {
             const order = await Order.findById(orderId)
 
             if (!order) {
-                return res.status(404).json({ success: false, message: "Order not found" });
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Order not found" });
             }
 
 
             const productIndex = order.products.findIndex(item => item.product.toString() === productId);
             if (productIndex === -1) {
-                return res.status(404).json({ message: "Product not found in the order" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "Product not found in the order" });
             }
 
             const product = order.products[productIndex];
 
             if (product.status !== 'Delivered') {
-                return res.status(400).json({ message: "Only delivered products can be returned" });
+                return res.status(statusCode.BAD_REQUEST).json({ message: "Only delivered products can be returned" });
             }
 
 
@@ -511,11 +512,11 @@ const orderController = {
 
 
             await order.save()
-            res.status(200).json({ success: true, message: "Return Request Submitted Successfully. Awaiting Admin Approval." })
+            res.status(statusCode.OK).json({ success: true, message: "Return Request Submitted Successfully. Awaiting Admin Approval." })
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ success: false, message: "Internal Server Error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
         }
     },
 
@@ -535,7 +536,7 @@ const orderController = {
             }
 
             if (!order || !order.invoice) {
-                return res.status(404).json({ success: false, message: "Invoice not found" });
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Invoice not found" });
             }
 
             const invoicePath = path.join(__dirname, "../../public", order.invoice);
@@ -543,7 +544,7 @@ const orderController = {
 
 
             if (!fs.existsSync(invoicePath)) {
-                return res.status(404).json({ success: false, message: "Invoice file not found" });
+                return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Invoice file not found" });
             }
 
 
@@ -552,7 +553,7 @@ const orderController = {
             fs.createReadStream(invoicePath).pipe(res);
         } catch (error) {
             console.error('Error downloading invoice:', error);
-            res.status(500).json({ success: false, message: "Internal Server Error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
         }
     }
 };

@@ -9,6 +9,7 @@ const Wallet = require("../model/wallet");
 const Admin = require("../model/admin")
 const Address = require("../model/address")
 const Coupon=require("../model/coupon")
+const statusCode = require("../utils/statuscode")
 
 
 
@@ -96,7 +97,7 @@ const ordermanagement = {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ message: 'Error fetching order details' });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: 'Error fetching order details' });
         }
     },
     updateOrderStatus: async (req, res) => {
@@ -108,12 +109,12 @@ const ordermanagement = {
                 { orderStatus },
                 { new: true }
             );
-            res.status(200).json({ message: "Order status updated successfully", order });
+            res.status(statusCode.OK).json({ message: "Order status updated successfully", order });
 
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
         }
     },
 
@@ -139,12 +140,12 @@ const ordermanagement = {
 
             if (!order) {
                 console.error("Order not found:", orderId);
-                return res.status(404).json({ message: "Order not found" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "Order not found" });
             }
 
             if (!order.products || order.products.length <= index) {
                 console.error("Invalid product index:", index, "Total products:", order.products.length);
-                return res.status(400).json({ message: "Invalid product index" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "Invalid product index" });
             }
 
             const currentProduct = order.products[index];
@@ -154,7 +155,7 @@ const ordermanagement = {
                     currentProductId: currentProduct.product._id.toString(),
                     expectedProductId: productId
                 });
-                return res.status(400).json({ message: "Product ID mismatch" });
+                return res.status(statusCode.BAD_REQUEST).json({ message: "Product ID mismatch" });
             }
 
             // Handle refunds for Cancelled or Returned status
@@ -196,7 +197,7 @@ const ordermanagement = {
                 const wallet = await Wallet.findOne({ userId: order.user });
                 console.log("wallet", wallet);
                 if (!wallet) {
-                    return res.status(404).json({ success: false, message: "Wallet not found" });
+                    return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Wallet not found" });
                 }
 
                 wallet.transactions.push({
@@ -213,7 +214,7 @@ const ordermanagement = {
                 const adminId = admin[0]._id;
                 let adminWallet = await Wallet.findOne({ userId: adminId });
                 if (!adminWallet) {
-                    return res.status(400).json({ success: false, message: "Wallet not found" });
+                    return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Wallet not found" });
                 }
 
                 adminWallet.transactions.push({
@@ -251,14 +252,14 @@ const ordermanagement = {
 
             await order.save();
 
-            return res.status(200).json({
+            return res.status(statusCode.OK).json({
                 message: "Product status updated successfully",
                 order
             });
 
         } catch (error) {
             console.error("Full error in updateProductStatus:", error);
-            res.status(500).json({
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({
                 message: "Internal Server Error",
                 error: error.message
             });
@@ -273,7 +274,7 @@ const ordermanagement = {
             const { period, date } = req.query;
 
             if (!period || !date) {
-                return res.status(400).json({ message: "Period and date are required" });
+                return res.status(statusCode.BAD_REQUEST).json({ message: "Period and date are required" });
             }
 
 
@@ -295,7 +296,7 @@ const ordermanagement = {
                 .populate("products.product", "name price image");
 
             if (!orders || orders.length === 0) {
-                return res.status(404).json({ message: "No orders found for the selected period" });
+                return res.status(statusCode.NOT_FOUND).json({ message: "No orders found for the selected period" });
             }
 
 
@@ -305,12 +306,12 @@ const ordermanagement = {
             res.download(invoicePath, `invoice-${period}-${date}.pdf`, (err) => {
                 if (err) {
                     console.error("Error downloading invoice:", err);
-                    res.status(500).json({ message: "Failed to download invoice" });
+                    res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Failed to download invoice" });
                 }
             });
         } catch (error) {
             console.log(error)
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
         }
     },
     generateInvoice: async (orders, period, date) => {
