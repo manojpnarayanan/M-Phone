@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
@@ -146,6 +147,10 @@
         .social-login-btn i {
             font-size: 1.2rem;
         }
+
+        .alert {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -156,6 +161,21 @@
                     <div class="card-header">
                         <span>M</span> Store Login
                     </div>
+
+                    <% if (messages.success) { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <%= messages.success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+                    
+                    <% if (messages.error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <%= messages.error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+
                     <div class="card-body">
                         <form id="loginForm" action="/user/login" method="POST" onsubmit="return validateForm()">
                             <div class="mb-3">
@@ -212,7 +232,34 @@
             return isValid; // Stop submission if validation fails
         }
 
-        window.onload = function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap alert close buttons
+            const closeButtons = document.querySelectorAll('.alert .btn-close');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const alert = this.closest('.alert');
+                    if (alert) {
+                        // Remove the alert from the DOM
+                        alert.classList.remove('show');
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 150);
+                    }
+                });
+            });
+            
+            // Auto-dismiss alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 150);
+                }, 5000);
+            });
+
+            // Check URL params for notifications
             const urlParams = new URLSearchParams(window.location.search);
             const error = urlParams.get('error');
             const success = urlParams.get('success');
@@ -232,7 +279,7 @@
                     text: success
                 });
             }
-        };
+        });
     </script>
 </body>
 </html>

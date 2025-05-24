@@ -28,9 +28,10 @@ router.get("/reset-password",(req,res)=>{res.render("user/resetpassword")})
 router.post("/reset-password", userController.resetPassword);
 
 
-router.get("/dashboard",middleware.existUser,userController.loadDashboard)
+
+router.get("/dashboard",middleware.existUser,middleware.isVerifiedtrue,userController.loadDashboard)
 router.use("/dashboard",middleware.isVerifiedtrue,userDashboard)
-router.use("/myprofile",middleware.existUser,profile)
+router.use("/myprofile",middleware.existUser,middleware.isVerifiedtrue,profile)
 
 router.post("/logout",(req,res)=>{res.clearCookie("token"),res.redirect("/user/login")})
 router.get("/google",passport.authenticate("google",{
