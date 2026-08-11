@@ -1,5 +1,8 @@
 const dotenv=require("dotenv")
 dotenv.config()
+console.log("KEY_ID exists:", !!process.env.KEY_ID);
+console.log("KEY_SECRET exists:", !!process.env.KEY_SECRET);
+console.log("MONGO_HOST exists:", !!process.env.MONGO_HOST);
 const express=require("express")
 const session = require('express-session');
 // const helmet=require("helmet")

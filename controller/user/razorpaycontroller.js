@@ -130,6 +130,9 @@ const updateProductQuantities = async (products) => {
     }
 };
 
+console.log("KEY_ID exists:", !!process.env.KEY_ID);
+console.log("KEY_SECRET exists:", !!process.env.KEY_SECRET);
+
 const razorpay = new Razorpay({
     key_id: process.env.KEY_ID,
     key_secret: process.env.KEY_SECRET
