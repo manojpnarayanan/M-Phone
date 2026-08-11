@@ -26,7 +26,7 @@ app.use(session({
     secret: 'your_secret_key',
     resave: false, 
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 1000 * 60 * 60 } // 1-hour session expiry
+    cookie: { secure: false,  maxAge: Number(process.env.SESSION_MAX_AGE) }
 }));
 
 
@@ -52,25 +52,9 @@ app.use("/admin",adminRouter)
 app.use("/user",userRouter)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 connectDb();
 
-app.listen(3000,()=>{
-    console.log("server is running")
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`server is running on port ${PORT}`)
 })
