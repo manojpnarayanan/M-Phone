@@ -11,14 +11,19 @@ const sendMail = async (options) => {
     }
 
     const transporter = nodemailer.createTransport({
-        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true, // SSL on port 465 prevents Railway port 587 connection timeouts (ETIMEDOUT)
         auth: {
             user: user,
             pass: pass,
         },
         tls: {
             rejectUnauthorized: false
-        }
+        },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 15000
     });
 
     const mailOptions = {
