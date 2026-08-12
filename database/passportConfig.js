@@ -5,7 +5,7 @@ const dotenv = require("dotenv")
 
 dotenv.config();
 
-const callbackURL = process.env.GOOGLE_CALLBACK_URL || "https://www.m-phone.auction-hub.online/user/google/callback";
+const callbackURL = process.env.GOOGLE_CALLBACK_URL || "/user/google/callback";
 
 passport.use(new googleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,

@@ -7,6 +7,7 @@ const express=require("express")
 const session = require('express-session');
 // const helmet=require("helmet")
 const app=express()
+app.set("trust proxy", 1);
 // app.use(helmet());
 const connectDb=require("./database/connectDb")
 const path = require("path")
