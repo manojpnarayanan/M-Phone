@@ -5,10 +5,12 @@ const dotenv = require("dotenv")
 
 dotenv.config();
 
+const callbackURL = process.env.GOOGLE_CALLBACK_URL || "https://www.m-phone.auction-hub.online/user/google/callback";
+
 passport.use(new googleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://www.m-phone.cloud/user/google/callback",
+    callbackURL: callbackURL,
 },
     async (accessToken, refreshToken, profile, done) => {
         try {
@@ -32,14 +34,5 @@ passport.use(new googleStrategy({
 
 
 ))
-// passport.serializeUser((user, done) => done(null, user.id));
-// passport.deserializeUser(async(id, done)=>{
-//     try{
-//         const user=await User.findById(id);
-//         done(null,user)
-//     }catch(error){
-//         done(error)
-//     }
 
-// });
 module.exports = passport

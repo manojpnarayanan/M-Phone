@@ -2,9 +2,7 @@ const User = require("../../model/user")
 const bcryptjs = require("bcryptjs")
 const generator = require("./otpgenerator")
 const otpgenerator = require("otp-generator")
-const nodemailer = require("nodemailer")
-
-
+const sendMail = require("../../utils/sendMail")
 
 function createOtp() {
   const otp = Math.floor(100000 + Math.random() * 900000);
@@ -86,28 +84,16 @@ const signupController = {
 
       await newUser.save();
 
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.GMAIL_USER,
-          pass: process.env.GMAIL_PASS,
-        },
-      });
-
-      const mailOptions = {
-        from: process.env.GMAIL_USER,
+      await sendMail({
         to: email,
         subject: "Your OTP for Verification",
         text: `Your OTP is: ${otp}`,
-      };
-
-      const info = await transporter.sendMail(mailOptions);
-      console.log("OTP Sent:", info.response);
+      });
 
       return res.json({ message: "OTP Sent", email });
     } catch (error) {
       console.error("Signup Error:", error);
-      return res.status(500).json({ message: "Error during sign up" });
+      return res.status(500).json({ message: error.message || "Error during sign up" });
     }
   }
 }

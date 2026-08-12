@@ -1,7 +1,7 @@
 const User = require("../../model/user")
 const bcryptjs = require("bcryptjs")
 const jwt = require("jsonwebtoken")
-const nodemailer = require('nodemailer');
+const sendMail = require("../../utils/sendMail")
 const Product = require("../../model/addproduct")
 const Cart = require("../../model/cart")
 const statusCode = require("../../utils/statuscode")
@@ -107,26 +107,16 @@ const userController = {
             user.otpExpiry = otpExpiry
             await user.save()
 
-            const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                    user: process.env.GMAIL_USER,
-                    pass: process.env.GMAIL_PASS,
-                }
-            })
-            const mailOptions = {
-                from: process.env.GMAIL_USER,
+            await sendMail({
                 to: email,
                 subject: "OTP for Reset Password",
                 text: `Your otp for Reset password is ${otp}`
-            }
+            });
 
-            const info = await transporter.sendMail(mailOptions)
-
-            console.log(info.response)
             return res.status(200).json({ message: "Otp sent to Your Mail" })
         } catch (error) {
             console.log(error)
+            return res.status(500).json({ message: error.message || "Failed to send reset OTP" });
         }
     },
     resetPassword: async (req, res) => {

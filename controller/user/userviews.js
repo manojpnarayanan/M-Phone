@@ -10,6 +10,7 @@ const Wallet = require("../../model/wallet")
 const Review = require("../../model/review")
 const Referral = require("../../model/referral")
 const nodemailer = require("nodemailer")
+const sendMail = require("../../utils/sendMail")
 const statusCode = require("../../utils/statuscode")
 
 
@@ -72,49 +73,33 @@ const userViews = {
 
 
             let filter = {};
-
-
             if (search) {
                 filter.$or = [
                     { name: { $regex: search, $options: 'i' } },
                     { description: { $regex: search, $options: 'i' } }
                 ];
             }
-
-
             if (category !== 'all') {
                 filter.category = category;
             }
-
-
             if (brand !== 'all') {
                 filter.brand = brand;
             }
-
-
             if (priceRange > 0) {
                 filter.price = { $lte: priceRange };
             }
-
-
             let sortOption = {};
             if (sort === 'price_low_to_high') {
                 sortOption = { price: 1 };
             } else if (sort === 'price_high_to_low') {
                 sortOption = { price: -1 };
             }
-
-
             const products = await Product.find(filter)
                 .sort(sortOption)
                 .skip(skip)
                 .limit(limit);
-
-
             const totalProducts = await Product.countDocuments(filter);
             const totalPages = Math.ceil(totalProducts / limit);
-
-
             res.render('user/landingshop', {
                 products,
                 currentPage: page,
@@ -147,19 +132,12 @@ const userViews = {
                     user: req.session.user || {}
                 });
             }
-
-
             const reviews = await Review.find({ product: productId }).populate('user', 'name');
-
-
             const highestDiscount = product.discount || 0;
-
-
             const relatedProducts = await Product.find({
                 category: product.category,
                 _id: { $ne: productId }
             }).limit(5);
-
 
             let cartItemCount = 0;
             if (req.session.user) {
@@ -168,7 +146,6 @@ const userViews = {
                     cartItemCount = cart.items.length;
                 }
             }
-
 
             const isLoggedIn = req.session.user ? true : false;
 
@@ -274,7 +251,6 @@ const userViews = {
             sortOption = { price: 1 }
 
         }
-
         try {
             const token = req.cookies.token
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
@@ -360,7 +336,7 @@ const userViews = {
             const processedOrders = orders.map(order => {
                 order.products = order.products.map(item => {
                     if (!item.product) {
-                        item.product = { name: 'Product Not Available', image: [] }; // Default product data
+                        item.product = { name: 'Product Not Available', image: [] };
                     }
                     return item;
                 });
@@ -473,11 +449,8 @@ const userViews = {
             if (user.isActive == false) {
                 return res.status(401).json({ message: "User is Blocked Contact support team" });
             }
-            console.log("reached")
             let cart = await Cart.findOne({ user: decoded.id }).populate('products.product')
-            console.log(cart)
-
-
+            
             if (!cart) {
                 cart = new Cart({
                     user: user._id,
@@ -486,12 +459,10 @@ const userViews = {
                 await cart.save();
 
             }
-            console.log("reached")
 
             let cartItems = [];
             let totalItems = 0;
             let totalPrice = 0;
-            console.log("reached")
 
             if (cart) {
                 cart.products.forEach(item => {
@@ -524,36 +495,28 @@ const userViews = {
 
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const userId = decoded.id;
-
-
             const product = await Product.findById(productId);
             if (!product) {
                 return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found" });
             }
-
 
             const cart = await Cart.findOne({ user: userId });
             if (!cart) {
                 return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Cart not found" });
             }
 
-
             const cartProduct = cart.products.find(item => item.product.toString() === productId);
             if (!cartProduct) {
                 return res.status(statusCode.NOT_FOUND).json({ success: false, message: "Product not found in cart" });
             }
 
-
             if (quantity > product.stock) {
                 return res.status(statusCode.OK).json({ success: false, message: `Only ${product.stock} units left in stock` });
             }
 
-
             if (quantity > 5) {
                 return res.status(statusCode.OK).json({ success: false, message: "You can add only 5 units of this product" });
             }
-
-
             cartProduct.quantity = quantity;
             await cart.save();
 
@@ -563,8 +526,6 @@ const userViews = {
             res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal Server Error" });
         }
     },
-
-
     removeFromCart: async (req, res) => {
         try {
             const productId = req.params.id
@@ -581,14 +542,8 @@ const userViews = {
             if (!cart) {
                 return res.status(statusCode.NOT_FOUND).json({ message: "Cart not found" });
             }
-
             return res.json({ success: true, message: "Item removed successfully" })
-
-
         } catch (error) {
-            console.log(error)
-            console.error(error);
-
             return res.status(statusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
         }
     },
@@ -599,31 +554,18 @@ const userViews = {
             if (!email) {
                 return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "email not found" })
             }
-            let transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                    user: process.env.GMAIL_USER,
-                    pass: process.env.GMAIL_PASS
-                }
-            })
-            let mailOptions = {
-                from: process.env.GMAIL_USER,
+            await sendMail({
                 to: email,
                 subject: "Join our referral Program",
-                text: `Hey! Use my referral code  ${referralCode} and get ₹250 off! Visit:https://m-phone.cloud/user/signup`
-            }
-            await transporter.sendMail(mailOptions);
+                text: `Hey! Use my referral code ${referralCode} and get ₹250 off! Visit: https://www.m-phone.auction-hub.online/user/signup`
+            });
             res.status(statusCode.OK).json({ success: true, message: "Invitation sent successfully" })
 
         } catch (error) {
             console.log(error)
             res.json({ message: 'Error sending invitation.' });
-
-
         }
     }
-
-
 
 }
 module.exports = userViews

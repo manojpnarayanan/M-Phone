@@ -1,5 +1,5 @@
 const otpgenerator = require("otp-generator")
-const nodemailer = require("nodemailer")
+const sendMail = require("../../utils/sendMail")
 const jwt = require("jsonwebtoken")
 const User = require("../../model/user")
 const bcryptjs = require("bcryptjs");
@@ -89,29 +89,17 @@ const generator = {
 
             user.otp = otp;
             user.otpExpiry = otpExpiry;
-            await user.save()
 
-            const transporter = nodemailer.createTransport({
-                service: "gmail",
-                auth: {
-                    user: process.env.GMAIL_USER,
-                    pass: process.env.GMAIL_PASS,
-                },
-            });
-            const mailOptions = {
-                from: process.env.GMAIL_USER,
+            await sendMail({
                 to: email,
                 subject: "Your OTP for Verification",
                 text: `Your OTP is: ${otp}`,
-            };
-
-            await transporter.sendMail(mailOptions);
-            console.log("OTP resent successfully");
+            });
 
             return res.json({ message: "OTP resent successfully" });
         } catch (error) {
             console.log(error)
-            return res.status(500).json({ message: "Failed to resend OTP" });
+            return res.status(500).json({ message: error.message || "Failed to resend OTP" });
 
         }
     }
