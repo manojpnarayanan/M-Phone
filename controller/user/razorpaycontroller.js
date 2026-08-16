@@ -266,10 +266,11 @@ const razorpayController = {
                 console.log("adminWallet", adminWallet)
 
                 if (!adminWallet) {
-                    // Do NOT send res.json() here — it causes ERR_HTTP_HEADERS_SENT
-                    // Admin wallet not found, just log and return silently
-                    console.log("Admin wallet not found, skipping wallet credit for order:", order._id)
-                    return
+                    adminWallet = new Wallet({
+                        userId: adminId,
+                        walletBalance: 0,
+                        transactions: []
+                    });
                 }
                 adminWallet.transactions.push({
                     orderId: order._id,

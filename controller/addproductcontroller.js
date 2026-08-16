@@ -23,9 +23,14 @@ const addproducts = {
       let imagePaths = [];
 
       for (let i = 0; i < croppedImagesArray.length; i++) {
-        const base64Data = croppedImagesArray[i];
+        let base64Data = croppedImagesArray[i];
         if (!base64Data || base64Data.trim() === "") {
           return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Invalid image files Add only jpg/png" });
+        }
+
+        // Ensure data URI prefix for Cloudinary
+        if (!base64Data.startsWith("data:")) {
+          base64Data = `data:image/jpeg;base64,${base64Data}`;
         }
 
         // Upload base64 image directly to Cloudinary
@@ -52,8 +57,8 @@ const addproducts = {
       res.redirect("/admin/dashboard/productlist")
 
     } catch (error) {
-      console.log(error)
-      res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed" });
+      console.log("Error adding product:", error);
+      res.status(statusCode.BAD_REQUEST).json({ success: false, message: error.message || "Product adding Failed" });
     }
   },
 

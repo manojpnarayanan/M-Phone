@@ -217,6 +217,13 @@ const orderController = {
             if (paymentMethod !== "cash_on_delivery") {
                 let adminWallet = await Wallet.findOne({ userId: adminId })
                 console.log("adminWallet", adminWallet)
+                if (!adminWallet) {
+                    adminWallet = new Wallet({
+                        userId: adminId,
+                        walletBalance: 0,
+                        transactions: []
+                    });
+                }
 
                 adminWallet.transactions.push({
                     orderId: newOrder._id,
