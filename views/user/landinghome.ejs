@@ -139,7 +139,7 @@
                                     <!-- Product Image -->
                                     <div class="absolute inset-0 flex items-center justify-center p-6">
                                         <% if (product.image && product.image.length > 0) { %>
-                                            <img src="/<%= product.image[0] %>" 
+                                            <img src="<%= imgSrc(product.image[0]) %>" 
                                                 class="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-500 float-animation" 
                                                 alt="<%= product.name %>">
                                         <% } else { %>

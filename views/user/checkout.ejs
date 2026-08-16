@@ -516,7 +516,7 @@
                         <% if (product && product.length> 0) { %>
                             <% product.forEach(item=> { %>
                                 <div class="order-item">
-                                    <img src="/<%= item.product.image[0] %>" alt="<%= item.product.name %>"
+                                    <img src="<%= imgSrc(item.product.image[0]) %>" alt="<%= item.product.name %>"
                                         class="item-image">
                                     <div class="item-details">
                                         <div class="item-name">

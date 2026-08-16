@@ -466,7 +466,7 @@
             <div class="product-card">
               <a href="/products/<%= product._id %>" class="text-decoration-none">
                 <% if (product.image && product.image.length > 0) { %>
-                  <img src="/<%= product.image[0] %>" class="product-image" alt="<%= product.name %>">
+                  <img src="<%= imgSrc(product.image[0]) %>" class="product-image" alt="<%= product.name %>">
                 <% } else { %>
                   <img src="/images/default.png" class="product-image" alt="No Image Available">
                 <% } %>

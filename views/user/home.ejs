@@ -179,7 +179,7 @@
                                     <!-- Product Image - Centered and consistent size -->
                                     <div class="absolute inset-0 flex items-center justify-center p-6">
                                         <% if (product.image && product.image.length> 0) { %>
-                                            <img src="/<%= product.image[0] %>"
+                                            <img src="<%= imgSrc(product.image[0]) %>"
                                                 class="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-500 float-animation"
                                                 alt="<%= product.name %>">
                                             <% } else { %>
@@ -320,7 +320,7 @@
                             <!-- Product Image -->
                             <div class="absolute inset-0 flex items-center justify-center p-3">
                                 <% if (product.image && product.image.length > 0) { %>
-                                    <img src="/<%= product.image[0] %>" class="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-500" alt="<%= product.name %>">
+                                    <img src="<%= imgSrc(product.image[0]) %>" class="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-500" alt="<%= product.name %>">
                                 <% } else { %>
                                     <img src="/images/default.png" class="max-h-full max-w-full object-contain" alt="No Image Available">
                                 <% } %>

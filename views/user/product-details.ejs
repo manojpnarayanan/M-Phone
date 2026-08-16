@@ -262,12 +262,12 @@
                     <div class="product-image-container">
                         <div class="zoom-lens" id="zoomLens"></div>
                         <% if (product.image && product.image.length > 0) { %>
-                            <img id="mainImage" src="/<%= product.image[0] %>" class="main-image" alt="<%= product.name %>">
+                            <img id="mainImage" src="<%= imgSrc(product.image[0]) %>" class="main-image" alt="<%= product.name %>">
                         <% } else { %>
                             <img id="mainImage" src="/images/default.png" class="main-image" alt="No Image Available">
                         <% } %>
                         <div class="zoom-result" id="zoomResult">
-                            <img id="zoomedImage" src="/<%= product.image[0] %>" alt="Zoomed Image">
+                            <img id="zoomedImage" src="<%= imgSrc(product.image[0]) %>" alt="Zoomed Image">
                         </div>
                     </div>
                 </div>
@@ -325,7 +325,7 @@
                     <div class="related-product-card">
                         <a href="/user/dashboard/products/<%= related._id %>" class="text-decoration-none">
                             <% if (related.image && related.image.length > 0) { %>
-                                <img src="/<%= related.image[0] %>" alt="<%= related.name %>" class="related-product-image">
+                                <img src="<%= imgSrc(related.image[0]) %>" alt="<%= related.name %>" class="related-product-image">
                             <% } else { %>
                                 <img src="/images/default.png" alt="No Image Available" class="related-product-image">
                             <% } %>

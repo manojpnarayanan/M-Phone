@@ -203,7 +203,7 @@
                                                 <% order.products.forEach(item=> { %>
                                                     <div class="product-item">
                                                         <div class="product-image">
-                                                            <img src="/<%= item.product.image[0] %>" width="40"
+                                                            <img src="<%= imgSrc(item.product.image[0]) %>" width="40"
                                                                 height="40" class="img-xs" alt="Item">
                                                         </div>
                                                         <div class="product-details">

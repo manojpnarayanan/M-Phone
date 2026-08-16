@@ -39,7 +39,15 @@ app.use(nocache())
 app.use(flash());
 app.use((req, res, next) => {
     res.locals.messages = req.flash();
-    next();
+    // Helper: works for both old local paths and new Cloudinary URLs
+    res.locals.imgSrc = (imgPath) => {
+        if (!imgPath) return '/images/placeholder.jpg';
+        if (imgPath.startsWith('http://') || imgPath.startsWith('https://')) {
+            return imgPath; // Cloudinary URL — use as-is
+        }
+        return '/' + imgPath; // Old local path — prepend /
+    };
+    next();
 });
 
 

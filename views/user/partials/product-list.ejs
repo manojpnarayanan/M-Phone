@@ -5,7 +5,7 @@
                 <a href="/product/<%= product._id %>">
                     <div class="position-relative">
                         <% if (product.image && product.image.length > 0) { %>
-                            <img src="/<%= product.image[0] %>" class="card-img-top" alt="<%= product.name %>">
+                            <img src="<%= imgSrc(product.image[0]) %>" class="card-img-top" alt="<%= product.name %>">
                         <% } else { %>
                             <img src="/images/default.png" class="card-img-top" alt="No Image Available">
                         <% } %>

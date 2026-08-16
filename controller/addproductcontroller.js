@@ -2,7 +2,7 @@
 const Product = require("../model/addproduct")
 const fs = require("fs");
 const path = require("path");
-const sharp = require("sharp");
+const { cloudinary } = require("../multer/allmulter");
 const Brands = require("../model/brandschema")
 const Category = require("../model/createcategory")
 const statusCode=require("../utils/statuscode")
@@ -11,7 +11,6 @@ const addproducts = {
   addProduct: async (req, res) => {
     try {
       const { name, description, price, stock, isActive, brand, croppedImages, category, discount, availability, deliveryTime, tags } = req.body
-      // console.log(req.body)
       if (!croppedImages) {
         return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
       }
@@ -20,26 +19,24 @@ const addproducts = {
       if (croppedImagesArray.length < 3) {
         return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
       }
+
       let imagePaths = [];
-      const uploadDir = "public/uploads/product-images/";
 
       for (let i = 0; i < croppedImagesArray.length; i++) {
-        const base64Data = croppedImagesArray[i].replace(/^data:image\/\w+;base64,/, "");
+        const base64Data = croppedImagesArray[i];
         if (!base64Data || base64Data.trim() === "") {
           return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Invalid image files Add only jpg/png" });
         }
 
-        const imageName = `image-${Date.now()}-${i}.jpg`;
-        const imagePath = `${uploadDir}${imageName}`;
-        fs.writeFileSync(imagePath, Buffer.from(base64Data, "base64"));
+        // Upload base64 image directly to Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(base64Data, {
+          folder: "m-phone/products",
+          transformation: [{ width: 500, height: 500, crop: "limit", quality: "auto" }],
+        });
 
-
-        await sharp(imagePath)
-          .resize(500, 500)
-          .toFile(`${uploadDir}optimized-${imageName}`);
-
-        imagePaths.push(`uploads/product-images/optimized-${imageName}`);
+        imagePaths.push(uploadResult.secure_url);
       }
+
       const product = new Product({
         name,
         description,
@@ -52,7 +49,6 @@ const addproducts = {
       })
 
       await product.save();
-
       res.redirect("/admin/dashboard/productlist")
 
     } catch (error) {
@@ -123,10 +119,7 @@ const addproducts = {
 
   updateEditProduct: async (req, res) => {
     try {
-
       const { name, description, price, stock, category, brand, tags, isActive } = req.body;
-
-
 
       const product = await Product.findById(req.params.id);
       if (!product) {
@@ -147,63 +140,31 @@ const addproducts = {
       product.tags = tags ? tags.split(",") : [];
       product.isActive = isActive === "on";
 
-
       let currentImages = req.body.existingImages;
       if (!Array.isArray(currentImages)) {
-
         currentImages = [currentImages];
       }
 
-
       let finalImages = [];
 
-
       for (let i = 0; i < currentImages.length; i++) {
-
         const fieldName = "replacementImage" + i;
+        const file = req.files ? req.files.find(file => file.fieldname === fieldName) : null;
 
-        const file = req.files.find(file => file.fieldname === fieldName);
         if (file) {
-
-          const optimizedPath = path.join(__dirname, "../public/uploads/product-images/optimized-" + file.filename);
-
-          await sharp(file.path)
-            .resize(500, 500)
-            .toFile(optimizedPath);
-
-          finalImages.push("uploads/product-images/optimized-" + file.filename);
-
-          await fs.promises.unlink(file.path);
-
-          const oldImagePath = path.join(__dirname, "../public", currentImages[i]);
-          if (fs.existsSync(oldImagePath)) {
-            await fs.promises.unlink(oldImagePath);
-          }
+          // File was uploaded via multer → Cloudinary, use the Cloudinary URL
+          finalImages.push(file.path); // multer-storage-cloudinary stores URL in file.path
         } else {
-
+          // Keep existing image (could be Cloudinary URL or old local path)
           finalImages.push(currentImages[i]);
         }
       }
-
 
       if (finalImages.length < 3) {
         return res.status(statusCode.BAD_REQUEST).send("A product must have at least 3 images");
       }
 
-
-      for (let img of product.image) {
-        if (!finalImages.includes(img)) {
-          const imagePath = path.join(__dirname, "../public", img);
-          if (fs.existsSync(imagePath)) {
-            await fs.promises.unlink(imagePath);
-          }
-        }
-      }
-
-
       product.image = finalImages;
-
-
       await product.save();
 
       res.redirect("/admin/dashboard/productlist");

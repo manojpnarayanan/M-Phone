@@ -3,7 +3,7 @@ const router=express.Router()
 const productupdates=require("../controller/productcontroller")
 const Category = require("../model/createcategory")
 const addproductController=require("../controller/addproductcontroller")
-const upload=require("../multer/allmulter")
+const { upload }=require("../multer/allmulter")
 
 
 router.post("/createcategory",productupdates.addCategory)

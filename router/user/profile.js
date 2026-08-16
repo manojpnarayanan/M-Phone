@@ -1,6 +1,6 @@
 const express=require("express")
 const router=express.Router()
-const upload = require("../../multer/allmulter"); // Import multer middleware
+const { upload } = require("../../multer/allmulter"); // Import multer middleware
 
 const orderController=require("../../controller/user/ordercontroller")
 const profileController=require("../../controller/user/profilecontroller")

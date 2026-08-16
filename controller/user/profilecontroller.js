@@ -151,7 +151,8 @@ const profilecontroller = {
         // phone:phone
       };
       if (req.file) {
-        updateData.photo = `/uploads/profile-pictures/${req.file.filename}`;
+        // multer-storage-cloudinary stores the Cloudinary URL in file.path
+        updateData.photo = req.file.path;
       }
       const updateUser = await User.findByIdAndUpdate(decoded.id, updateData, { new: true })
 

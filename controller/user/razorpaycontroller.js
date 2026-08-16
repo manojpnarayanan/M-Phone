@@ -258,7 +258,7 @@ const razorpayController = {
             const creditAdminWallet = async (order) => {
                 const admin = await Admin.find();
                 if (!admin || admin.length === 0) {
-                    console.log("no admin fou nd")
+                    console.log("no admin found")
                     return
                 }
                 const adminId = admin[0]._id;
@@ -266,7 +266,10 @@ const razorpayController = {
                 console.log("adminWallet", adminWallet)
 
                 if (!adminWallet) {
-                    return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Wallet not found" })
+                    // Do NOT send res.json() here — it causes ERR_HTTP_HEADERS_SENT
+                    // Admin wallet not found, just log and return silently
+                    console.log("Admin wallet not found, skipping wallet credit for order:", order._id)
+                    return
                 }
                 adminWallet.transactions.push({
                     orderId: order._id,

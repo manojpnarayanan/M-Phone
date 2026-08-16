@@ -1,32 +1,37 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    let uploadPath;
-    // Adjust destination based on URL if needed; here we assume product images
-    if (req.originalUrl.includes('admin/dashboard/brands/addbrands')) {
-      uploadPath = "public/uploads";
-    }else if(req.originalUrl.includes('/user/myprofile/update-email')){
-        uploadPath="public/uploads/profile-pictures"
-    } else {
-      uploadPath = "public/uploads/product-images";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    let folder = "m-phone/products";
+
+    if (req.originalUrl.includes("admin/dashboard/brands/addbrands")) {
+      folder = "m-phone/brands";
+    } else if (req.originalUrl.includes("/user/myprofile/update-email")) {
+      folder = "m-phone/profiles";
     }
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
+
+    return {
+      folder: folder,
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+      transformation: [{ width: 500, height: 500, crop: "limit", quality: "auto" }],
+    };
   },
-  filename: (req, file, cb) => {
-    cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
-  }
 });
 
 const upload = multer({
   storage,
-  limits: { fileSize: 50 * 1024 * 1024 } // 50 MB limit
+  limits: { fileSize: 50 * 1024 * 1024 },
 });
 
-module.exports = upload;
+module.exports = { upload, cloudinary };
