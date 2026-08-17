@@ -9,7 +9,7 @@ const { upload }=require("../multer/allmulter")
 router.post("/createcategory",productupdates.addCategory)
 router.get("/categories",productupdates.getCategory)
 router.get("/addproduct",addproductController.loadAddProductForm)
-router.post("/addproduct",upload.array("images",5),addproductController.addProduct)
+router.post("/addproduct",addproductController.addProduct)
 
 router.get("/editcategory/:id",productupdates.editCategory)
 router.put("/editcategory/:id",productupdates.updateCategory)
