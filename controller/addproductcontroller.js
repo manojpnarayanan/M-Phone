@@ -11,13 +11,22 @@ const addproducts = {
   addProduct: async (req, res) => {
     try {
       const { name, description, price, stock, isActive, brand, croppedImages, category, discount, availability, deliveryTime, tags } = req.body
+      
+      console.log("addProduct req.body received:", { name, price, stock, brand, category, croppedImagesLength: croppedImages ? croppedImages.length : "missing" });
+
       if (!croppedImages) {
-        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed: No images uploaded. Add at least 3 images." });
       }
 
-      const croppedImagesArray = JSON.parse(croppedImages);
-      if (croppedImagesArray.length < 3) {
-        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed, Add At Least 3 images" });
+      let croppedImagesArray;
+      try {
+        croppedImagesArray = JSON.parse(croppedImages);
+      } catch (e) {
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed: Corrupted image data received." });
+      }
+
+      if (!Array.isArray(croppedImagesArray) || croppedImagesArray.length < 3) {
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: `Product adding Failed: Minimum 3 images required, but only received ${croppedImagesArray ? croppedImagesArray.length : 0}. Please crop all 3 images before submitting.` });
       }
 
       let imagePaths = [];
