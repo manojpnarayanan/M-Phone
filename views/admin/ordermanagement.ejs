@@ -179,12 +179,14 @@
                             <thead>
                                 <tr>
                                     <th>Sl. No</th>
+                                    <th>Order Number</th>
                                     <th>Customer</th>
                                     <th>Products</th>
                                     <th>Shipping Address</th>
                                     <th>Ordered Date</th>
                                     <th>Total Amount</th>
                                     <th>Status</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -194,6 +196,11 @@
                                             <td>
                                                 <%= index + 1 %>
                                             </td> <!-- Sl. No -->
+                                            <td>
+                                                <span class="badge bg-light text-dark border">
+                                                    #<%= order.orderId ? order.orderId.substring(0, 8).toUpperCase() : order._id.toString().substring(0, 8).toUpperCase() %>
+                                                </span>
+                                            </td>
                                             <td>
                                                 <%= order.user.name %><br>
                                                     <%= order.user.email %><br>
@@ -256,18 +263,23 @@
                                                     </div>
                                                     <% }) %>
                                             </td>
+                                            <td>
+                                                <a href="/admin/dashboard/ordermanage/view-detail/<%= order._id %>" class="btn btn-sm btn-outline-primary">
+                                                    View Details
+                                                </a>
+                                            </td>
                                         </tr>
                                         <% }) %>
                                             <% } else { %>
                                                 <tr>
-                                                    <td colspan="7" class="text-center">No orders found.</td>
+                                                    <td colspan="9" class="text-center">No orders found.</td>
                                                 </tr>
                                                 <% } %>
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="5" class="text-end"><strong>Total Amount of All Orders:</strong></td>
-                                    <td colspan="2"><strong>
+                                    <td colspan="6" class="text-end"><strong>Total Amount of All Orders:</strong></td>
+                                    <td colspan="3"><strong>
                                             <%= orders.reduce((total, order)=> total + order.totalAmount, 0).toFixed(2)
                                                 %>
                                         </strong></td>

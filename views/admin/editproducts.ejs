@@ -28,7 +28,7 @@
                         <% if (product.image && product.image.length > 0) { %>
                           <% product.image.forEach((image, index) => { %>
                             <div class="mb-4">
-                              <img src="/<%= image %>" class="rounded border" style="width:100px; height:100px;">
+                              <img src="<%= imgSrc(image) %>" class="rounded border" style="width:100px; height:100px;">
                               <!-- Hidden field to preserve the current image if not replaced -->
                               <input type="hidden" name="existingImages[]" value="<%= image %>">
                               <!-- File input for replacing this image -->

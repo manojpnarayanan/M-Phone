@@ -5,10 +5,8 @@ console.log("KEY_SECRET exists:", !!process.env.KEY_SECRET);
 console.log("MONGO_HOST exists:", !!process.env.MONGO_HOST);
 const express=require("express")
 const session = require('express-session');
-// const helmet=require("helmet")
 const app=express()
 app.set("trust proxy", 1);
-// app.use(helmet());
 const connectDb=require("./database/connectDb")
 const path = require("path")
 const adminRouter=require("./router/admin")

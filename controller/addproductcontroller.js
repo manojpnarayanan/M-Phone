@@ -3,30 +3,64 @@ const Product = require("../model/addproduct")
 const fs = require("fs");
 const path = require("path");
 const { cloudinary } = require("../multer/allmulter");
-const Brands = require("../model/brandschema")
-const Category = require("../model/createcategory")
-const statusCode=require("../utils/statuscode")
+const Brands = require("../model/brandschema");
+const Category = require("../model/createcategory");
+const statusCode = require("../utils/statuscode");
+const MESSAGES = require("../utils/messages");
 
 const addproducts = {
   addProduct: async (req, res) => {
     try {
-      const { name, description, price, stock, isActive, brand, croppedImages, category, discount, availability, deliveryTime, tags } = req.body
-      
+      const { name, description, price, stock, isActive, brand, croppedImages, category, discount, availability, deliveryTime, tags } = req.body;
+
+      if (!name || name.trim().length < 3) {
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.TITLE_REQUIRED });
+      }
+
+      if (!description || description.trim().length < 10) {
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.DESC_REQUIRED });
+      }
+
+      const numPrice = Number(price);
+      if (isNaN(numPrice) || numPrice <= 0) {
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.PRICE_INVALID });
+      }
+
+      const numStock = Number(stock);
+      if (isNaN(numStock) || numStock < 0) {
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.STOCK_INVALID });
+      }
+
+      if (discount !== undefined && discount !== "") {
+        const numDiscount = Number(discount);
+        if (isNaN(numDiscount) || numDiscount < 0 || numDiscount > 100) {
+          return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.DISCOUNT_INVALID });
+        }
+      }
+
+      if (!category) {
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.CATEGORY_REQUIRED });
+      }
+
+      if (!brand) {
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.BRAND_REQUIRED });
+      }
+
       console.log("addProduct req.body received:", { name, price, stock, brand, category, croppedImagesLength: croppedImages ? croppedImages.length : "missing" });
 
       if (!croppedImages) {
-        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed: No images uploaded. Add at least 3 images." });
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.NO_IMAGES });
       }
 
       let croppedImagesArray;
       try {
         croppedImagesArray = JSON.parse(croppedImages);
       } catch (e) {
-        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Product adding Failed: Corrupted image data received." });
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.CORRUPTED_IMAGES });
       }
 
       if (!Array.isArray(croppedImagesArray) || croppedImagesArray.length < 3) {
-        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: `Product adding Failed: Minimum 3 images required, but only received ${croppedImagesArray ? croppedImagesArray.length : 0}. Please crop all 3 images before submitting.` });
+        return res.status(statusCode.BAD_REQUEST).json({ success: false, message: MESSAGES.PRODUCT.MIN_IMAGES_REQUIRED });
       }
 
       let imagePaths = [];
@@ -37,12 +71,12 @@ const addproducts = {
           return res.status(statusCode.BAD_REQUEST).json({ success: false, message: "Invalid image files Add only jpg/png" });
         }
 
-        // Ensure data URI prefix for Cloudinary
+
         if (!base64Data.startsWith("data:")) {
           base64Data = `data:image/jpeg;base64,${base64Data}`;
         }
 
-        // Upload base64 image directly to Cloudinary
+
         const uploadResult = await cloudinary.uploader.upload(base64Data, {
           folder: "m-phone/products",
           transformation: [{ width: 500, height: 500, crop: "limit", quality: "auto" }],
@@ -135,14 +169,26 @@ const addproducts = {
     try {
       const { name, description, price, stock, category, brand, tags, isActive } = req.body;
 
+      if (!name || name.trim().length < 3) {
+        return res.status(statusCode.BAD_REQUEST).send(MESSAGES.PRODUCT.TITLE_REQUIRED);
+      }
+
+      if (isNaN(Number(price)) || Number(price) <= 0) {
+        return res.status(statusCode.BAD_REQUEST).send(MESSAGES.PRODUCT.PRICE_INVALID);
+      }
+
+      if (isNaN(Number(stock)) || Number(stock) < 0) {
+        return res.status(statusCode.BAD_REQUEST).send(MESSAGES.PRODUCT.STOCK_INVALID);
+      }
+
       const product = await Product.findById(req.params.id);
       if (!product) {
-        return res.status(statusCode.NOT_FOUND).send("Product not found");
+        return res.status(statusCode.NOT_FOUND).send(MESSAGES.PRODUCT.NOT_FOUND);
       }
-      const categoryDoc = await Category.findOne({ parent: category })
+      const categoryDoc = await Category.findOne({ parent: category });
 
       if (!categoryDoc) {
-        return res.status(statusCode.BAD_REQUEST).send("Category not found");
+        return res.status(statusCode.BAD_REQUEST).send(MESSAGES.CATEGORY.NOT_FOUND);
       }
 
       product.name = name;
@@ -166,10 +212,9 @@ const addproducts = {
         const file = req.files ? req.files.find(file => file.fieldname === fieldName) : null;
 
         if (file) {
-          // File was uploaded via multer → Cloudinary, use the Cloudinary URL
-          finalImages.push(file.path); // multer-storage-cloudinary stores URL in file.path
+          finalImages.push(file.path);
         } else {
-          // Keep existing image (could be Cloudinary URL or old local path)
+
           finalImages.push(currentImages[i]);
         }
       }
