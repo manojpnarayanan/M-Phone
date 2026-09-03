@@ -1079,7 +1079,7 @@
                                               <div class="product-item" data-product-id="<%= item.product._id %>">
                                                 <div class="product-image">
                                                   <% if (item.product && item.product.image) { %>
-                                                    <img src="/<%= item.product.image[0] %>"
+                                                    <img src="<%= imgSrc(item.product.image[0]) %>"
                                                       alt="<%= item.product.name %>">
                                                     <% } else { %>
                                                       <i class="fas fa-box" style="font-size: 24px; color: #ccc;"></i>
@@ -1303,7 +1303,7 @@
                             <div class="product-card">
                               <div class="product-image">
                                 <img
-                                  src="/<%= product.image && product.image.length > 0 ? product.image[0] : 'images/default.png' %>"
+                                  src="<%= imgSrc(product.image && product.image.length > 0 ? product.image[0] : null) %>"
                                   alt="<%= product.name %>" />
                               </div>
                               <div class="product-details">

@@ -339,7 +339,7 @@
                     <div class="img-gallery me-3">
                         <% if (product.image && product.image.length > 0) { %>
                             <% product.image.forEach(img => { %>
-                                <img src="/<%= img %>" class="img-thumbnail" onclick="changeImage('/<%= img %>')" alt="Thumbnail">
+                                <img src="<%= imgSrc(img) %>" class="img-thumbnail" onclick="changeImage('<%= imgSrc(img) %>')" alt="Thumbnail">
                             <% }) %>
                         <% } %>
                     </div>
@@ -408,7 +408,7 @@
                     <div class="related-product-card">
                         <a href="/products/<%= related._id %>" class="text-decoration-none">
                             <% if (related.image && related.image.length > 0) { %>
-                                <img src="/<%= related.image[0] %>" alt="<%= related.name %>" class="related-product-image">
+                                <img src="<%= imgSrc(related.image[0]) %>" alt="<%= related.name %>" class="related-product-image">
                             <% } else { %>
                                 <img src="/images/default.png" alt="No Image Available" class="related-product-image">
                             <% } %>
